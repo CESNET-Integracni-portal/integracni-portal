@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="databaseConfig.xml"/>
+    <import resource="springSecurity.xml"/>
+
+    <!-- Load application.properties file -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:application.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Scan packages for services, etc. -->
+    <context:annotation-config/>
+    <context:component-scan base-package="cz.cvut.fel.integracniportal">
+        <!-- Controllers should be loaded in the *-servlet.xml, not in the applicationContext.xml -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- Should be only needed when using autowired in classes that are not managed by Spring -->
+    <!--<context:spring-configured />-->
+
+</beans>

@@ -1,0 +1,49 @@
+package cz.cvut.fel.integracniportal.service;
+
+import cz.cvut.fel.integracniportal.model.UserDetails;
+import cz.cvut.fel.integracniportal.model.UserRole;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Service used by Spring to get access to user credentials during authentication.
+ */
+@Service
+public class AuthenticationService implements org.springframework.security.core.userdetails.UserDetailsService {
+
+    @Autowired
+    UserDetailsService userService;
+
+    /**
+     * Called by Spring during authentication in order to find a user by his username.
+     * @param username    Username of the user who is currently attempting to log in.
+     * @return User credentials if the user exists.
+     * @throws UsernameNotFoundException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserDetails userEntity = userService.getUserByUsername(username);
+        if (userEntity == null) {
+            throw new UsernameNotFoundException("User not found.");
+        }
+
+        // For security purposes, we should return new Spring User object, not an entity
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        for (UserRole userRole: userEntity.getUserRoles()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getName()));
+        }
+        return new org.springframework.security.core.userdetails.User(
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                grantedAuthorities
+        );
+    }
+}
