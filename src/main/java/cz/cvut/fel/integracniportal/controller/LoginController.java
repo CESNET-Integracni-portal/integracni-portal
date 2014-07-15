@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class LoginController {
 
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LoginController.class);
+
     @Autowired
     UserDetailsService userService;
 
@@ -101,6 +103,7 @@ public class LoginController {
                                         @Validated @ModelAttribute("registerForm")RegisterForm registerForm,
                                         BindingResult result) {
 
+        logger.info("Registering new user: " + registerForm.getUsername());
         UserDetails user = new UserDetails();
         user.setUsername(registerForm.getUsername());
         // Encode the password
@@ -109,6 +112,7 @@ public class LoginController {
             try {
                 userService.saveUser(user);
             } catch (Exception e) {
+                logger.error("Unable to register new user - username " + registerForm.getUsername() + " is already taken.");
                 result.rejectValue("username", "username.taken");
             }
         }
@@ -117,6 +121,7 @@ public class LoginController {
             return new ModelAndView("register", "registerForm", registerForm);
         }
 
+        logger.info("User " + registerForm.getUsername() + " created.");
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 registerForm.getUsername(), registerForm.getPassword());
         token.setDetails(new WebAuthenticationDetails(request));

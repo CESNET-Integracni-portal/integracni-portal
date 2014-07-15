@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,8 @@ import java.util.List;
 @Service
 public class AuthenticationService implements org.springframework.security.core.userdetails.UserDetailsService {
 
+    private static final Logger logger = Logger.getLogger(AuthenticationService.class);
+
     @Autowired
     UserDetailsService userService;
 
@@ -32,6 +35,7 @@ public class AuthenticationService implements org.springframework.security.core.
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails userEntity = userService.getUserByUsername(username);
         if (userEntity == null) {
+            logger.error("Login credentials for user " + username + " not found.");
             throw new UsernameNotFoundException("User not found.");
         }
 

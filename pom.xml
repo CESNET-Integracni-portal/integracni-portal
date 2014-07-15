@@ -124,6 +124,14 @@
             <version>9.3-1100-jdbc41</version>
         </dependency>
 
+        <!-- Logging -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework</groupId>
