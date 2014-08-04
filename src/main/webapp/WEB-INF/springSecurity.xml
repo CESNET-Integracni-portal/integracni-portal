@@ -7,11 +7,12 @@
        http://www.springframework.org/schema/security
        http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <!-- Setup login pages for Spring security-->
-    <security:http auto-config="true" use-expressions="true">
-        <security:form-login login-page="/login" default-target-url="/" authentication-failure-url="/login-error"
-                             login-processing-url="/login-process" username-parameter="username" password-parameter="password" />
-        <security:logout logout-success-url="/logout"/>
+    <security:http pattern="/rest/secure/**" create-session="never" entry-point-ref="clientAuthenticationEntryPoint"
+            auto-config="true" use-expressions="true">
+        <security:anonymous enabled="false"/>
+        <security:intercept-url pattern="/rest/secure/**" access="hasRole('ROLE_ADMIN')"/>
+        <security:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauthAccessDeniedHandler"/>
     </security:http>
 
     <!-- Create bcrypt bean for password encoding -->
@@ -30,4 +31,12 @@
             </security:user-service>
         </security:authentication-provider>
     </security:authentication-manager>
+
+    <security:authentication-manager id="clientAuthenticationManager" xmlns="http://www.springframework.org/schema/security">
+        <security:authentication-provider user-service-ref="client-details-user-service"/>
+    </security:authentication-manager>
+
+    <bean id="client-details-user-service" class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="client-details-service" />
+    </bean>
 </beans>

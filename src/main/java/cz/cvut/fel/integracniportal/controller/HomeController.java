@@ -6,6 +6,7 @@ import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,19 @@ public class HomeController {
 
     @RequestMapping(value = "user/{username}", method = RequestMethod.GET)
     @ResponseBody
-    public UserDetailsResource home(@PathVariable("username") String username) {
+    public UserDetailsResource user(@PathVariable("username") String username) {
+        UserDetails userDetails = userDetailsService.getUserByUsername(username);
+        if (userDetails != null) {
+            UserDetailsResource userDetailsResource = new UserDetailsResource(userDetails);
+            return userDetailsResource;
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "secure/user/{username}", method = RequestMethod.GET)
+    @ResponseBody
+    @Secured("ROLE_ADMIN")
+    public UserDetailsResource secure(@PathVariable("username") String username) {
         UserDetails userDetails = userDetailsService.getUserByUsername(username);
         if (userDetails != null) {
             UserDetailsResource userDetailsResource = new UserDetailsResource(userDetails);

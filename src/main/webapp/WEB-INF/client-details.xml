@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:context="http://www.springframework.org/schema/context"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+					  http://www.springframework.org/schema/security/oauth2
+					  http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+					  http://www.springframework.org/schema/context
+					  http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- File based client details access
+         This can be replaced with a persistence store implementation if there are more than a handful of clients-->
+    <oauth:client-details-service id="client-details-service">
+
+        <!-- Allow access to test clients -->
+        <oauth:client
+                client-id="8595c8284a52475e514d667e4313e86a"
+                secret="226d24617e6554d71a68614c34436d67"
+                authorized-grant-types="password,refresh_token"
+                authorities="ROLE_CLIENT"
+                access-token-validity="3600"
+                />
+
+    </oauth:client-details-service>
+
+</beans>
