@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.controller;
 
+import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
@@ -22,6 +23,9 @@ public class HomeController {
 
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Autowired
+    CesnetService cesnetService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<String> test() {
@@ -49,5 +53,11 @@ public class HomeController {
             return userDetailsResource;
         }
         return null;
+    }
+
+    @RequestMapping(value = "cesnet", method = RequestMethod.GET)
+    @ResponseBody
+    public List<String> cesnet() {
+        return cesnetService.getFiles();
     }
 }

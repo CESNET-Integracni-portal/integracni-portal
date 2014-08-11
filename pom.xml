@@ -192,6 +192,13 @@
             <version>9.3-1100-jdbc41</version>
         </dependency>
 
+        <!-- Cesnet -->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.51</version>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>log4j</groupId>
