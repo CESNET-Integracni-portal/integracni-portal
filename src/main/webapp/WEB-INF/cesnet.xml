@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int-sftp="http://www.springframework.org/schema/integration/sftp"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/integration/sftp
+                           http://www.springframework.org/schema/integration/sftp/spring-integration-sftp.xsd">
+
+    <!-- SSH -->
+
+    <bean id="sshUserInfo" class="cz.cvut.fel.integracniportal.cesnet.SshUserInfo">
+        <property name="username" value="${ssh.user}"/>
+        <property name="password" value="${ssh.password}"/>
+    </bean>
+
+    <bean id="sshDataSource" class="cz.cvut.fel.integracniportal.cesnet.SshDataSource">
+        <property name="sessionContext" ref="sshSessionContext"/>
+        <property name="sessionTemplate" ref="sshSessionTemplate"/>
+        <property name="retryTemplate" ref="retryTemplate"/>
+    </bean>
+
+    <bean id="sshResource"
+          class="cz.cvut.fel.integracniportal.cesnet.SshChannel"
+          scope="prototype">
+        <property name="sshDataSource" ref="sshDataSource"/>
+    </bean>
+
+    <bean id="sshSessionContext" class="cz.cvut.fel.integracniportal.cesnet.SessionContext">
+        <property name="hostname" value="${ssh.server}"/>
+        <property name="port" value="${ssh.port}"/>
+        <property name="sshUserInfo" ref="sshUserInfo"/>
+        <property name="jsch" ref="jsch"/>
+        <property name="connectTimeout" value="5000"/>
+        <property name="serverKeepAliveInterval" value="60000"/>
+    </bean>
+
+    <bean id="jsch" class="com.jcraft.jsch.JSch"/>
+
+    <bean id="sshSessionTemplate" class="cz.cvut.fel.integracniportal.cesnet.SessionTemplate"/>
+
+    <bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+        <property name="backOffPolicy" ref="exponentialBackOffPolicy"/>
+    </bean>
+    <bean id="exponentialBackOffPolicy" class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+        <property name="initialInterval" value="1000"/>
+    </bean>
+
+
+    <!-- SFTP -->
+
+    <bean id="sftpSessionFactory" class="org.springframework.integration.sftp.session.DefaultSftpSessionFactory">
+        <property name="host" value="${ssh.server}"/>
+        <property name="port" value="${ssh.port}"/>
+        <property name="user" value="${ssh.user}"/>
+        <property name="password" value="${ssh.password}"/>
+    </bean>
+
+    <bean id="cachingSessionFactory" class="org.springframework.integration.file.remote.session.CachingSessionFactory">
+        <constructor-arg ref="sftpSessionFactory"/>
+        <property name="poolSize" value="10"/>
+        <property name="sessionWaitTimeout" value="1000"/>
+    </bean>
+
+</beans>

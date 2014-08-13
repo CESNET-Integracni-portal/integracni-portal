@@ -55,9 +55,9 @@ public class HomeController {
         return null;
     }
 
-    @RequestMapping(value = "cesnet", method = RequestMethod.GET)
+    @RequestMapping(value = "ssh/ls", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> cesnet() {
+    public List<String> cesnetLs() {
         return cesnetService.getFiles();
     }
 }

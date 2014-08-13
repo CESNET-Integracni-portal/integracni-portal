@@ -11,6 +11,7 @@
     <import resource="client-details.xml"/>
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>
+    <import resource="cesnet.xml"/>
 
     <!-- Load application.properties file -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
