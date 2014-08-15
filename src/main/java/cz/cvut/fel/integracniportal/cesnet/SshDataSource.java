@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,29 @@ public class SshDataSource {
 
     }
 
+    public ChannelSftp getSftpChannel() throws Exception {
+
+        ChannelSftp sftpChannel;
+
+        try {
+            sftpChannel = doOpenSftpChannel();
+        } catch (Exception ex) {
+            logger.warn("Problem with the jsch session.  Retrying...", ex);
+            sftpChannel = retryTemplate.execute(
+                    new RetryCallback<ChannelSftp>() {
+                        @Override
+                        public ChannelSftp doWithRetry(final RetryContext context) throws Exception {
+                            doCreateSession();
+                            logger.warn("Retrying #" + context.getRetryCount());
+                            return doOpenSftpChannel();
+                        }
+                    });
+        }
+
+        return sftpChannel;
+
+    }
+
     public String getRemoteBaseDir() {
         return sessionContext.getRemoteBaseDir();
     }
@@ -135,6 +159,24 @@ public class SshDataSource {
                 Session s = sessionContext.getSession();
 
                 return (ChannelExec) s.openChannel("exec");
+            }
+        });
+
+    }
+
+    private ChannelSftp doOpenSftpChannel() throws Exception {
+
+        return sessionTemplate.execute(new SessionCallback<ChannelSftp>() {
+            @Override
+            public String getName() {
+                return "open ssh channel";
+            }
+
+            @Override
+            public ChannelSftp execute() throws Exception {
+                Session s = sessionContext.getSession();
+
+                return (ChannelSftp) s.openChannel("sftp");
             }
         });
 

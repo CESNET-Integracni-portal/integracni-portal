@@ -1,11 +1,13 @@
 package cz.cvut.fel.integracniportal.cesnet;
 
+import com.jcraft.jsch.SftpException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Provider;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -19,12 +21,21 @@ public class CesnetServiceImpl implements CesnetService {
     @Autowired
     Provider<SshChannel> sshResourceProvider;
 
-    @Override
-    public List<String> getFiles() {
-        SshChannel pooledSshResource = sshResourceProvider.get();
+    @Autowired
+    Provider<SftpChannel> sftpChannelChannelProvider;
 
-        List<String> result = pooledSshResource.sendCommand("dmls -l VO_storage-cache_tape");
+    @Override
+    public List<String> getFileList() {
+        SshChannel sshChannel = sshResourceProvider.get();
+
+        List<String> result = sshChannel.sendCommand("dmls -l VO_storage-cache_tape");
         return result;
+    }
+
+    @Override
+    public InputStream getFile(String filename) throws SftpException {
+        SftpChannel sftpChannel = sftpChannelChannelProvider.get();
+        return sftpChannel.getFile(filename);
     }
 
 }

@@ -27,12 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * This class is the heart-and-soul unit of the sftp channel operation.
- * It is wrapped as such so that it represents a pooled resource of the connection pool.
- *
- * @author sso
- */
 public class SshChannel {
 
     private static final Logger logger = Logger.getLogger(SshChannel.class);
@@ -45,16 +39,6 @@ public class SshChannel {
 
     private ChannelExec sshChannel;
 
-    private boolean usable = true;
-
-
-    /**
-     * Initializes the resources.
-     * Don't put the logic in the constructor; sftpDataSource haven't been finished initializing.
-     *
-     * @throws Exception if we are unable to initialize from the beginning,
-     *                   just panic and quit the bean creation process.
-     */
     @PostConstruct
     private void init() throws Exception {
 
@@ -74,8 +58,6 @@ public class SshChannel {
         try {
             sshChannel.setCommand(command);
             sshChannel.connect();
-
-            usable = false;
 
             response = readResponse();
             return response;
@@ -105,10 +87,6 @@ public class SshChannel {
             logger.debug("destroying the pooled resource...");
             sshChannel.disconnect();
         }
-    }
-
-    boolean isValid() {
-        return usable;
     }
 
     public SshDataSource getSshDataSource() {
