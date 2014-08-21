@@ -17,13 +17,13 @@ package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.*;
 
 public class SftpChannel {
 
@@ -46,10 +46,22 @@ public class SftpChannel {
         sftpChannel.connect();
     }
 
-    public InputStream getFile(String filename) throws SftpException {
+    public void cd(String path) throws SftpException {
+        sftpChannel.cd(path);
+    }
+
+    public InputStream getFile(String filename) throws SftpException, IOException {
         InputStream inputStream = sftpChannel.get(filename);
+        ByteArrayOutputStream clonedStream = new ByteArrayOutputStream();
+        IOUtils.copy(inputStream, clonedStream);
+        clonedStream.flush();
+        InputStream result = new ByteArrayInputStream(clonedStream.toByteArray());
         sftpChannel.disconnect();
-        return inputStream;
+        return result;
+    }
+
+    public void uploadFile(InputStream fileStream, String filename) throws SftpException {
+        sftpChannel.put(fileStream, filename);
     }
 
     @PreDestroy

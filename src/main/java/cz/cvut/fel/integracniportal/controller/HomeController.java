@@ -62,28 +62,4 @@ public class HomeController {
         }
         return null;
     }
-
-    @RequestMapping(value = "ssh/ls", method = RequestMethod.GET)
-    @ResponseBody
-    public List<String> cesnetLs() {
-        return cesnetService.getFileList();
-    }
-
-    @RequestMapping(value = "ssh/get", method = RequestMethod.GET)
-    public void cesnetGet(HttpServletResponse response) {
-        String filename = "VO_storage-cache_tape/laser-game.jpg";
-        MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-        String mimeType = mimetypesFileTypeMap.getContentType(filename);
-
-        try {
-            InputStream remoteFileInputStream = cesnetService.getFile(filename);
-            IOUtils.copy(remoteFileInputStream, response.getOutputStream());
-            response.setContentType(mimeType);
-            response.flushBuffer();
-        } catch (SftpException e) {
-            logger.error("Unable to read the remote file '" + filename + "'.");
-        } catch (IOException e) {
-            logger.error("Unable to write remote file '" + filename + "' into response output stream.");
-        }
-    }
 }
