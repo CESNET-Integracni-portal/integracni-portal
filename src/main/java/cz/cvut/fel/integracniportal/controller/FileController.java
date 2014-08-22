@@ -14,6 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import resourceitems.CesnetFileMetadata;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
@@ -33,13 +34,23 @@ public class FileController {
     @Autowired
     CesnetService cesnetService;
 
-    @RequestMapping(value = "ssh/ls", method = RequestMethod.GET)
+    @RequestMapping(value = "files", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> cesnetLs() {
+    public List<CesnetFileMetadata> cesnetLs() {
         return cesnetService.getFileList();
     }
 
-    @RequestMapping(value = "ssh/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)
+    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/metadata", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<CesnetFileMetadata> cesnetGetFileState(@PathVariable("filename") String filename) {
+        CesnetFileMetadata fileMetadata = cesnetService.getFileMetadata(filename);
+        if (fileMetadata == null) {
+            return new ResponseEntity<CesnetFileMetadata>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<CesnetFileMetadata>(fileMetadata, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("filename") String filename) {
         MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
         String mimeType = mimetypesFileTypeMap.getContentType(filename);
@@ -56,7 +67,7 @@ public class FileController {
         }
     }
 
-    @RequestMapping(value = "ssh/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "files", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> cesnetUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
         String filename = file.getOriginalFilename();
