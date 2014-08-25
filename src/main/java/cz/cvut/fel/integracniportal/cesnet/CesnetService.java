@@ -15,5 +15,9 @@ public interface CesnetService {
 
     public CesnetFileMetadata getFileMetadata(String filename);
 
+    public void moveFileOffline(String filename) throws FileAccessException;
+
+    public void moveFileOnline(String filename) throws FileAccessException;
+
     public void uploadFile(InputStream fileStream, String filename) throws SftpException;
 }

@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
+import cz.cvut.fel.integracniportal.cesnet.FileAccessException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
@@ -48,6 +49,28 @@ public class FileController {
             return new ResponseEntity<CesnetFileMetadata>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<CesnetFileMetadata>(fileMetadata, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/archive", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> cesnetMoveFileOffline(@PathVariable("filename") String filename) {
+        try {
+            cesnetService.moveFileOffline(filename);
+            return new ResponseEntity<String>(HttpStatus.OK);
+        } catch (FileAccessException fae) {
+            return new ResponseEntity<String>(fae.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/restore", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> cesnetMoveFileOnline(@PathVariable("filename") String filename) {
+        try {
+            cesnetService.moveFileOnline(filename);
+            return new ResponseEntity<String>(HttpStatus.OK);
+        } catch (FileAccessException fae) {
+            return new ResponseEntity<String>(fae.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)

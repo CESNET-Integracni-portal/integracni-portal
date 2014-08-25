@@ -70,6 +70,26 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
+    public void moveFileOffline(String filename) throws FileAccessException {
+        SshChannel sshChannel = sshResourceProvider.get();
+
+        List<String> response = sshChannel.sendCommand("dmput -r " + rootDir + "/" + filename);
+        if (response.size() > 0) {
+            throw new FileAccessException(response.get(0));
+        }
+    }
+
+    @Override
+    public void moveFileOnline(String filename) throws FileAccessException {
+        SshChannel sshChannel = sshResourceProvider.get();
+
+        List<String> response = sshChannel.sendCommand("dmget " + rootDir + "/" + filename);
+        if (response.size() > 0) {
+            throw new FileAccessException(response.get(0));
+        }
+    }
+
+    @Override
     public void uploadFile(InputStream fileStream, String filename) throws SftpException {
         SftpChannel sftpChannel = sftpChannelChannelProvider.get();
         sftpChannel.cd(rootDir);

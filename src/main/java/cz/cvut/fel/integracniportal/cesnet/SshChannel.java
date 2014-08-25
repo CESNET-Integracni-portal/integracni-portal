@@ -56,10 +56,13 @@ public class SshChannel {
         List<String> response = Collections.emptyList();
 
         try {
+            long startTime = System.currentTimeMillis();
             sshChannel.setCommand(command);
             sshChannel.connect();
-
             response = readResponse();
+            long endTime = System.currentTimeMillis();
+            logger.info("Ssh command '" + command + "' took " + (endTime-startTime) + "ms to complete.");
+
             return response;
         } catch (IOException e) {
             e.printStackTrace();
