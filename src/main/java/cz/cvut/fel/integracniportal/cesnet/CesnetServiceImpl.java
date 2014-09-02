@@ -38,7 +38,7 @@ public class CesnetServiceImpl implements CesnetService {
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Override
-    public List<CesnetFileMetadata> getFileList() {
+    public List<CesnetFileMetadata> getFileList() throws FileAccessException {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> lsOutput = sshChannel.sendCommand("dmls -l " + rootDir);
@@ -64,7 +64,7 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public CesnetFileMetadata getFileMetadata(String filename) {
+    public CesnetFileMetadata getFileMetadata(String filename) throws FileAccessException {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> lsOutput = sshChannel.sendCommand("dmls -l " + rootDir + "/" + filename);
@@ -103,8 +103,11 @@ public class CesnetServiceImpl implements CesnetService {
         sftpChannel.uploadFile(fileStream, filename);
     }
 
-    private CesnetFileMetadata parseFileMetadata(String lsOutput) {
+    private CesnetFileMetadata parseFileMetadata(String lsOutput) throws FileAccessException {
         String[] parts = lsOutput.split("\\s+");
+        if (parts == null || parts.length < 9) {
+            throw new FileAccessException("Unable to parse metadata.");
+        }
 
         CesnetFileMetadata fileMetadata = new CesnetFileMetadata();
         fileMetadata.setFilename(parts[8].substring(parts[8].lastIndexOf("/")+1));

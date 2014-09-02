@@ -9,13 +9,13 @@ import java.util.List;
 
 
 public interface CesnetService {
-    public List<CesnetFileMetadata> getFileList();
+    public List<CesnetFileMetadata> getFileList() throws FileAccessException;
 
     public InputStream getFile(String filename) throws SftpException, IOException;
 
     public void deleteFile(String filename) throws SftpException;
 
-    public CesnetFileMetadata getFileMetadata(String filename);
+    public CesnetFileMetadata getFileMetadata(String filename) throws FileAccessException;
 
     public void moveFileOffline(String filename) throws FileAccessException;
 

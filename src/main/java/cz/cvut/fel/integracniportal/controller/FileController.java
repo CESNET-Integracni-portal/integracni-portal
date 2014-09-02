@@ -37,14 +37,23 @@ public class FileController {
 
     @RequestMapping(value = "files", method = RequestMethod.GET)
     @ResponseBody
-    public List<CesnetFileMetadata> cesnetLs() {
-        return cesnetService.getFileList();
+    public ResponseEntity<List<CesnetFileMetadata>> cesnetLs() {
+        try {
+            return new ResponseEntity<List<CesnetFileMetadata>>(cesnetService.getFileList(), HttpStatus.OK);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<List<CesnetFileMetadata>>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/metadata", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<CesnetFileMetadata> cesnetGetFileState(@PathVariable("filename") String filename) {
-        CesnetFileMetadata fileMetadata = cesnetService.getFileMetadata(filename);
+        CesnetFileMetadata fileMetadata = null;
+        try {
+            fileMetadata = cesnetService.getFileMetadata(filename);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<CesnetFileMetadata>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
         if (fileMetadata == null) {
             return new ResponseEntity<CesnetFileMetadata>(HttpStatus.NOT_FOUND);
         }
@@ -54,6 +63,16 @@ public class FileController {
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/archive", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetMoveFileOffline(@PathVariable("filename") String filename) {
+        CesnetFileMetadata fileMetadata = null;
+        try {
+            fileMetadata = cesnetService.getFileMetadata(filename);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        if (fileMetadata == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+
         try {
             cesnetService.moveFileOffline(filename);
             return new ResponseEntity<String>(HttpStatus.OK);
@@ -65,6 +84,15 @@ public class FileController {
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/restore", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetMoveFileOnline(@PathVariable("filename") String filename) {
+        CesnetFileMetadata fileMetadata = null;
+        try {
+            fileMetadata = cesnetService.getFileMetadata(filename);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        if (fileMetadata == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
         try {
             cesnetService.moveFileOnline(filename);
             return new ResponseEntity<String>(HttpStatus.OK);
@@ -75,28 +103,48 @@ public class FileController {
 
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("filename") String filename) {
-        MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-        String mimeType = mimetypesFileTypeMap.getContentType(filename);
-
+        CesnetFileMetadata fileMetadata = null;
         try {
-            InputStream remoteFileInputStream = cesnetService.getFile(filename);
-            IOUtils.copy(remoteFileInputStream, response.getOutputStream());
-            response.setContentType(mimeType);
-            response.flushBuffer();
-        } catch (SftpException e) {
-            logger.error("Unable to read the remote file '" + filename + "'.");
-        } catch (IOException e) {
-            logger.error("Unable to write remote file '" + filename + "' into response output stream.");
+            fileMetadata = cesnetService.getFileMetadata(filename);
+        } catch (FileAccessException e) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        }
+        if (fileMetadata == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+            String mimeType = mimetypesFileTypeMap.getContentType(filename);
+
+            try {
+                InputStream remoteFileInputStream = cesnetService.getFile(filename);
+                IOUtils.copy(remoteFileInputStream, response.getOutputStream());
+                response.setContentType(mimeType);
+                response.flushBuffer();
+            } catch (SftpException e) {
+                logger.error("Unable to read the remote file '" + filename + "'.");
+            } catch (IOException e) {
+                logger.error("Unable to write remote file '" + filename + "' into response output stream.");
+            }
         }
     }
 
     @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("filename") String filename) {
+        CesnetFileMetadata fileMetadata = null;
+        try {
+            fileMetadata = cesnetService.getFileMetadata(filename);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        if (fileMetadata == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+
         try {
             cesnetService.deleteFile(filename);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
         } catch (SftpException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
