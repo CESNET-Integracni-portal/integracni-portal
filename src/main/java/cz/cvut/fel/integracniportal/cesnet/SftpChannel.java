@@ -60,6 +60,10 @@ public class SftpChannel {
         return result;
     }
 
+    public void deleteFile(String filename) throws SftpException {
+        sftpChannel.rm(filename);
+    }
+
     public void uploadFile(InputStream fileStream, String filename) throws SftpException {
         sftpChannel.put(fileStream, filename);
     }

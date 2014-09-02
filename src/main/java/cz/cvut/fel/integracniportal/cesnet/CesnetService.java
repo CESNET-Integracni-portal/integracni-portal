@@ -13,6 +13,8 @@ public interface CesnetService {
 
     public InputStream getFile(String filename) throws SftpException, IOException;
 
+    public void deleteFile(String filename) throws SftpException;
+
     public CesnetFileMetadata getFileMetadata(String filename);
 
     public void moveFileOffline(String filename) throws FileAccessException;

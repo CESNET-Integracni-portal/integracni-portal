@@ -57,6 +57,13 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
+    public void deleteFile(String filename) throws SftpException {
+        SftpChannel sftpChannel = sftpChannelChannelProvider.get();
+        sftpChannel.cd(rootDir);
+        sftpChannel.deleteFile(filename);
+    }
+
+    @Override
     public CesnetFileMetadata getFileMetadata(String filename) {
         SshChannel sshChannel = sshResourceProvider.get();
 

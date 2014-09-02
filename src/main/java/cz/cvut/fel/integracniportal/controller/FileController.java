@@ -90,6 +90,16 @@ public class FileController {
         }
     }
 
+    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> cesnetDelete(@PathVariable("filename") String filename) {
+        try {
+            cesnetService.deleteFile(filename);
+            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+        } catch (SftpException e) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @RequestMapping(value = "files", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> cesnetUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
