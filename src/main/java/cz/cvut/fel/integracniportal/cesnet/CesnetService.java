@@ -11,6 +11,8 @@ import java.util.List;
 public interface CesnetService {
     public List<CesnetFileMetadata> getFileList() throws FileAccessException;
 
+    public List<CesnetFileMetadata> getFileListByType(FileState fileState) throws FileAccessException;
+
     public InputStream getFile(String filename) throws SftpException, IOException;
 
     public void deleteFile(String filename) throws SftpException;

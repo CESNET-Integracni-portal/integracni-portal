@@ -3,15 +3,13 @@ package cz.cvut.fel.integracniportal.controller;
 import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.cesnet.FileAccessException;
-import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
+import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,7 +43,17 @@ public class FileController {
         }
     }
 
-    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "files/{filestate}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<List<CesnetFileMetadata>> cesnetLsByState(@PathVariable("filestate") FileState fileState) {
+        try {
+            return new ResponseEntity<List<CesnetFileMetadata>>(cesnetService.getFileListByType(fileState), HttpStatus.OK);
+        } catch (FileAccessException e) {
+            return new ResponseEntity<List<CesnetFileMetadata>>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}/metadata", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<CesnetFileMetadata> cesnetGetFileState(@PathVariable("filename") String filename) {
         CesnetFileMetadata fileMetadata = null;
@@ -60,7 +68,7 @@ public class FileController {
         return new ResponseEntity<CesnetFileMetadata>(fileMetadata, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/archive", method = RequestMethod.PUT)
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}/archive", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetMoveFileOffline(@PathVariable("filename") String filename) {
         CesnetFileMetadata fileMetadata = null;
@@ -81,7 +89,29 @@ public class FileController {
         }
     }
 
-    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}/restore", method = RequestMethod.PUT)
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}/checkarchive", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> cesnetCheckOffline(@PathVariable("filename") String filename) {
+        long startTime = System.currentTimeMillis();
+        CesnetFileMetadata fileMetadata = null;
+        do {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                logger.error("Unable to sleep.");
+            }
+            try {
+                fileMetadata = cesnetService.getFileMetadata(filename);
+            } catch (FileAccessException e) {
+                logger.error("Unable to get metadata");
+            }
+        } while (fileMetadata == null || !fileMetadata.getState().equals("OFL"));
+        long endTime = System.currentTimeMillis();
+        logger.info("Finished archiving in " + (endTime-startTime) + "ms.");
+        return new ResponseEntity<String>("Finished archiving in " + (endTime-startTime) + "ms.", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}/restore", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetMoveFileOnline(@PathVariable("filename") String filename) {
         CesnetFileMetadata fileMetadata = null;
@@ -101,7 +131,7 @@ public class FileController {
         }
     }
 
-    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("filename") String filename) {
         CesnetFileMetadata fileMetadata = null;
         try {
@@ -128,7 +158,7 @@ public class FileController {
         }
     }
 
-    @RequestMapping(value = "files/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "file/{filename:[a-zA-Z0-9\\._-]+}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("filename") String filename) {
         CesnetFileMetadata fileMetadata = null;
         try {

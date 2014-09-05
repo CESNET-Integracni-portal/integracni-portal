@@ -1,6 +1,5 @@
 package cz.cvut.fel.integracniportal.controller;
 
-import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
@@ -15,13 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.apache.commons.io.IOUtils;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
