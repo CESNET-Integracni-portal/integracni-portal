@@ -1,13 +1,15 @@
 package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.SftpException;
+import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import resourceitems.CesnetFileMetadata;
 
 import javax.inject.Provider;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -16,9 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class CesnetServiceImpl implements CesnetService {
@@ -39,7 +38,7 @@ public class CesnetServiceImpl implements CesnetService {
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Override
-    public List<CesnetFileMetadata> getFileList() throws FileAccessException {
+    public List<CesnetFileMetadata> getFileList() throws FileAccessException, ServiceAccessException {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("cd ");
         stringBuilder.append(rootDir);
@@ -50,7 +49,7 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public List<CesnetFileMetadata> getFileListByType(FileState fileState) throws FileAccessException {
+    public List<CesnetFileMetadata> getFileListByType(FileState fileState) throws FileAccessException, ServiceAccessException {
         StringBuilder stringBuilder = new StringBuilder();
         // Go to root directory
         stringBuilder.append("cd ");
@@ -68,7 +67,7 @@ public class CesnetServiceImpl implements CesnetService {
         return getFileListForCommand(stringBuilder.toString());
     }
 
-    private List<CesnetFileMetadata> getFileListForCommand(String command) throws FileAccessException {
+    private List<CesnetFileMetadata> getFileListForCommand(String command) throws FileAccessException, ServiceAccessException {
         SshChannel sshChannel = sshResourceProvider.get();
         List<String> lsOutput = sshChannel.sendCommand(command);
         if (lsOutput.isEmpty()) {
@@ -97,12 +96,12 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public CesnetFileMetadata getFileMetadata(String filename) throws FileAccessException {
+    public CesnetFileMetadata getFileMetadata(String filename) throws FileAccessException, ServiceAccessException, FileNotFoundException {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> lsOutput = sshChannel.sendCommand("dmls -l " + rootDir + "/" + filename);
         if (lsOutput.size() != 1) {
-            return null;
+            throw new FileNotFoundException();
         }
 
         CesnetFileMetadata fileMetadata = parseFileMetadata(lsOutput.get(0));
@@ -110,22 +109,22 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public void moveFileOffline(String filename) throws FileAccessException {
+    public void moveFileOffline(String filename) throws FileNotFoundException, ServiceAccessException {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> response = sshChannel.sendCommand("dmput -r " + rootDir + "/" + filename);
         if (response.size() > 0) {
-            throw new FileAccessException(response.get(0));
+            throw new FileNotFoundException(response.get(0));
         }
     }
 
     @Override
-    public void moveFileOnline(String filename) throws FileAccessException {
+    public void moveFileOnline(String filename) throws ServiceAccessException, FileNotFoundException {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> response = sshChannel.sendCommand("dmget " + rootDir + "/" + filename);
         if (response.size() > 0) {
-            throw new FileAccessException(response.get(0));
+            throw new FileNotFoundException(response.get(0));
         }
     }
 

@@ -1,11 +1,11 @@
-package resourceitems;
+package cz.cvut.fel.integracniportal.cesnet;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
 /**
- * Created by pstrnad on 22.8.2014.
+ * Class for file metadata received from Cesnet.
  */
 public class CesnetFileMetadata {
     private String filename;

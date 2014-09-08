@@ -17,6 +17,8 @@ package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
+import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +46,8 @@ public class SshChannel {
 
         sshChannel = sshDataSource.getSshChannel();
         if (sshChannel == null) {
-            throw new Exception("Problem obtaining an ssh channel.");
+            logger.error("Cannot obtain an ssh channel.");
+            throw new Exception("Cannot obtain an ssh channel.");
         }
 
         in = sshChannel.getInputStream();
@@ -52,27 +55,21 @@ public class SshChannel {
 
     }
 
-    public List<String> sendCommand(String command) {
-        List<String> response = Collections.emptyList();
-
+    public List<String> sendCommand(String command) throws ServiceAccessException {
         try {
-            long startTime = System.currentTimeMillis();
             sshChannel.setCommand(command);
             sshChannel.connect();
-            response = readResponse();
-            long endTime = System.currentTimeMillis();
-            logger.info("Ssh command '" + command + "' took " + (endTime-startTime) + "ms to complete.");
+            List<String> response = readResponse();
+            sshChannel.disconnect();
 
             return response;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unable to read response.");
+            throw new ServiceAccessException("Unable to read response.");
         } catch (JSchException e) {
-            e.printStackTrace();
+            logger.error("Unable to connect to Cesnet.");
+            throw new ServiceAccessException("Unable to connect to Cesnet.");
         }
-
-        sshChannel.disconnect();
-
-        return response;
     }
 
     private List<String> readResponse() throws IOException {

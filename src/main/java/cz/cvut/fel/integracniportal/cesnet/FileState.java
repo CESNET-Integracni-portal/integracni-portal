@@ -1,7 +1,5 @@
 package cz.cvut.fel.integracniportal.cesnet;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 public enum FileState {
     REG("REG"),
     MIG("MIG"),
