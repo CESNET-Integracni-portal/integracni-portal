@@ -12,7 +12,7 @@ public class CesnetFileMetadata {
     private Long filesize;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date created;
-    private String state;
+    private FileState state;
 
     public String getFilename() {
         return filename;
@@ -38,11 +38,11 @@ public class CesnetFileMetadata {
         this.created = created;
     }
 
-    public String getState() {
+    public FileState getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(FileState state) {
         this.state = state;
     }
 }
