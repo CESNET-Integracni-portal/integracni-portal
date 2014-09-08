@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.resource;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata;
+import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.util.Date;
@@ -20,7 +21,10 @@ public class FileMetadataResource {
     private Long filesize;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
-    private Date created;
+    private Date createdOn;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
+    private Date changedOn;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date archiveOn;
@@ -28,7 +32,7 @@ public class FileMetadataResource {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date deleteOn;
 
-    private String state;
+    private FileState state;
 
     public FileMetadataResource() {}
 
@@ -37,7 +41,8 @@ public class FileMetadataResource {
         filename = fileMetadata.getFilename();
         mimetype = fileMetadata.getMimetype();
         filesize = cesnetFileMetadata.getFilesize();
-        created = cesnetFileMetadata.getCreated();
+        createdOn = fileMetadata.getCreatedOn();
+        changedOn = fileMetadata.getChangedOn();
         archiveOn = fileMetadata.getArchiveOn();
         deleteOn = fileMetadata.getDeleteOn();
         state = cesnetFileMetadata.getState();
@@ -75,12 +80,20 @@ public class FileMetadataResource {
         this.filesize = filesize;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreatedOn() {
+        return createdOn;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Date getChangedOn() {
+        return changedOn;
+    }
+
+    public void setChangedOn(Date changedOn) {
+        this.changedOn = changedOn;
     }
 
     public Date getArchiveOn() {
@@ -99,11 +112,11 @@ public class FileMetadataResource {
         this.deleteOn = deleteOn;
     }
 
-    public String getState() {
+    public FileState getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(FileState state) {
         this.state = state;
     }
 }

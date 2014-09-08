@@ -45,9 +45,16 @@ public interface FileMetadataService {
     /**
      * Uploads a file and stores its metadata in database.
      * @param file    The file to be uploaded.
-     * @return
+     * @return Uuid identifier of the created file.
      */
     public String uploadFile(MultipartFile file) throws IOException, ServiceAccessException;
+
+    /**
+     * Updates file and its metadata.
+     * @param fileuuid    Uuid identifier of the file to be updated.
+     * @param file    The file to be updated.
+     */
+    public void updateFile(String fileuuid, MultipartFile file) throws IOException, ServiceAccessException;
 
     /**
      * Deletes a file and removes its metadata from database

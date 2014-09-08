@@ -53,8 +53,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public String uploadFile(MultipartFile file) throws ServiceAccessException, IOException {
         FileMetadata fileMetadata = new FileMetadata();
-        fileMetadata.setFilename(file.getOriginalFilename());
-        fileMetadata.setMimetype(file.getContentType());
+        setFileMetadata(fileMetadata, file);
         createFileMetadata(fileMetadata);
         String uuid = fileMetadata.getUuid();
 
@@ -67,6 +66,18 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         } catch (IOException e) {
             removeFileMetadata(fileMetadata);
             throw e;
+        }
+    }
+
+    @Override
+    public void updateFile(String fileuuid, MultipartFile file) throws ServiceAccessException, IOException {
+        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
+        try {
+            cesnetService.uploadFile(file.getInputStream(), fileuuid);
+            setFileMetadata(fileMetadata, file);
+            updateFileMetadata(fileMetadata);
+        } catch (SftpException e) {
+            throw new ServiceAccessException("Cesnet service not available.");
         }
     }
 
@@ -114,6 +125,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
             }
         }
         return fileMetadataResources;
+    }
+
+    private void setFileMetadata(FileMetadata fileMetadata, MultipartFile file) {
+        fileMetadata.setFilename(file.getOriginalFilename());
+        fileMetadata.setMimetype(file.getContentType());
     }
 
 }

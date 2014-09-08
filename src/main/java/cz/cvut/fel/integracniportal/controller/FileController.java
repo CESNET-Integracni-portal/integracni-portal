@@ -2,8 +2,8 @@ package cz.cvut.fel.integracniportal.controller;
 
 import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
-import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.cesnet.FileState;
+import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.resource.FileMetadataResource;
@@ -16,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -99,45 +97,53 @@ public class FileController {
     }
 
     /**
-     * Archive a file.
-     * @param fileuuid    The uuid identifier of the file.
+     * Updates metadata for file
+     * @param fileuuid                The uuid identifier of the file.
+     * @param fileMetadataResource    New metadata, see {@link FileMetadataResource} for the list of fields.
+     *                                The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
+     * @return
      */
-    @RequestMapping(value = "file/{fileuuid}/archive", method = RequestMethod.PUT)
+    @RequestMapping(value = "file/{fileuuid}/metadata", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> cesnetMoveFileOffline(@PathVariable("fileuuid") String fileuuid) {
+    public ResponseEntity<FileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid,
+                                                                   @RequestBody FileMetadataResource fileMetadataResource) {
+        FileMetadata fileMetadata = null;
         try {
-
-            cesnetService.moveFileOffline(fileuuid);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+            fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
         }
+
+        FileState newFileState = fileMetadataResource.getState();
+        if (newFileState != null) {
+            try {
+                switch (newFileState) {
+                    case REG:
+                        cesnetService.moveFileOnline(fileuuid);
+                        break;
+                    case OFL:
+                        cesnetService.moveFileOffline(fileuuid);
+                        break;
+                    default:
+                        return new ResponseEntity<FileMetadataResource>(HttpStatus.BAD_REQUEST);
+                }
+            } catch (ServiceAccessException e) {
+                return new ResponseEntity<FileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
+            } catch (FileNotFoundException e) {
+                return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
+            }
+        }
+
+        fileMetadata.setFilename(fileMetadataResource.getFilename());
+        fileMetadata.setMimetype(fileMetadataResource.getMimetype());
+        fileMetadata.setArchiveOn(fileMetadataResource.getArchiveOn());
+        fileMetadata.setDeleteOn(fileMetadataResource.getDeleteOn());
+        fileMetadataService.updateFileMetadata(fileMetadata);
+        return new ResponseEntity<FileMetadataResource>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Restore a file from archive.
-     * @param fileuuid    The uuid identifier of the file.
-     */
-    @RequestMapping(value = "file/{fileuuid}/restore", method = RequestMethod.PUT)
-    @ResponseBody
-    public ResponseEntity<String> cesnetMoveFileOnline(@PathVariable("fileuuid") String fileuuid) {
-        try {
-
-            cesnetService.moveFileOnline(fileuuid);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * Download the file.
+     * Download a file.
      * @param fileuuid    The uuid identifier of the file.
      */
     @RequestMapping(value = "file/{fileuuid}", method = RequestMethod.GET)
@@ -161,6 +167,29 @@ public class FileController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        }
+    }
+
+    /**
+     * Update a file.
+     * @param fileuuid    The uuid identifier of the file.
+     * @param file        New file to replace the original one.
+     * @return
+     */
+    @RequestMapping(value = "file/{fileuuid}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
+        try {
+
+            fileMetadataService.updateFile(fileuuid, file);
+            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+
+        } catch (FileNotFoundException e) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        } catch (IOException e) {
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 

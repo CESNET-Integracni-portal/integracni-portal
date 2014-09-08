@@ -144,7 +144,7 @@ public class CesnetServiceImpl implements CesnetService {
         CesnetFileMetadata fileMetadata = new CesnetFileMetadata();
         fileMetadata.setFilename(parts[8]);
         fileMetadata.setFilesize(Long.parseLong(parts[4]));
-        fileMetadata.setState(parts[7].substring(1, parts[7].length()-1));
+        fileMetadata.setState(FileState.valueOf(parts[7].substring(1, parts[7].length()-1)));
         try {
             fileMetadata.setCreated(dateFormat.parse(parts[5]+" "+parts[6]));
         } catch (ParseException e) {
