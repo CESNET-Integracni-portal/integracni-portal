@@ -51,6 +51,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
+    public List<FileMetadata> getOldFilesForDeletion() {
+        return fileMetadataDao.getFilesForDeletion();
+    }
+
+    @Override
     public String uploadFile(MultipartFile file) throws ServiceAccessException, IOException {
         FileMetadata fileMetadata = new FileMetadata();
         setFileMetadata(fileMetadata, file);

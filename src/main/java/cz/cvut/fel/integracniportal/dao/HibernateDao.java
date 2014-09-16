@@ -5,10 +5,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Parent class for all Data Access Object classes. Provides access to Hibernate template and session.
  */
+@Transactional
 public abstract class HibernateDao {
     HibernateTemplate hibernateTemplate;
 

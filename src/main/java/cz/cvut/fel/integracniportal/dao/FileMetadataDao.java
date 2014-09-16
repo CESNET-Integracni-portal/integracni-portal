@@ -41,4 +41,9 @@ public interface FileMetadataDao {
      */
     public void removeFileMetadata(FileMetadata fileMetadata);
 
+    /**
+     * Returns list of files that should be deleted according to their deleteOn field.
+     * @return List of files to be deleted.
+     */
+    public List<FileMetadata> getFilesForDeletion();
 }

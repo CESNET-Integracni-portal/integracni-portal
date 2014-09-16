@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.dao;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,5 +53,13 @@ public class FileMetadataDaoImpl extends HibernateDao implements FileMetadataDao
     @Transactional
     public void removeFileMetadata(FileMetadata fileMetadata) {
         getHibernateTemplate().delete(fileMetadata);
+    }
+
+    @Override
+    public List<FileMetadata> getFilesForDeletion() {
+        Criteria c = getCriteria(FileMetadata.class, "rf");
+        c.add(Restrictions.isNotNull("rf.deleteOn"));
+        c.add(Restrictions.lt("rf.deleteOn", new Date()));
+        return c.list();
     }
 }

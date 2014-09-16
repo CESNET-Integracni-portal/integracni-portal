@@ -43,6 +43,12 @@ public interface FileMetadataService {
     public void removeFileMetadata(FileMetadata fileMetadata);
 
     /**
+     * Returns list of files that should be deleted according to their deleteOn field.
+     * @return List of files to be deleted.
+     */
+    public List<FileMetadata> getOldFilesForDeletion();
+
+    /**
      * Uploads a file and stores its metadata in database.
      * @param file    The file to be uploaded.
      * @return Uuid identifier of the created file.
