@@ -39,7 +39,7 @@ public class FileController {
      * Returns list of all files.
      * @return List of {@link FileMetadataResource} metadata.
      */
-    @RequestMapping(value = "files", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/files", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<FileMetadataResource>> cesnetLs() {
         try {
@@ -59,7 +59,7 @@ public class FileController {
      * @param fileState State by which the files will be filtered.
      * @return List of {@link FileMetadataResource} metadata.
      */
-    @RequestMapping(value = "files/{filestate}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/files/{filestate}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<FileMetadataResource>> cesnetLsByState(@PathVariable("filestate") FileState fileState) {
         try {
@@ -79,7 +79,7 @@ public class FileController {
      * @param fileuuid    The uuid identifier of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "file/{fileuuid}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuuid}/metadata", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<FileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
@@ -103,7 +103,7 @@ public class FileController {
      *                                The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
-    @RequestMapping(value = "file/{fileuuid}/metadata", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/file/{fileuuid}/metadata", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<FileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid,
                                                                    @RequestBody FileMetadataResource fileMetadataResource) {
@@ -146,7 +146,7 @@ public class FileController {
      * Download a file.
      * @param fileuuid    The uuid identifier of the file.
      */
-    @RequestMapping(value = "file/{fileuuid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuuid}", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
 
@@ -176,7 +176,7 @@ public class FileController {
      * @param file        New file to replace the original one.
      * @return
      */
-    @RequestMapping(value = "file/{fileuuid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/file/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
@@ -197,7 +197,7 @@ public class FileController {
      * Delete a file.
      * @param fileuuid    The uuid identifier of the file.
      */
-    @RequestMapping(value = "file/{fileuuid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v0.1/file/{fileuuid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("fileuuid") String fileuuid) {
         try {
             fileMetadataService.deleteFile(fileuuid);
@@ -214,7 +214,7 @@ public class FileController {
      * @param file    File to be uploaded.
      * @return
      */
-    @RequestMapping(value = "files", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/files", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> cesnetUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
         try {
