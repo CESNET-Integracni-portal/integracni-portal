@@ -220,7 +220,7 @@ public class FileController {
         try {
 
             String uuid = fileMetadataService.uploadFile(file);
-            return new ResponseEntity<String>("/rest/file/"+uuid, HttpStatus.CREATED);
+            return new ResponseEntity<String>("/rest/v0.1/file/"+uuid, HttpStatus.CREATED);
 
         } catch (IOException e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
