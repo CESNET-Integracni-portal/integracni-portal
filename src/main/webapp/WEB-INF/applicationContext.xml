@@ -12,6 +12,7 @@
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>
     <import resource="cesnet.xml"/>
+    <import resource="alfresco.xml"/>
     <import resource="cron.xml"/>
 
     <!-- Load application.properties file -->

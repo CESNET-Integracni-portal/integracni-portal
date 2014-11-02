@@ -5,7 +5,7 @@ import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.resource.FileMetadataResource;
+import cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
@@ -73,18 +73,18 @@ public interface FileMetadataService {
      * @param fileMetadataUuid    Uuid of the file.
      * @return Full file metadata.
      */
-    public FileMetadataResource getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException;
+    public CesnetFileMetadataResource getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException;
 
     /**
      * Returns full metadata information about all files.
      * @return List of full file metadata.
      */
-    public List<FileMetadataResource> getFileMetadataResources() throws ServiceAccessException, FileAccessException;
+    public List<CesnetFileMetadataResource> getFileMetadataResources() throws ServiceAccessException, FileAccessException;
 
     /**
      * Returns full metadata information about all files in certain state.
      * @param fileState    State by which the files will be filtered.
      * @return List of full file metadata.
      */
-    public List<FileMetadataResource> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException;
+    public List<CesnetFileMetadataResource> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException;
 }

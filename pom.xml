@@ -19,6 +19,11 @@
             <id>mvnrepository</id>
             <url>http://repo1.maven.org/maven2</url>
         </repository>
+        <repository>
+            <id>maven.alfresco.com</id>
+            <name>Alfresco Maven Repository</name>
+            <url>http://maven.alfresco.com/nexus/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -217,6 +222,19 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.51</version>
+        </dependency>
+
+        <!-- Alfresco -->
+        <dependency>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-client-impl</artifactId>
+            <version>0.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco.cmis.client</groupId>
+            <artifactId>alfresco-opencmis-extension</artifactId>
+            <version>0.2</version>
+            <type>jar</type>
         </dependency>
 
         <!-- Apache Commons Upload -->

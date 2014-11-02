@@ -6,7 +6,7 @@ import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.resource.FileMetadataResource;
+import cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource;
 import cz.cvut.fel.integracniportal.service.FileMetadataService;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -25,9 +25,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
-public class FileController {
+public class CesnetFileController {
 
-    private static final Logger logger = Logger.getLogger(FileController.class);
+    private static final Logger logger = Logger.getLogger(CesnetFileController.class);
 
     @Autowired
     private CesnetService cesnetService;
@@ -37,40 +37,40 @@ public class FileController {
 
     /**
      * Returns list of all files.
-     * @return List of {@link FileMetadataResource} metadata.
+     * @return List of {@link cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource} metadata.
      */
     @RequestMapping(value = "/v0.1/files", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<FileMetadataResource>> cesnetLs() {
+    public ResponseEntity<List<CesnetFileMetadataResource>> cesnetLs() {
         try {
 
-            List<FileMetadataResource> fileMetadataResources = fileMetadataService.getFileMetadataResources();
-            return new ResponseEntity<List<FileMetadataResource>>(fileMetadataResources, HttpStatus.OK);
+            List<CesnetFileMetadataResource> fileMetadataResources = fileMetadataService.getFileMetadataResources();
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(fileMetadataResources, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<List<FileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileAccessException e) {
-            return new ResponseEntity<List<FileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
     /**
      * Returns list of all files in a certain state.
      * @param fileState State by which the files will be filtered.
-     * @return List of {@link FileMetadataResource} metadata.
+     * @return List of {@link cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource} metadata.
      */
     @RequestMapping(value = "/v0.1/files/{filestate}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<FileMetadataResource>> cesnetLsByState(@PathVariable("filestate") FileState fileState) {
+    public ResponseEntity<List<CesnetFileMetadataResource>> cesnetLsByState(@PathVariable("filestate") FileState fileState) {
         try {
 
-            List<FileMetadataResource> fileMetadataResources = fileMetadataService.getFileMetadataResources();
-            return new ResponseEntity<List<FileMetadataResource>>(fileMetadataResources, HttpStatus.OK);
+            List<CesnetFileMetadataResource> fileMetadataResources = fileMetadataService.getFileMetadataResources();
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(fileMetadataResources, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<List<FileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileAccessException e) {
-            return new ResponseEntity<List<FileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<List<CesnetFileMetadataResource>>(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -81,37 +81,37 @@ public class FileController {
      */
     @RequestMapping(value = "/v0.1/file/{fileuuid}/metadata", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<FileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
+    public ResponseEntity<CesnetFileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
 
-            FileMetadataResource fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
-            return new ResponseEntity<FileMetadataResource>(fileMetadataResource, HttpStatus.OK);
+            CesnetFileMetadataResource fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
+            return new ResponseEntity<CesnetFileMetadataResource>(fileMetadataResource, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<FileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileAccessException e) {
-            return new ResponseEntity<FileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.NOT_FOUND);
         }
     }
 
     /**
      * Updates metadata for file
      * @param fileuuid                The uuid identifier of the file.
-     * @param fileMetadataResource    New metadata, see {@link FileMetadataResource} for the list of fields.
+     * @param fileMetadataResource    New metadata, see {@link cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource} for the list of fields.
      *                                The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
     @RequestMapping(value = "/v0.1/file/{fileuuid}/metadata", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<FileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid,
-                                                                   @RequestBody FileMetadataResource fileMetadataResource) {
+    public ResponseEntity<CesnetFileMetadataResource> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
+                                                                   @RequestBody CesnetFileMetadataResource fileMetadataResource) {
         FileMetadata fileMetadata = null;
         try {
             fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.NOT_FOUND);
         }
 
         FileState newFileState = fileMetadataResource.getState();
@@ -125,12 +125,12 @@ public class FileController {
                         cesnetService.moveFileOffline(fileuuid);
                         break;
                     default:
-                        return new ResponseEntity<FileMetadataResource>(HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.BAD_REQUEST);
                 }
             } catch (ServiceAccessException e) {
-                return new ResponseEntity<FileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
+                return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.SERVICE_UNAVAILABLE);
             } catch (FileNotFoundException e) {
-                return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.NOT_FOUND);
             }
         }
 
@@ -139,7 +139,7 @@ public class FileController {
         fileMetadata.setArchiveOn(fileMetadataResource.getArchiveOn());
         fileMetadata.setDeleteOn(fileMetadataResource.getDeleteOn());
         fileMetadataService.updateFileMetadata(fileMetadata);
-        return new ResponseEntity<FileMetadataResource>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<CesnetFileMetadataResource>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -150,7 +150,7 @@ public class FileController {
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
 
-            FileMetadataResource fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
+            CesnetFileMetadataResource fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
             response.setContentType(fileMetadataResource.getMimetype());
             response.setHeader("Content-Disposition", "attachment; filename=\""+fileMetadataResource.getFilename()+"\"");
             InputStream remoteFileInputStream = cesnetService.getFile(fileuuid);

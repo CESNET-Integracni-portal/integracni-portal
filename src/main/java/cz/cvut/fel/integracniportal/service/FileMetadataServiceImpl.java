@@ -8,7 +8,7 @@ import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.resource.FileMetadataResource;
+import cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,33 +98,33 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public FileMetadataResource getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException {
+    public CesnetFileMetadataResource getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileMetadataUuid);
         CesnetFileMetadata cesnetFileMetadata = cesnetService.getFileMetadata(fileMetadataUuid);
-        FileMetadataResource fileMetadataResource = new FileMetadataResource(fileMetadata, cesnetFileMetadata);
+        CesnetFileMetadataResource fileMetadataResource = new CesnetFileMetadataResource(fileMetadata, cesnetFileMetadata);
         return fileMetadataResource;
     }
 
     @Override
-    public List<FileMetadataResource> getFileMetadataResources() throws ServiceAccessException, FileAccessException {
+    public List<CesnetFileMetadataResource> getFileMetadataResources() throws ServiceAccessException, FileAccessException {
         List<CesnetFileMetadata> cesnetFileMetadatas = cesnetService.getFileList();
 
         return getFileMetadataResourcesFor(cesnetFileMetadatas);
     }
 
     @Override
-    public List<FileMetadataResource> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException {
+    public List<CesnetFileMetadataResource> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException {
         List<CesnetFileMetadata> cesnetFileMetadatas = cesnetService.getFileListByType(fileState);
 
         return getFileMetadataResourcesFor(cesnetFileMetadatas);
     }
 
-    private List<FileMetadataResource> getFileMetadataResourcesFor(List<CesnetFileMetadata> cesnetFileMetadatas) {
-        List<FileMetadataResource> fileMetadataResources = new ArrayList<FileMetadataResource>();
+    private List<CesnetFileMetadataResource> getFileMetadataResourcesFor(List<CesnetFileMetadata> cesnetFileMetadatas) {
+        List<CesnetFileMetadataResource> fileMetadataResources = new ArrayList<CesnetFileMetadataResource>();
         for (CesnetFileMetadata cesnetFileMetadata: cesnetFileMetadatas) {
             try {
                 FileMetadata fileMetadata = getFileMetadataByUuid(cesnetFileMetadata.getFilename());
-                fileMetadataResources.add(new FileMetadataResource(fileMetadata, cesnetFileMetadata));
+                fileMetadataResources.add(new CesnetFileMetadataResource(fileMetadata, cesnetFileMetadata));
             } catch (FileNotFoundException e) {
                 continue;
             }

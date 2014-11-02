@@ -12,8 +12,6 @@ import java.util.Date;
  */
 public class FileMetadataResource {
 
-    private String uuid;
-
     private String filename;
 
     private String mimetype;
@@ -26,35 +24,7 @@ public class FileMetadataResource {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date changedOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
-    private Date archiveOn;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
-    private Date deleteOn;
-
-    private FileState state;
-
     public FileMetadataResource() {}
-
-    public FileMetadataResource(FileMetadata fileMetadata, CesnetFileMetadata cesnetFileMetadata) {
-        uuid = fileMetadata.getUuid();
-        filename = fileMetadata.getFilename();
-        mimetype = fileMetadata.getMimetype();
-        filesize = cesnetFileMetadata.getFilesize();
-        createdOn = fileMetadata.getCreatedOn();
-        changedOn = fileMetadata.getChangedOn();
-        archiveOn = fileMetadata.getArchiveOn();
-        deleteOn = fileMetadata.getDeleteOn();
-        state = cesnetFileMetadata.getState();
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public String getFilename() {
         return filename;
@@ -96,27 +66,4 @@ public class FileMetadataResource {
         this.changedOn = changedOn;
     }
 
-    public Date getArchiveOn() {
-        return archiveOn;
-    }
-
-    public void setArchiveOn(Date archiveOn) {
-        this.archiveOn = archiveOn;
-    }
-
-    public Date getDeleteOn() {
-        return deleteOn;
-    }
-
-    public void setDeleteOn(Date deleteOn) {
-        this.deleteOn = deleteOn;
-    }
-
-    public FileState getState() {
-        return state;
-    }
-
-    public void setState(FileState state) {
-        this.state = state;
-    }
 }
