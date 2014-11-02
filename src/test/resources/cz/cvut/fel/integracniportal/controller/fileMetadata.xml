@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <resource_file uuid="1" filename="a.txt" mimetype="text/plain" created_on="2014-01-01" changed_on="2014-01-01"/>
+    <resource_file uuid="2" filename="b.html" mimetype="text/html" created_on="2014-01-01" changed_on="2014-01-01"/>
+</dataset>
