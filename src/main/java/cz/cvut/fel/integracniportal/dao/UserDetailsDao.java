@@ -2,6 +2,8 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.UserDetails;
 
+import java.util.List;
+
 /**
  * Data Access Object interface for UserDetails login credentials.
  */
@@ -20,6 +22,12 @@ public interface UserDetailsDao {
      * @return UserDetails login credentials.
      */
     public UserDetails getUserByUsername(String username);
+
+    /**
+     * Finds all users in the database.
+     * @return List of users.
+     */
+    public List<UserDetails> getAllUsers();
 
     /**
      * Saves the user into database.

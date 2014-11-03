@@ -1,15 +1,24 @@
 package cz.cvut.fel.integracniportal.resource;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.UserDetails;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Resource class for user details.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailsResource {
 
     private long userId;
 
     private String username;
+
+    private String password;
+
+    private List<String> userRoles = new ArrayList<String>();
 
     public UserDetailsResource() {}
     public UserDetailsResource(UserDetails userDetails) {
@@ -30,4 +39,19 @@ public class UserDetailsResource {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<String> getUserRoles() {
+        return userRoles;
+    }
+    public void setUserRoles(List<String> userRoles) {
+        this.userRoles = userRoles;
+    }
+
 }

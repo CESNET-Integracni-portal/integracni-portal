@@ -1,5 +1,6 @@
-package cz.cvut.fel.integracniportal.form;
+package cz.cvut.fel.integracniportal.validator;
 
+import cz.cvut.fel.integracniportal.form.RegisterForm;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

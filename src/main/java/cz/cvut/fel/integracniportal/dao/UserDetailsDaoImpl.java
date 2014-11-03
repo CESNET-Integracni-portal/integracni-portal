@@ -6,6 +6,8 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Hibernate implementation of the UserDetailsDao interface.
  */
@@ -24,6 +26,12 @@ public class UserDetailsDaoImpl extends HibernateDao implements UserDetailsDao {
         Criteria criteria = getCriteria(UserDetails.class, "user");
         criteria.add(Restrictions.eq("user.username", username));
         return (UserDetails) criteria.uniqueResult();
+    }
+
+    @Override
+    public List<UserDetails> getAllUsers() {
+        Criteria criteria = getCriteria(UserDetails.class, "user");
+        return criteria.list();
     }
 
     @Override

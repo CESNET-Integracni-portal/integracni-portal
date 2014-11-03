@@ -7,9 +7,9 @@
        http://www.springframework.org/schema/security
        http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <security:http pattern="/rest/secure/**" create-session="never" entry-point-ref="clientAuthenticationEntryPoint"
+    <security:http pattern="/rest/**" create-session="never" entry-point-ref="clientAuthenticationEntryPoint"
             auto-config="true" use-expressions="true">
-        <security:anonymous enabled="false"/>
+        <security:anonymous enabled="true"/>
         <security:intercept-url pattern="/rest/secure/**" access="hasRole('ROLE_ADMIN')"/>
         <security:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
         <security:access-denied-handler ref="oauthAccessDeniedHandler"/>
