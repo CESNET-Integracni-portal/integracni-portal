@@ -46,7 +46,6 @@ public class UserController {
     }
 
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.POST)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     public ResponseEntity<String> createUser(@Validated @RequestBody UserDetailsResource userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -62,7 +61,6 @@ public class UserController {
     }
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     public UserDetailsResource getUser(@PathVariable("userid") long userId) {
         UserDetails userDetails = userDetailsService.getUserById(userId);
