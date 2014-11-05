@@ -7,15 +7,16 @@ import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException
-import org.apache.commons.io.IOUtils
 import org.junit.Test
 import org.kubek2k.springockito.annotations.ReplaceWithMock
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
+import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize
 import static org.mockito.Mockito.when
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * @author Radek Jezdik
@@ -23,64 +24,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FileController_getFile_Test extends AbstractIntegrationTestCase {
+public class CesnetFileController_getList_Test extends AbstractIntegrationTestCase {
 
     @Autowired
     @ReplaceWithMock
     CesnetService cesnetService;
 
     @Test
-    void "should return the content of the file"() {
-        def returnBody = "<html></html>"
+    void "should return list of all files"() {
+        when(cesnetService.getFileList()).thenReturn([
+                new CesnetFileMetadata(filename: "1"),
+                new CesnetFileMetadata(filename: "2")
+        ])
 
-        when(cesnetService.getFileMetadata("2"))
-                .thenReturn(new CesnetFileMetadata(filename: "2"))
-
-        when(cesnetService.getFile("2"))
-                .thenReturn(IOUtils.toInputStream(returnBody, "UTF-8"))
-
-        apiGet("file/2")
+        apiGet("archive")
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", 'attachment; filename=\"b.html\"'))
-                .andExpect(content().contentType("text/html"))
-                .andExpect(content().string(returnBody))
-    }
-
-
-    @Test
-    void "should return 404 Not Found for non existing file"() {
-        apiGet("file/666")
-                .andExpect(status().isNotFound())
+                .andExpect(jsonPath('$').isArray())
+                .andExpect(jsonPath('$', hasSize(2)))
+                .andExpect(jsonPath('$[0].uuid').value("1"))
+                .andExpect(jsonPath('$[1].uuid').value("2"))
+                .andExpect(jsonPath('$[0].filename').value("a.txt"))
+                .andExpect(jsonPath('$[1].filename').value("b.html"))
+                .andExpect(jsonPath('$[0].mimetype').value("text/plain"))
+                .andExpect(jsonPath('$[1].mimetype').value("text/html"))
     }
 
 
     @Test
     void "should return 503 Service Unavailable if ServiceAccessException thrown"() {
-        when(cesnetService.getFileMetadata("2"))
+        when(cesnetService.getFileList())
                 .thenThrow(new ServiceAccessException("Service unavailable"))
 
-        apiGet("file/2")
+        apiGet("archive")
                 .andExpect(status().isServiceUnavailable())
     }
 
 
     @Test
     void "should return 503 Service Unavailable if FileAccessException thrown"() {
-        when(cesnetService.getFileMetadata("2"))
+        when(cesnetService.getFileList())
                 .thenThrow(new FileAccessException("Service unavailable"))
 
-        apiGet("file/2")
+        apiGet("archive")
                 .andExpect(status().isServiceUnavailable())
-    }
-
-
-    @Test
-    void "should return 404 Not Found if FileNotFoundException thrown"() {
-        when(cesnetService.getFileMetadata("2"))
-                .thenThrow(new FileNotFoundException("Not found"))
-
-        apiGet("file/2")
-                .andExpect(status().isNotFound())
     }
 
 }

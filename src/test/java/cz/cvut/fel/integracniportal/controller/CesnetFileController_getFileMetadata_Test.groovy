@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
+import cz.cvut.fel.integracniportal.cesnet.FileState
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException
 import org.junit.Test
@@ -13,7 +14,6 @@ import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
-import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize
 import static org.mockito.Mockito.when
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -24,49 +24,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FileController_getList_Test extends AbstractIntegrationTestCase {
+public class CesnetFileController_getFileMetadata_Test extends AbstractIntegrationTestCase {
 
     @Autowired
     @ReplaceWithMock
     CesnetService cesnetService;
 
     @Test
-    void "should return list of all files"() {
-        when(cesnetService.getFileList()).thenReturn([
-                new CesnetFileMetadata(filename: "1"),
-                new CesnetFileMetadata(filename: "2")
-        ])
+    void "should return the file metadata json"() {
+        when(cesnetService.getFileMetadata("2"))
+                .thenReturn(new CesnetFileMetadata(filename: "2", filesize: 100, state: FileState.REG))
 
-        apiGet("files")
+        apiGet("archive/2/metadata")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$').isArray())
-                .andExpect(jsonPath('$', hasSize(2)))
-                .andExpect(jsonPath('$[0].uuid').value("1"))
-                .andExpect(jsonPath('$[1].uuid').value("2"))
-                .andExpect(jsonPath('$[0].filename').value("a.txt"))
-                .andExpect(jsonPath('$[1].filename').value("b.html"))
-                .andExpect(jsonPath('$[0].mimetype').value("text/plain"))
-                .andExpect(jsonPath('$[1].mimetype').value("text/html"))
+                .andExpect(jsonPath('$.uuid').value("2"))
+                .andExpect(jsonPath('$.filename').value("b.html"))
+                .andExpect(jsonPath('$.filesize').value(100))
+                .andExpect(jsonPath('$.state').value("REG"))
+                .andExpect(jsonPath('$.mimetype').value("text/html"))
+                .andExpect(jsonPath('$.createdOn').value("2013-12-31T23:00+0000"))
+                .andExpect(jsonPath('$.changedOn').value("2013-12-31T23:00+0000"))
+                .andExpect(jsonPath('$.archiveOn').value(null))
+                .andExpect(jsonPath('$.deleteOn').value(null))
+    }
+
+
+    @Test
+    void "should return 404 Not Found for non existing file"() {
+        apiGet("archive/666/metadata")
+                .andExpect(status().isNotFound())
     }
 
 
     @Test
     void "should return 503 Service Unavailable if ServiceAccessException thrown"() {
-        when(cesnetService.getFileList())
+        when(cesnetService.getFileMetadata("2"))
                 .thenThrow(new ServiceAccessException("Service unavailable"))
 
-        apiGet("files")
+        apiGet("archive/2/metadata")
                 .andExpect(status().isServiceUnavailable())
     }
 
 
     @Test
     void "should return 503 Service Unavailable if FileAccessException thrown"() {
-        when(cesnetService.getFileList())
+        when(cesnetService.getFileMetadata("2"))
                 .thenThrow(new FileAccessException("Service unavailable"))
 
-        apiGet("files")
+        apiGet("archive/2/metadata")
                 .andExpect(status().isServiceUnavailable())
+    }
+
+
+    @Test
+    void "should return 404 Not Found if FileNotFoundException thrown"() {
+        when(cesnetService.getFileMetadata("2"))
+                .thenThrow(new FileNotFoundException("Not found"))
+
+        apiGet("archive/2/metadata")
+                .andExpect(status().isNotFound())
     }
 
 }

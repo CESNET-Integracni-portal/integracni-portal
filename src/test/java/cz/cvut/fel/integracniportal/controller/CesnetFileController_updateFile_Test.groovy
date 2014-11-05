@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FileController_updateFile_Test extends AbstractIntegrationTestCase {
+public class CesnetFileController_updateFile_Test extends AbstractIntegrationTestCase {
 
     @Autowired
     @ReplaceWithMock
@@ -40,7 +40,7 @@ public class FileController_updateFile_Test extends AbstractIntegrationTestCase 
 
         def file = new MockMultipartFile("x.json", "x.json", "application/json", "{}".getBytes())
 
-        mockMvc.perform(fileUpload(fromApi("file/2")).file(file))
+        mockMvc.perform(fileUpload(fromApi("archive/2")).file(file))
                 .andExpect(status().isNoContent())
 
         def meta = metadataDao.getFileMetadataByUuid("2");
@@ -49,7 +49,7 @@ public class FileController_updateFile_Test extends AbstractIntegrationTestCase 
 
     @Test
     void "should return 404 Not Found for non existing file"() {
-        apiGet("file/666")
+        apiGet("archive/666")
                 .andExpect(status().isNotFound())
     }
 

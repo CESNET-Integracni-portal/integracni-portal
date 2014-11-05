@@ -39,7 +39,7 @@ public class CesnetFileController {
      * Returns list of all files.
      * @return List of {@link cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource} metadata.
      */
-    @RequestMapping(value = "/v0.1/cesnet", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<CesnetFileMetadataResource>> cesnetLs() {
         try {
@@ -59,7 +59,7 @@ public class CesnetFileController {
      * @param fileState State by which the files will be filtered.
      * @return List of {@link cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource} metadata.
      */
-    @RequestMapping(value = "/v0.1/cesnet/{filestate}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive/{filestate}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<CesnetFileMetadataResource>> cesnetLsByState(@PathVariable("filestate") FileState fileState) {
         try {
@@ -79,7 +79,7 @@ public class CesnetFileController {
      * @param fileuuid    The uuid identifier of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "/v0.1/cesnet/{fileuuid}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive/{fileuuid}/metadata", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<CesnetFileMetadataResource> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
@@ -103,7 +103,7 @@ public class CesnetFileController {
      *                                The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
-    @RequestMapping(value = "/v0.1/cesnet/{fileuuid}/metadata", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/archive/{fileuuid}/metadata", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<CesnetFileMetadataResource> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                                                    @RequestBody CesnetFileMetadataResource fileMetadataResource) {
@@ -146,7 +146,7 @@ public class CesnetFileController {
      * Download a file.
      * @param fileuuid    The uuid identifier of the file.
      */
-    @RequestMapping(value = "/v0.1/cesnet/{fileuuid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive/{fileuuid}", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
 
@@ -176,7 +176,7 @@ public class CesnetFileController {
      * @param file        New file to replace the original one.
      * @return
      */
-    @RequestMapping(value = "/v0.1/cesnet/{fileuuid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/archive/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
@@ -197,7 +197,7 @@ public class CesnetFileController {
      * Delete a file.
      * @param fileuuid    The uuid identifier of the file.
      */
-    @RequestMapping(value = "/v0.1/cesnet/{fileuuid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v0.1/archive/{fileuuid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("fileuuid") String fileuuid) {
         try {
             fileMetadataService.deleteFile(fileuuid);
@@ -214,13 +214,13 @@ public class CesnetFileController {
      * @param file    File to be uploaded.
      * @return
      */
-    @RequestMapping(value = "/v0.1/cesnet", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> cesnetUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
             String uuid = fileMetadataService.uploadFile(file);
-            return new ResponseEntity<String>("/rest/v0.1/file/"+uuid, HttpStatus.CREATED);
+            return new ResponseEntity<String>("/rest/v0.1/archive/"+uuid, HttpStatus.CREATED);
 
         } catch (IOException e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

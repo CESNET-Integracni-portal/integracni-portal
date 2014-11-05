@@ -33,7 +33,7 @@ public class AlfrescoFileController {
      * @param fileUri    The URI of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "/v0.1/alfresco/{fileuri}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuri}/metadata", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<FileMetadataResource> alfrescoGetFileMetadata(@PathVariable("fileuri") String fileUri) {
         try {
@@ -56,7 +56,7 @@ public class AlfrescoFileController {
      * Download a file.
      * @param fileUri    The URI of the file.
      */
-    @RequestMapping(value = "/v0.1/alfresco/{fileuri}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.GET)
     public void alfrescoGet(HttpServletResponse response, @PathVariable("fileuri") String fileUri) {
         try {
 
@@ -79,7 +79,7 @@ public class AlfrescoFileController {
      * @param fileUri    The URI of the file.
      * @param file        New file to replace the original one.
      */
-    @RequestMapping(value = "/v0.1/alfresco/{fileuri}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> alfrescoUpdate(@PathVariable("fileuri") String fileUri, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
@@ -98,7 +98,7 @@ public class AlfrescoFileController {
      * Delete a file.
      * @param fileUri    The URI of the file.
      */
-    @RequestMapping(value = "/v0.1/alfresco/{fileuri}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.DELETE)
     public ResponseEntity<String> alfrescoDelete(@PathVariable("fileuri") String fileUri) {
         try {
             alfrescoService.deleteFile(fileUri);
@@ -112,7 +112,7 @@ public class AlfrescoFileController {
      * Upload a file.
      * @param file    File to be uploaded.
      */
-    @RequestMapping(value = "/v0.1/alfresco", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/files", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> alfrescoUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
         try {
@@ -121,7 +121,7 @@ public class AlfrescoFileController {
             if (document == null) {
                 return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
             }
-            return new ResponseEntity<String>("/rest/v0.1/alfresco/" + document.getContentStreamFileName(), HttpStatus.CREATED);
+            return new ResponseEntity<String>("/rest/v0.1/file/" + document.getContentStreamFileName(), HttpStatus.CREATED);
 
         } catch (CmisContentAlreadyExistsException e) {
             return new ResponseEntity<String>(HttpStatus.CONFLICT);
