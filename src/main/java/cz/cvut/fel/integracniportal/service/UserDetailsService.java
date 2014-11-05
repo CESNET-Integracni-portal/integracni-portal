@@ -2,7 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
+import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 
 import java.util.List;
 
@@ -32,11 +32,11 @@ public interface UserDetailsService {
     public List<UserDetails> getAllUsers();
 
     /**
-     * Creates a user from supplied {@link cz.cvut.fel.integracniportal.resource.UserDetailsResource}.
+     * Creates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
      *
-     * @param userDetailsResource the user details resource
+     * @param userDetailsResource the user details
      */
-    public UserDetails createUser(UserDetailsResource userDetailsResource) throws UserRoleNotFoundException;
+    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException;
 
     /**
      * Saves the user into database.

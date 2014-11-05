@@ -4,7 +4,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Entity for file metadata.
@@ -24,6 +23,13 @@ public class FileMetadata {
 
     @Column(name = "mimetype", nullable = false)
     private String mimetype;
+
+    @Column(name = "filesize", nullable = false)
+    private Long filesize;
+
+    @ManyToOne
+    @JoinColumn(name = "parent", referencedColumnName = "folder_id")
+    private Folder parent;
 
     @Column(name = "created_on", nullable = false)
     private Date createdOn;
@@ -59,6 +65,22 @@ public class FileMetadata {
 
     public void setMimetype(String mimetype) {
         this.mimetype = mimetype;
+    }
+
+    public Long getFilesize() {
+        return filesize;
+    }
+
+    public void setFilesize(Long filesize) {
+        this.filesize = filesize;
+    }
+
+    public Folder getParent() {
+        return parent;
+    }
+
+    public void setParent(Folder parent) {
+        this.parent = parent;
     }
 
     public Date getCreatedOn() {

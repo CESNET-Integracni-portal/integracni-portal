@@ -2,7 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
+import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import cz.cvut.fel.integracniportal.validator.UserDetailsResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class UserController {
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.GET)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
-    public List<UserDetailsResource> getAllUsers() {
+    public List<UserDetailsRepresentation> getAllUsers() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
-        List<UserDetailsResource> result = new ArrayList<UserDetailsResource>(userDetailsList.size());
+        List<UserDetailsRepresentation> result = new ArrayList<UserDetailsRepresentation>(userDetailsList.size());
         for (UserDetails userDetails: userDetailsList) {
             result.add(userDetailsToResource(userDetails));
         }
@@ -47,7 +47,7 @@ public class UserController {
 
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> createUser(@Validated @RequestBody UserDetailsResource userDetailsResource, BindingResult bindingResult) {
+    public ResponseEntity<String> createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<String>(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
         }
@@ -62,13 +62,13 @@ public class UserController {
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
-    public UserDetailsResource getUser(@PathVariable("userid") long userId) {
+    public UserDetailsRepresentation getUser(@PathVariable("userid") long userId) {
         UserDetails userDetails = userDetailsService.getUserById(userId);
         return userDetailsToResource(userDetails);
     }
 
-    private UserDetailsResource userDetailsToResource(UserDetails userDetails) {
-        UserDetailsResource userDetailsResource = new UserDetailsResource();
+    private UserDetailsRepresentation userDetailsToResource(UserDetails userDetails) {
+        UserDetailsRepresentation userDetailsResource = new UserDetailsRepresentation();
         userDetailsResource.setUserId(userDetails.getUserId());
         userDetailsResource.setUsername(userDetails.getUsername());
         return userDetailsResource;

@@ -12,7 +12,13 @@
                 http://www.springframework.org/schema/security/spring-security.xsd
                 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="jsonObjectMapper"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
     <!-- Allow the use of @Secured and @PreAuthorize in controllers -->
     <security:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" proxy-target-class="true"/>

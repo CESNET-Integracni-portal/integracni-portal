@@ -3,9 +3,11 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
+import cz.cvut.fel.integracniportal.exceptions.FolderNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.resource.CesnetFileMetadataResource;
+import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
@@ -18,7 +20,7 @@ import java.util.List;
 public interface FileMetadataService {
 
     /**
-     * Finds a resource file metadata in database by its uuid.
+     * Finds a file metadata in database by its uuid.
      * @param fileMetadataUuid    Uuid of the file.
      * @return FileMetadata metadata.
      */
@@ -50,10 +52,19 @@ public interface FileMetadataService {
 
     /**
      * Uploads a file and stores its metadata in database.
-     * @param file    The file to be uploaded.
+     * @param folderId  Id of the folder to which the file should be uploaded.
+     * @param file      The file to be uploaded.
      * @return Uuid identifier of the created file.
      */
-    public String uploadFile(MultipartFile file) throws IOException, ServiceAccessException;
+    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, FolderNotFoundException;
+
+    /**
+     * Uploads a file and stores its metadata in database.
+     * @param folder    Folder to which the file should be uploaded.
+     * @param file      The file to be uploaded.
+     * @return Uuid identifier of the created file.
+     */
+    public FileMetadata uploadFile(Folder folder, MultipartFile file) throws IOException, ServiceAccessException;
 
     /**
      * Updates file and its metadata.
@@ -73,18 +84,18 @@ public interface FileMetadataService {
      * @param fileMetadataUuid    Uuid of the file.
      * @return Full file metadata.
      */
-    public CesnetFileMetadataResource getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException;
+    public CesnetFileMetadataRepresentation getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException;
 
     /**
      * Returns full metadata information about all files.
      * @return List of full file metadata.
      */
-    public List<CesnetFileMetadataResource> getFileMetadataResources() throws ServiceAccessException, FileAccessException;
+    public List<CesnetFileMetadataRepresentation> getFileMetadataResources() throws ServiceAccessException, FileAccessException;
 
     /**
      * Returns full metadata information about all files in certain state.
      * @param fileState    State by which the files will be filtered.
      * @return List of full file metadata.
      */
-    public List<CesnetFileMetadataResource> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException;
+    public List<CesnetFileMetadataRepresentation> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException;
 }

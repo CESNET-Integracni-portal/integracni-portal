@@ -11,14 +11,14 @@ import java.util.List;
 public interface FileMetadataDao {
 
     /**
-     * Finds a resource file metadata in database by its uuid.
+     * Finds a file metadata in database by its uuid.
      * @param fileMetadataUuid    Uuid of the file.
      * @return FileMetadata metadata.
      */
     public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) throws FileNotFoundException;
 
     /**
-     * Finds all resource files in database.
+     * Finds all files in database.
      * @return List of FileMetadata metadata.
      */
     public List<FileMetadata> getAllFileMetadatas();

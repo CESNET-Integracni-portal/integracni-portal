@@ -1,4 +1,4 @@
-package cz.cvut.fel.integracniportal.resource;
+package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -10,7 +10,7 @@ import java.util.List;
  * Resource class for user details.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDetailsResource {
+public class UserDetailsRepresentation {
 
     private long userId;
 
@@ -20,8 +20,8 @@ public class UserDetailsResource {
 
     private List<String> userRoles = new ArrayList<String>();
 
-    public UserDetailsResource() {}
-    public UserDetailsResource(UserDetails userDetails) {
+    public UserDetailsRepresentation() {}
+    public UserDetailsRepresentation(UserDetails userDetails) {
         this.userId = userDetails.getUserId();
         this.username = userDetails.getUsername();
     }

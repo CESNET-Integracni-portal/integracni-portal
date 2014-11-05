@@ -26,6 +26,14 @@
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 
+    <!-- Date formatting when exporting to JSON -->
+    <bean id="jsonDateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg value="${format.date}"/>
+    </bean>
+    <bean id="jsonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="dateFormat" ref="jsonDateFormat"/>
+    </bean>
+
     <!-- Scan packages for services, etc. -->
     <context:annotation-config/>
     <context:component-scan base-package="cz.cvut.fel.integracniportal">

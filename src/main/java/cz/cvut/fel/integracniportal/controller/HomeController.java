@@ -2,7 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
+import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,10 @@ public class HomeController {
 
     @RequestMapping(value = "user/{username}", method = RequestMethod.GET)
     @ResponseBody
-    public UserDetailsResource user(@PathVariable("username") String username) {
+    public UserDetailsRepresentation user(@PathVariable("username") String username) {
         UserDetails userDetails = userDetailsService.getUserByUsername(username);
         if (userDetails != null) {
-            UserDetailsResource userDetailsResource = new UserDetailsResource(userDetails);
+            UserDetailsRepresentation userDetailsResource = new UserDetailsRepresentation(userDetails);
             return userDetailsResource;
         }
         return null;
@@ -46,10 +46,10 @@ public class HomeController {
     @RequestMapping(value = "secure/user/{username}", method = RequestMethod.GET)
     @ResponseBody
     @Secured("ROLE_ADMIN")
-    public UserDetailsResource secure(@PathVariable("username") String username) {
+    public UserDetailsRepresentation secure(@PathVariable("username") String username) {
         UserDetails userDetails = userDetailsService.getUserByUsername(username);
         if (userDetails != null) {
-            UserDetailsResource userDetailsResource = new UserDetailsResource(userDetails);
+            UserDetailsRepresentation userDetailsResource = new UserDetailsRepresentation(userDetails);
             return userDetailsResource;
         }
         return null;

@@ -1,8 +1,5 @@
-package cz.cvut.fel.integracniportal.resource;
+package cz.cvut.fel.integracniportal.representation;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata;
-import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.util.Date;
@@ -10,7 +7,9 @@ import java.util.Date;
 /**
  * Resource class for file metadata.
  */
-public class FileMetadataResource {
+public class FileMetadataRepresentation {
+
+    private String uuid;
 
     private String filename;
 
@@ -18,13 +17,28 @@ public class FileMetadataResource {
 
     private Long filesize;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date createdOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mmZZZZZ")
     private Date changedOn;
 
-    public FileMetadataResource() {}
+    public FileMetadataRepresentation() {}
+
+    public FileMetadataRepresentation(FileMetadata fileMetadata) {
+        uuid = fileMetadata.getUuid();
+        filename = fileMetadata.getFilename();
+        mimetype = fileMetadata.getMimetype();
+        filesize = fileMetadata.getFilesize();
+        createdOn = fileMetadata.getCreatedOn();
+        changedOn = fileMetadata.getChangedOn();
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getFilename() {
         return filename;

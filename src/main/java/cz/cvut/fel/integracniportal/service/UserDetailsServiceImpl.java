@@ -4,7 +4,7 @@ import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
-import cz.cvut.fel.integracniportal.resource.UserDetailsResource;
+import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails createUser(UserDetailsResource userDetailsResource) throws UserRoleNotFoundException {
+    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException {
         UserDetails user = new UserDetails();
         List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getUserRoles().size());
         for (String userRoleName: userDetailsResource.getUserRoles()) {

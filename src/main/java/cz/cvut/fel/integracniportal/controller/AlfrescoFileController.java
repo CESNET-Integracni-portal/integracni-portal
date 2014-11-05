@@ -2,7 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.cmis.AlfrescoService;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
-import cz.cvut.fel.integracniportal.resource.FileMetadataResource;
+import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -35,20 +35,20 @@ public class AlfrescoFileController {
      */
     @RequestMapping(value = "/v0.1/file/{fileuri}/metadata", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<FileMetadataResource> alfrescoGetFileMetadata(@PathVariable("fileuri") String fileUri) {
+    public ResponseEntity<FileMetadataRepresentation> alfrescoGetFileMetadata(@PathVariable("fileuri") String fileUri) {
         try {
 
             Document document = alfrescoService.getFile(fileUri);
-            FileMetadataResource metadata = new FileMetadataResource();
+            FileMetadataRepresentation metadata = new FileMetadataRepresentation();
             metadata.setFilename(document.getName());
             metadata.setFilesize(document.getContentStreamLength());
             metadata.setCreatedOn(document.getCreationDate().getTime());
             metadata.setChangedOn(document.getLastModificationDate().getTime());
             metadata.setMimetype(document.getContentStreamMimeType());
-            return new ResponseEntity<FileMetadataResource>(metadata, HttpStatus.OK);
+            return new ResponseEntity<FileMetadataRepresentation>(metadata, HttpStatus.OK);
 
         } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<FileMetadataResource>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<FileMetadataRepresentation>(HttpStatus.NOT_FOUND);
         }
     }
 
