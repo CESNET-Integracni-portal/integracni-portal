@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.controller;
 
+import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
@@ -20,7 +22,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
-public class UserController {
+public class UserController extends AbstractController {
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -47,22 +49,24 @@ public class UserController {
 
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
+    public ResponseEntity<Object> createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<String>(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
 
         try {
             UserDetails userDetails = userDetailsService.createUser(userDetailsResource);
-            return new ResponseEntity<String>("/rest/v0.1/user/"+userDetails.getUserId(), HttpStatus.OK);
+            return new ResponseEntity<Object>("/rest/v0.1/user/"+userDetails.getUserId(), HttpStatus.OK);
+        } catch (AlreadyExistsException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
         } catch (UserRoleNotFoundException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
-    public UserDetailsRepresentation getUser(@PathVariable("userid") long userId) {
+    public UserDetailsRepresentation getUser(@PathVariable("userid") Long userId) {
         UserDetails userDetails = userDetailsService.getUserById(userId);
         return userDetailsToResource(userDetails);
     }
@@ -72,6 +76,21 @@ public class UserController {
         userDetailsResource.setUserId(userDetails.getUserId());
         userDetailsResource.setUsername(userDetails.getUsername());
         return userDetailsResource;
+    }
+
+    @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> updateUser(@PathVariable("userid") Long userId,
+                                             @RequestBody UserDetailsRepresentation userDetailsResource) {
+
+        try {
+            UserDetails userDetails = userDetailsService.updateUser(userId, userDetailsResource);
+            return new ResponseEntity<String>("/rest/v0.1/user/"+userDetails.getUserId(), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+        } catch (UserRoleNotFoundException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

@@ -138,7 +138,7 @@ public class CesnetServiceImpl implements CesnetService {
     private CesnetFileMetadata parseFileMetadata(String lsOutput) throws FileAccessException {
         String[] parts = lsOutput.split("\\s+");
         if (parts == null || parts.length < 9) {
-            throw new FileAccessException("Unable to parse metadata.");
+            throw new FileAccessException("cesnet.parseError");
         }
 
         CesnetFileMetadata fileMetadata = new CesnetFileMetadata();

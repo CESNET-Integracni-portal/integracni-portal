@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
  * Entity for folder.
  */
 @Entity
-@Table(name = "resource_folder")
+@Table(name = "resource_folder", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "name"}))
 public class Folder {
 
     @Id
@@ -24,6 +26,7 @@ public class Folder {
     private Folder parent;
 
     @OneToMany(mappedBy = "parent")
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.DELETE})
     private List<Folder> folders;
 
     @OneToMany(mappedBy = "parent")
@@ -34,6 +37,10 @@ public class Folder {
 
     @Column(name = "changed_on", nullable = false)
     private Date changedOn;
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "user_id")
+    private UserDetails owner;
 
     public Long getFolderId() {
         return folderId;
@@ -89,5 +96,13 @@ public class Folder {
 
     public void setChangedOn(Date changedOn) {
         this.changedOn = changedOn;
+    }
+
+    public UserDetails getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserDetails owner) {
+        this.owner = owner;
     }
 }

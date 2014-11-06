@@ -65,10 +65,10 @@ public class SshChannel {
             return response;
         } catch (IOException e) {
             logger.error("Unable to read response.");
-            throw new ServiceAccessException("Unable to read response.");
+            throw new ServiceAccessException("cesnet.service.badResponse");
         } catch (JSchException e) {
             logger.error("Unable to connect to Cesnet.");
-            throw new ServiceAccessException("Unable to connect to Cesnet.");
+            throw new ServiceAccessException("cesnet.service.unavailable");
         }
     }
 

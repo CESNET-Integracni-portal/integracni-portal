@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
@@ -26,6 +28,13 @@ public interface UserDetailsService {
     public UserDetails getUserByUsername(String username);
 
     /**
+     * Gets the currently logged in user.
+     *
+     * @return UserDetails for the current user.
+     */
+    public UserDetails getCurrentUser();
+
+    /**
      * Finds all users in the database.
      * @return List of users.
      */
@@ -36,7 +45,15 @@ public interface UserDetailsService {
      *
      * @param userDetailsResource the user details
      */
-    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException;
+    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException;
+
+    /**
+     * Updates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
+     *
+     * @param userId                id of the user to be updated
+     * @param userDetailsResource   the user details
+     */
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException;
 
     /**
      * Saves the user into database.

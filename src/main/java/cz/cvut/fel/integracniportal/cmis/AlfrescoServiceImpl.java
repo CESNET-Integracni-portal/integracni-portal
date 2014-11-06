@@ -99,10 +99,10 @@ public class AlfrescoServiceImpl implements AlfrescoService {
             if (folderObject != null && folderObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
                 return (Folder) folderObject;
             } else {
-                throw new ServiceAccessException("Unable to access alfresco root folder for the application.");
+                throw new ServiceAccessException("alfresco.rootFolderInaccesible");
             }
         } catch (CmisObjectNotFoundException e) {
-            throw new ServiceAccessException("Unable to access alfresco root folder for the application.");
+            throw new ServiceAccessException("alfresco.rootFolderInaccesible");
         }
     }
 }

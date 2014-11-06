@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.representation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.Date;
 /**
  * Resource class for file metadata.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileMetadataRepresentation {
 
     private String uuid;

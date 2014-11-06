@@ -57,7 +57,7 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
     @Test
     void "should return 503 Service Unavailable if ServiceAccessException thrown"() {
         when(cesnetService.getFileMetadata("2"))
-                .thenThrow(new ServiceAccessException("Service unavailable"))
+                .thenThrow(new ServiceAccessException("cesnet.service.unavailable"))
 
         apiGet("archive/2")
                 .andExpect(status().isServiceUnavailable())
@@ -67,7 +67,7 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
     @Test
     void "should return 503 Service Unavailable if FileAccessException thrown"() {
         when(cesnetService.getFileMetadata("2"))
-                .thenThrow(new FileAccessException("Service unavailable"))
+                .thenThrow(new FileAccessException("cesnet.service.unavailable"))
 
         apiGet("archive/2")
                 .andExpect(status().isServiceUnavailable())

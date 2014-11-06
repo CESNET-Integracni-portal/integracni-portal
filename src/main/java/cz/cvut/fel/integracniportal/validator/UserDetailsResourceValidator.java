@@ -9,6 +9,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.util.Collections;
+
 /**
  * Validator for the {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
  */
@@ -36,14 +38,17 @@ public class UserDetailsResourceValidator implements Validator {
      */
     @Override
     public void validate(Object o, Errors errors) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "Uživatelské jméno nesmí být prázdné.");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "Heslo nesmí být prázdné.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "username.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.empty");
         UserDetailsRepresentation userDetailsResource = (UserDetailsRepresentation) o;
 
-        for (String userRoleName: userDetailsResource.getUserRoles()) {
-            UserRole userRole = userRoleService.getRoleByName(userRoleName);
-            if (userRole == null) {
-                errors.rejectValue("userRoles", "Uživatelská role " + userRoleName + " neexistuje.");
+        if (userDetailsResource.getUserRoles() != null) {
+            for (String userRoleName : userDetailsResource.getUserRoles()) {
+                UserRole userRole = userRoleService.getRoleByName(userRoleName);
+                if (userRole == null) {
+                    Object[] args = {userRoleName};
+                    errors.rejectValue("userRoles", "role.notFound", args, "User role does not exist.");
+                }
             }
         }
     }

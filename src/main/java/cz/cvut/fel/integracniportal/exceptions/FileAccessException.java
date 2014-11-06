@@ -1,7 +1,18 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-public class FileAccessException extends Exception {
-    public FileAccessException(String s) {
-        super(s);
+import org.springframework.context.MessageSourceResolvable;
+
+public class FileAccessException extends AbstractCustomException {
+
+    public FileAccessException(MessageSourceResolvable e) {
+        super(e);
+    }
+
+    public FileAccessException(String code) {
+        super(code);
+    }
+
+    public FileAccessException(String code, Object... args) {
+        super(code, args);
     }
 }

@@ -1,11 +1,15 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
+import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,19 +43,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
+    public UserDetails getCurrentUser() {
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedUser == null) {
+            return null;
+        }
+        UserDetails userDetails = getUserByUsername(loggedUser.getUsername());
+        return userDetails;
+    }
+
+    @Override
     public List<UserDetails> getAllUsers() {
         return userDao.getAllUsers();
     }
 
     @Override
     @Transactional
-    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException {
+    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException {
+        if (getUserByUsername(userDetailsResource.getUsername()) != null) {
+            throw new AlreadyExistsException("user.alreadyExists");
+        }
+
         UserDetails user = new UserDetails();
         List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getUserRoles().size());
         for (String userRoleName: userDetailsResource.getUserRoles()) {
             UserRole userRole = userRoleService.getRoleByName(userRoleName);
             if (userRole == null) {
-                throw new UserRoleNotFoundException("Uživatelská role " + userRoleName + " neexistuje.");
+                throw new UserRoleNotFoundException("role.notFound", userRoleName);
             }
             userRoles.add(userRole);
         }
@@ -61,6 +79,34 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setPassword(encodedPassword);
         userDao.saveUser(user);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException {
+        UserDetails userDetails = getUserById(userId);
+        if (userDetails == null) {
+            throw new NotFoundException("user.notFound", userId);
+        }
+        if (userDetailsResource.getUsername() != null) {
+            userDetails.setUsername(userDetailsResource.getUsername());
+        }
+        if (userDetailsResource.getPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(userDetailsResource.getPassword());
+            userDetails.setPassword(encodedPassword);
+        }
+        if (userDetailsResource.getUserRoles() != null) {
+            userDetails.getUserRoles().clear();
+            for (String roleName: userDetailsResource.getUserRoles()) {
+                UserRole role = userRoleService.getRoleByName(roleName);
+                if (role == null) {
+                    throw new UserRoleNotFoundException("role.notFound", roleName);
+                }
+                userDetails.getUserRoles().add(role);
+            }
+        }
+        userDao.saveUser(userDetails);
+        return userDetails;
     }
 
     @Override

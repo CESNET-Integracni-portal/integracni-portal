@@ -1,7 +1,18 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-public class ServiceAccessException extends Exception {
-    public ServiceAccessException(String s) {
-        super(s);
+import org.springframework.context.MessageSourceResolvable;
+
+public class ServiceAccessException extends AbstractCustomException {
+
+    public ServiceAccessException(MessageSourceResolvable e) {
+        super(e);
+    }
+
+    public ServiceAccessException(String code) {
+        super(code);
+    }
+
+    public ServiceAccessException(String code, Object... args) {
+        super(code, args);
     }
 }

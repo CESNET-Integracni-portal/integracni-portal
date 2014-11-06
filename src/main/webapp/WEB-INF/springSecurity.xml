@@ -27,7 +27,7 @@
         <!-- Default admin user -->
         <security:authentication-provider>
             <security:user-service>
-                <security:user name="admin" password="admin" authorities="ROLE_ADMIN" />
+                <security:user name="${defaultAdmin.username}" password="${defaultAdmin.password}" authorities="ROLE_ADMIN" />
             </security:user-service>
         </security:authentication-provider>
     </security:authentication-manager>

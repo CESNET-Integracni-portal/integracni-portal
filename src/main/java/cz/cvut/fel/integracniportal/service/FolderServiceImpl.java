@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class FolderServiceImpl implements FolderService {
 
     @Autowired
     private FolderDao folderDao;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     public Folder getFolderById(long id) {
@@ -41,6 +45,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    @Transactional
     public List<FolderRepresentation> getTopLevelFolderRepresentations() {
         List<Folder> folders = getTopLevelFolders();
         List<FolderRepresentation> folderResources = new ArrayList<FolderRepresentation>(folders.size());
@@ -52,12 +57,16 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    @Transactional
     public Folder createFolder(Folder folder) {
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+        folder.setOwner(currentUser);
         folderDao.createFolder(folder);
         return folder;
     }
 
     @Override
+    @Transactional
     public Folder createFolder(String folderName, Folder parent) {
         Folder newFolder = new Folder();
         newFolder.setName(folderName);

@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.UserDetails;
+import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,16 @@ public class UserDetailsRepresentation {
 
     private String password;
 
-    private List<String> userRoles = new ArrayList<String>();
+    private List<String> userRoles;
 
     public UserDetailsRepresentation() {}
     public UserDetailsRepresentation(UserDetails userDetails) {
         this.userId = userDetails.getUserId();
         this.username = userDetails.getUsername();
+        List<String> roles =  new ArrayList<String>();
+        for (UserRole role: userDetails.getUserRoles()) {
+            roles.add(role.getName());
+        }
     }
 
     public long getUserId() {

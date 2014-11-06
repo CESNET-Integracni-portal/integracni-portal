@@ -3,7 +3,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
-import cz.cvut.fel.integracniportal.exceptions.FolderNotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -56,7 +56,7 @@ public interface FileMetadataService {
      * @param file      The file to be uploaded.
      * @return Uuid identifier of the created file.
      */
-    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, FolderNotFoundException;
+    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, NotFoundException;
 
     /**
      * Uploads a file and stores its metadata in database.

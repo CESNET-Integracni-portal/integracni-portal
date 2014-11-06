@@ -9,7 +9,7 @@ import java.util.Date;
  * Entity for file metadata.
  */
 @Entity
-@Table(name = "resource_file")
+@Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "filename"}))
 public class FileMetadata {
 
     @Id
@@ -36,6 +36,10 @@ public class FileMetadata {
 
     @Column(name = "changed_on", nullable = false)
     private Date changedOn;
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "user_id")
+    private UserDetails owner;
 
     @Column(name = "archive_on", nullable = true)
     private Date archiveOn;
@@ -97,6 +101,14 @@ public class FileMetadata {
 
     public void setChangedOn(Date changedOn) {
         this.changedOn = changedOn;
+    }
+
+    public UserDetails getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserDetails owner) {
+        this.owner = owner;
     }
 
     public Date getArchiveOn() {

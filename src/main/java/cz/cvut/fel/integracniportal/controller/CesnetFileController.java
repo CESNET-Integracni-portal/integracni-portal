@@ -4,7 +4,7 @@ import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
-import cz.cvut.fel.integracniportal.exceptions.FolderNotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -29,7 +29,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
-public class CesnetFileController {
+public class CesnetFileController extends AbstractController {
 
     private static final Logger logger = Logger.getLogger(CesnetFileController.class);
 
@@ -145,18 +145,18 @@ public class CesnetFileController {
      */
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/metadata", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<CesnetFileMetadataRepresentation> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
+    public ResponseEntity<Object> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
 
             CesnetFileMetadataRepresentation fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
-            return new ResponseEntity<CesnetFileMetadataRepresentation>(fileMetadataResource, HttpStatus.OK);
+            return new ResponseEntity<Object>(fileMetadataResource, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileAccessException e) {
-            return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -169,13 +169,13 @@ public class CesnetFileController {
      */
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/metadata", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<CesnetFileMetadataRepresentation> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
+    public ResponseEntity<Object> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                                                    @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
         FileMetadata fileMetadata = null;
         try {
             fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         }
 
         FileState newFileState = fileMetadataRepresentation.getState();
@@ -189,12 +189,12 @@ public class CesnetFileController {
                         cesnetService.moveFileOffline(fileuuid);
                         break;
                     default:
-                        return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
                 }
             } catch (ServiceAccessException e) {
-                return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.SERVICE_UNAVAILABLE);
+                return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
             } catch (FileNotFoundException e) {
-                return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
             }
         }
 
@@ -203,7 +203,7 @@ public class CesnetFileController {
         fileMetadata.setArchiveOn(fileMetadataRepresentation.getArchiveOn());
         fileMetadata.setDeleteOn(fileMetadataRepresentation.getDeleteOn());
         fileMetadataService.updateFileMetadata(fileMetadata);
-        return new ResponseEntity<CesnetFileMetadataRepresentation>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -253,7 +253,7 @@ public class CesnetFileController {
         } catch (IOException e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -267,7 +267,7 @@ public class CesnetFileController {
             fileMetadataService.deleteFile(fileuuid);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileNotFoundException e) {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
@@ -286,12 +286,12 @@ public class CesnetFileController {
             FileMetadata fileMetadata = fileMetadataService.uploadFile(folderId, file);
             return new ResponseEntity<String>("/rest/v0.1/archive/file/"+fileMetadata.getUuid(), HttpStatus.CREATED);
 
-        } catch (FolderNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (IOException e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 

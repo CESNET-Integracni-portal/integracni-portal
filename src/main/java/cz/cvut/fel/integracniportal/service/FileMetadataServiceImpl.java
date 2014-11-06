@@ -6,10 +6,11 @@ import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
-import cz.cvut.fel.integracniportal.exceptions.FolderNotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Autowired
     private CesnetService cesnetService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) throws FileNotFoundException {
@@ -62,21 +66,23 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, FolderNotFoundException.class})
-    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, FolderNotFoundException {
+    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, NotFoundException.class})
+    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, NotFoundException {
         Folder parent = folderService.getFolderById(folderId);
         if (parent == null) {
-            throw new FolderNotFoundException();
+            throw new NotFoundException("cesnet.folder.notFound", folderId);
         }
         return uploadFile(parent, file);
     }
 
     @Override
-    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, FolderNotFoundException.class})
+    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, NotFoundException.class})
     public FileMetadata uploadFile(Folder folder, MultipartFile file) throws ServiceAccessException, IOException {
         FileMetadata fileMetadata = new FileMetadata();
         setFileMetadata(fileMetadata, file);
         fileMetadata.setParent(folder);
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+        fileMetadata.setOwner(currentUser);
         createFileMetadata(fileMetadata);
         String uuid = fileMetadata.getUuid();
 
@@ -85,7 +91,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
             folderService.updateFolder(folder);
             return fileMetadata;
         } catch (SftpException e) {
-            throw new ServiceAccessException("Cesnet service not available.");
+            throw new ServiceAccessException("cesnet.service.unavailable");
         }
     }
 
@@ -97,7 +103,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
             setFileMetadata(fileMetadata, file);
             updateFileMetadata(fileMetadata);
         } catch (SftpException e) {
-            throw new ServiceAccessException("Cesnet service not available.");
+            throw new ServiceAccessException("cesnet.service.unavailable");
         }
     }
 
@@ -108,7 +114,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
             cesnetService.deleteFile(uuid);
             removeFileMetadata(fileMetadata);
         } catch (SftpException e) {
-            throw new ServiceAccessException("Cesnet service not available.");
+            throw new ServiceAccessException("cesnet.service.unavailable");
         }
     }
 

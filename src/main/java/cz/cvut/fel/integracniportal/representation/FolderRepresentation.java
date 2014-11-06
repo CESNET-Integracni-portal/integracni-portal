@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.representation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 
@@ -8,6 +9,7 @@ import java.util.*;
 /**
  * Resource class for folder.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {
 
     private long folderId;
