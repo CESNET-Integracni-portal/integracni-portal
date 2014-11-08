@@ -18,7 +18,7 @@ public interface UserDetailsService {
      * @param userId    Id of the user.
      * @return UserDetails login credentials.
      */
-    public UserDetails getUserById(long userId);
+    public UserDetails getUserById(long userId) throws NotFoundException;
 
     /**
      * Finds a user in database by his username.

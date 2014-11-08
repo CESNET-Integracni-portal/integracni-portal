@@ -12,7 +12,7 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {
 
-    private long folderId;
+    private long id;
 
     private String name;
 
@@ -21,6 +21,8 @@ public class FolderRepresentation {
     private List<FolderRepresentation> folders;
 
     private List<FileMetadataRepresentation> files;
+
+    private UserDetailsRepresentation owner;
 
     private Date createdOn;
 
@@ -33,8 +35,13 @@ public class FolderRepresentation {
     }
 
     public FolderRepresentation(Folder folder, boolean deepCopy) {
-        folderId = folder.getFolderId();
+        id = folder.getFolderId();
         name = folder.getName();
+        if (folder.getOwner() != null) {
+            owner = new UserDetailsRepresentation();
+            owner.setId(folder.getOwner().getUserId());
+            owner.setUsername(folder.getOwner().getUsername());
+        }
         createdOn = folder.getCreatedOn();
         changedOn = folder.getChangedOn();
         if (deepCopy) {
@@ -60,37 +67,12 @@ public class FolderRepresentation {
         }
     }
 
-    private void createFromFolder(Folder folder, boolean deepCopy) {
-        folderId = folder.getFolderId();
-        name = folder.getName();
-        if (deepCopy) {
-            breadcrumbs = new ArrayList<Map<String, String>>();
-            Folder currentParent = folder.getParent();
-            while (currentParent != null) {
-                Map<String, String> breadcrumbEntry = new HashMap<String, String>();
-                breadcrumbEntry.put("id", currentParent.getFolderId().toString());
-                breadcrumbEntry.put("name", currentParent.getName());
-                breadcrumbs.add(breadcrumbEntry);
-            }
-            folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
-            for (Folder subFolder : folder.getFolders()) {
-                FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
-                folders.add(folderResource);
-            }
-            files = new ArrayList<FileMetadataRepresentation>(folder.getFiles().size());
-            for (FileMetadata fileMetadata : folder.getFiles()) {
-                FileMetadataRepresentation fileMetadataResource = new FileMetadataRepresentation(fileMetadata);
-                files.add(fileMetadataResource);
-            }
-        }
+    public long getId() {
+        return id;
     }
 
-    public long getFolderId() {
-        return folderId;
-    }
-
-    public void setFolderId(long folderId) {
-        this.folderId = folderId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -123,6 +105,14 @@ public class FolderRepresentation {
 
     public void setFiles(List<FileMetadataRepresentation> files) {
         this.files = files;
+    }
+
+    public UserDetailsRepresentation getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserDetailsRepresentation owner) {
+        this.owner = owner;
     }
 
     public Date getCreatedOn() {

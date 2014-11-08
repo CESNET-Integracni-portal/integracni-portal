@@ -19,6 +19,8 @@ public class FileMetadataRepresentation {
 
     private Long filesize;
 
+    private UserDetailsRepresentation owner;
+
     private Date createdOn;
 
     private Date changedOn;
@@ -30,6 +32,11 @@ public class FileMetadataRepresentation {
         filename = fileMetadata.getFilename();
         mimetype = fileMetadata.getMimetype();
         filesize = fileMetadata.getFilesize();
+        if (fileMetadata.getOwner() != null) {
+            owner = new UserDetailsRepresentation();
+            owner.setId(fileMetadata.getOwner().getUserId());
+            owner.setUsername(fileMetadata.getOwner().getUsername());
+        }
         createdOn = fileMetadata.getCreatedOn();
         changedOn = fileMetadata.getChangedOn();
     }
@@ -64,6 +71,14 @@ public class FileMetadataRepresentation {
 
     public void setFilesize(Long filesize) {
         this.filesize = filesize;
+    }
+
+    public UserDetailsRepresentation getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserDetailsRepresentation owner) {
+        this.owner = owner;
     }
 
     public Date getCreatedOn() {

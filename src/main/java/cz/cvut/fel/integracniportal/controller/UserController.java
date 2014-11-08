@@ -42,7 +42,7 @@ public class UserController extends AbstractController {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
         List<UserDetailsRepresentation> result = new ArrayList<UserDetailsRepresentation>(userDetailsList.size());
         for (UserDetails userDetails: userDetailsList) {
-            result.add(userDetailsToResource(userDetails));
+            result.add(new UserDetailsRepresentation(userDetails));
         }
         return result;
     }
@@ -55,8 +55,10 @@ public class UserController extends AbstractController {
         }
 
         try {
+
             UserDetails userDetails = userDetailsService.createUser(userDetailsResource);
-            return new ResponseEntity<Object>("/rest/v0.1/user/"+userDetails.getUserId(), HttpStatus.OK);
+            return new ResponseEntity<Object>(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
+
         } catch (AlreadyExistsException e) {
             return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
         } catch (UserRoleNotFoundException e) {
@@ -66,16 +68,15 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
-    public UserDetailsRepresentation getUser(@PathVariable("userid") Long userId) {
-        UserDetails userDetails = userDetailsService.getUserById(userId);
-        return userDetailsToResource(userDetails);
-    }
+    public ResponseEntity<Object> getUser(@PathVariable("userid") Long userId) {
+        try {
 
-    private UserDetailsRepresentation userDetailsToResource(UserDetails userDetails) {
-        UserDetailsRepresentation userDetailsResource = new UserDetailsRepresentation();
-        userDetailsResource.setUserId(userDetails.getUserId());
-        userDetailsResource.setUsername(userDetails.getUsername());
-        return userDetailsResource;
+            UserDetails userDetails = userDetailsService.getUserById(userId);
+            return new ResponseEntity<Object>(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.PUT)
@@ -84,8 +85,10 @@ public class UserController extends AbstractController {
                                              @RequestBody UserDetailsRepresentation userDetailsResource) {
 
         try {
-            UserDetails userDetails = userDetailsService.updateUser(userId, userDetailsResource);
-            return new ResponseEntity<String>("/rest/v0.1/user/"+userDetails.getUserId(), HttpStatus.OK);
+
+            userDetailsService.updateUser(userId, userDetailsResource);
+            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+
         } catch (NotFoundException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (UserRoleNotFoundException e) {

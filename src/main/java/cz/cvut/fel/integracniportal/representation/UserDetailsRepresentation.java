@@ -13,7 +13,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailsRepresentation {
 
-    private long userId;
+    private long id;
 
     private String username;
 
@@ -23,19 +23,21 @@ public class UserDetailsRepresentation {
 
     public UserDetailsRepresentation() {}
     public UserDetailsRepresentation(UserDetails userDetails) {
-        this.userId = userDetails.getUserId();
+        this.id = userDetails.getUserId();
         this.username = userDetails.getUsername();
         List<String> roles =  new ArrayList<String>();
-        for (UserRole role: userDetails.getUserRoles()) {
-            roles.add(role.getName());
+        if (userDetails.getUserRoles() != null) {
+            for (UserRole role : userDetails.getUserRoles()) {
+                roles.add(role.getName());
+            }
         }
     }
 
-    public long getUserId() {
-        return userId;
+    public long getId() {
+        return id;
     }
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUsername() {

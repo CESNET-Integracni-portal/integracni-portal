@@ -33,8 +33,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails getUserById(long userId) {
-        return userDao.getUserById(userId);
+    public UserDetails getUserById(long userId) throws NotFoundException {
+        UserDetails userDetails = userDao.getUserById(userId);
+        if (userDetails == null) {
+            throw new NotFoundException("user.notFound", userId);
+        }
+        return userDetails;
     }
 
     @Override
@@ -65,15 +69,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         UserDetails user = new UserDetails();
-        List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getUserRoles().size());
-        for (String userRoleName: userDetailsResource.getUserRoles()) {
-            UserRole userRole = userRoleService.getRoleByName(userRoleName);
-            if (userRole == null) {
-                throw new UserRoleNotFoundException("role.notFound", userRoleName);
+        if (userDetailsResource.getUserRoles() != null) {
+            List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getUserRoles().size());
+            for (String userRoleName : userDetailsResource.getUserRoles()) {
+                UserRole userRole = userRoleService.getRoleByName(userRoleName);
+                if (userRole == null) {
+                    throw new UserRoleNotFoundException("role.notFound", userRoleName);
+                }
+                userRoles.add(userRole);
             }
-            userRoles.add(userRole);
+            user.setUserRoles(userRoles);
         }
-        user.setUserRoles(userRoles);
         user.setUsername(userDetailsResource.getUsername());
         String encodedPassword = passwordEncoder.encode(userDetailsResource.getPassword());
         user.setPassword(encodedPassword);
@@ -82,12 +88,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {UserRoleNotFoundException.class, NotFoundException.class})
     public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException {
         UserDetails userDetails = getUserById(userId);
-        if (userDetails == null) {
-            throw new NotFoundException("user.notFound", userId);
-        }
         if (userDetailsResource.getUsername() != null) {
             userDetails.setUsername(userDetailsResource.getUsername());
         }

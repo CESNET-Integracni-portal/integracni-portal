@@ -9,6 +9,7 @@ import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation;
+import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import cz.cvut.fel.integracniportal.service.FileMetadataService;
 import cz.cvut.fel.integracniportal.service.FolderService;
@@ -77,9 +78,9 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
+    public ResponseEntity<FolderRepresentation> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
         Folder newFolder = folderService.createTopLevelFolder(folderRepresentation.getName());
-        return new ResponseEntity<String>("/rest/v0.1/archive/folder/"+newFolder.getFolderId(), HttpStatus.CREATED);
+        return new ResponseEntity<FolderRepresentation>(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
     }
 
     /**
@@ -90,15 +91,15 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
+    public ResponseEntity<Object> cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
                                                         @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
-            return new ResponseEntity<String>("/rest/v0.1/archive/folder/"+newFolder.getFolderId(), HttpStatus.CREATED);
+            return new ResponseEntity<Object>(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -146,7 +147,7 @@ public class CesnetFileController extends AbstractController {
      * @param fileuuid    The uuid identifier of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
@@ -170,7 +171,7 @@ public class CesnetFileController extends AbstractController {
      *                                      The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
-    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/metadata", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<Object> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                                                    @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
@@ -213,7 +214,7 @@ public class CesnetFileController extends AbstractController {
      * Download a file.
      * @param fileuuid    The uuid identifier of the file.
      */
-    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
 
@@ -243,7 +244,7 @@ public class CesnetFileController extends AbstractController {
      * @param file        New file to replace the original one.
      * @return
      */
-    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
@@ -283,18 +284,18 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}/files", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
+    public ResponseEntity<Object> cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
             FileMetadata fileMetadata = fileMetadataService.uploadFile(folderId, file);
-            return new ResponseEntity<String>("/rest/v0.1/archive/file/"+fileMetadata.getUuid(), HttpStatus.CREATED);
+            return new ResponseEntity<Object>(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (IOException e) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
