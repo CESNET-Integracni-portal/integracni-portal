@@ -59,12 +59,15 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<FolderRepresentation> cesnetGetFolder(@PathVariable("folderid") Long folderId) {
-        FolderRepresentation folderRepresentation = folderService.getFolderRepresentationById(folderId);
-        if (folderRepresentation == null) {
-            return new ResponseEntity<FolderRepresentation>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> cesnetGetFolder(@PathVariable("folderid") Long folderId) {
+        try {
+
+            FolderRepresentation folderRepresentation = folderService.getFolderRepresentationById(folderId);
+            return new ResponseEntity<Object>(folderRepresentation, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<FolderRepresentation>(folderRepresentation, HttpStatus.OK);
     }
 
     /**
@@ -75,8 +78,7 @@ public class CesnetFileController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
-
-        Folder newFolder = folderService.createFolder(folderRepresentation.getName(), null);
+        Folder newFolder = folderService.createTopLevelFolder(folderRepresentation.getName());
         return new ResponseEntity<String>("/rest/v0.1/archive/folder/"+newFolder.getFolderId(), HttpStatus.CREATED);
     }
 
@@ -90,14 +92,14 @@ public class CesnetFileController extends AbstractController {
     @ResponseBody
     public ResponseEntity<String> cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
                                                         @RequestBody FolderRepresentation folderRepresentation) {
+        try {
 
-        Folder parentFolder = folderService.getFolderById(parentFolderId);
-        if (parentFolder == null) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
+            return new ResponseEntity<String>("/rest/v0.1/archive/folder/"+newFolder.getFolderId(), HttpStatus.CREATED);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
-
-        Folder newFolder = folderService.createFolder(folderRepresentation.getName(), parentFolder);
-        return new ResponseEntity<String>("/rest/v0.1/archive/folder/"+newFolder.getFolderId(), HttpStatus.CREATED);
     }
 
     /**
@@ -107,18 +109,16 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<FolderRepresentation> cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
+    public ResponseEntity<Object> cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
                                                                    @RequestBody FolderRepresentation folderRepresentation) {
+        try {
 
-        Folder folder = folderService.getFolderById(folderId);
-        if (folder == null) {
-            return new ResponseEntity<FolderRepresentation>(HttpStatus.NOT_FOUND);
+            folderService.updateFolder(folderId, folderRepresentation);
+            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
-
-        folder.setName(folderRepresentation.getName());
-        folderService.updateFolder(folder);
-
-        return new ResponseEntity<FolderRepresentation>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -127,13 +127,16 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDeleteFolder(@PathVariable("folderid") Long folderId) {
-        Folder folder = folderService.getFolderById(folderId);
-        if (folder == null) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
+        try {
 
-        folderService.removeFolder(folder);
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+            folderService.removeFolder(folderId);
+            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 
 

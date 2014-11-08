@@ -35,7 +35,7 @@ public class AuthenticationService implements org.springframework.security.core.
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails userEntity = userService.getUserByUsername(username);
         if (userEntity == null) {
-            logger.error("Login credentials for user " + username + " not found.");
+            logger.info("Login credentials for user " + username + " not found.");
             throw new UsernameNotFoundException("User not found.");
         }
 

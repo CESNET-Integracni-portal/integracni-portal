@@ -1,9 +1,12 @@
 package cz.cvut.fel.integracniportal.service;
 
 
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -16,14 +19,14 @@ public interface FolderService {
      * @param id    Id of the folder.
      * @return The folder.
      */
-    public Folder getFolderById(long id);
+    public Folder getFolderById(long id) throws NotFoundException;
 
     /**
      * Finds a folder in database by its id and returns its representation.
      * @param id    Id of the folder.
      * @return The folder representation.
      */
-    public FolderRepresentation getFolderRepresentationById(long id);
+    public FolderRepresentation getFolderRepresentationById(long id) throws NotFoundException;
 
     /**
      * Finds all top level folders.
@@ -44,11 +47,31 @@ public interface FolderService {
     public Folder createFolder(Folder folder);
 
     /**
+     * Creates new top level folder in database.
+     * @param folderName    Name of the folder to be created.
+     */
+    public Folder createTopLevelFolder(String folderName);
+
+    /**
+     * Creates new folder in database.
+     * @param folderName    Name of the folder to be created.
+     * @param parentId      Id of the parent folder in which to create the new one.
+     */
+    public Folder createSubFolder(String folderName, Long parentId) throws NotFoundException;
+
+    /**
      * Creates new folder in database.
      * @param folderName    Name of the folder to be created.
      * @param parent        Parent folder in which to create the new one.
      */
-    public Folder createFolder(String folderName, Folder parent);
+    public Folder createSubFolder(String folderName, Folder parent);
+
+    /**
+     * Updates existing folder in the database.
+     * @param folderId              Id of the folder which is to be updated in the database.
+     * @param folderRepresentation  Folder representation data which used to update the database.
+     */
+    public Folder updateFolder(Long folderId, FolderRepresentation folderRepresentation) throws NotFoundException;
 
     /**
      * Updates existing folder in the database.
@@ -58,8 +81,14 @@ public interface FolderService {
 
     /**
      * Removes a folder from the database.
+     * @param folderId  Id of the folder to be removed from the database.
+     */
+    public void removeFolder(Long folderId) throws ServiceAccessException, NotFoundException;
+
+    /**
+     * Removes a folder from the database.
      * @param folder  Folder to be removed from the database.
      */
-    public void removeFolder(Folder folder);
+    public void removeFolder(Folder folder) throws ServiceAccessException;
 
 }

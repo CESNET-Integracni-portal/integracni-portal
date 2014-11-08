@@ -80,6 +80,12 @@ public interface FileMetadataService {
     public void deleteFile(String uuid) throws ServiceAccessException, FileNotFoundException;
 
     /**
+     * Deletes a file and removes its metadata from database
+     * @param fileMetadata    File to be deleted.
+     */
+    public void deleteFile(FileMetadata fileMetadata) throws ServiceAccessException;
+
+    /**
      * Returns full metadata information about a file.
      * @param fileMetadataUuid    Uuid of the file.
      * @return Full file metadata.

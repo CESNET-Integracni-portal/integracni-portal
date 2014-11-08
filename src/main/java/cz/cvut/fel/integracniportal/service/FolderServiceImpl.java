@@ -1,6 +1,9 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.FolderDao;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
+import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
@@ -21,20 +24,24 @@ public class FolderServiceImpl implements FolderService {
     private FolderDao folderDao;
 
     @Autowired
+    private FileMetadataService fileMetadataService;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Override
-    public Folder getFolderById(long id) {
-        return folderDao.getFolderById(id);
+    public Folder getFolderById(long id) throws NotFoundException {
+        Folder folder = folderDao.getFolderById(id);
+        if (folder == null) {
+            throw new NotFoundException("cesnet.folder.notFound", id);
+        }
+        return folder;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public FolderRepresentation getFolderRepresentationById(long id) {
+    public FolderRepresentation getFolderRepresentationById(long id) throws NotFoundException {
         Folder folder = getFolderById(id);
-        if (folder == null) {
-            return null;
-        }
         FolderRepresentation folderRepresentation = new FolderRepresentation(folder);
         return folderRepresentation;
     }
@@ -66,13 +73,35 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    @Transactional
-    public Folder createFolder(String folderName, Folder parent) {
+    public Folder createTopLevelFolder(String folderName) {
+        Folder newFolder = new Folder();
+        newFolder.setName(folderName);
+        createFolder(newFolder);
+        return newFolder;
+    }
+
+    @Override
+    @Transactional(rollbackFor = NotFoundException.class)
+    public Folder createSubFolder(String folderName, Long parentId) throws NotFoundException {
+        Folder parent = getFolderById(parentId);
+        return createSubFolder(folderName, parent);
+    }
+
+    @Override
+    public Folder createSubFolder(String folderName, Folder parent) {
         Folder newFolder = new Folder();
         newFolder.setName(folderName);
         newFolder.setParent(parent);
         createFolder(newFolder);
         return newFolder;
+    }
+
+    @Override
+    @Transactional(rollbackFor = NotFoundException.class)
+    public Folder updateFolder(Long folderId, FolderRepresentation folderRepresentation) throws NotFoundException {
+        Folder folder = getFolderById(folderId);
+        folder.setName(folderRepresentation.getName());
+        return updateFolder(folder);
     }
 
     @Override
@@ -82,7 +111,21 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void removeFolder(Folder folder) {
+    @Transactional(rollbackFor = ServiceAccessException.class)
+    public void removeFolder(Long folderId) throws ServiceAccessException, NotFoundException {
+        Folder folder = getFolderById(folderId);
+        removeFolder(folder);
+    }
+
+    @Override
+    @Transactional(rollbackFor = ServiceAccessException.class)
+    public void removeFolder(Folder folder) throws ServiceAccessException {
+        for (FileMetadata fileMetadata: folder.getFiles()) {
+            fileMetadataService.deleteFile(fileMetadata);
+        }
+        for (Folder subFolder: folder.getFolders()) {
+            removeFolder(subFolder);
+        }
         folderDao.removeFolder(folder);
     }
 }
