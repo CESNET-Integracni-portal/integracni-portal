@@ -12,6 +12,7 @@
     <import resource="../oauth2-configuration.xml"/>
     <import resource="../token-store.xml"/>
     <import resource="../cesnet.xml"/>
+    <import resource="../alfresco.xml"/>
     <import resource="../cron.xml"/>
 
     <!-- Load application.properties file -->
@@ -25,6 +26,14 @@
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+    <!-- Date formatting when exporting to JSON -->
+    <bean id="jsonDateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg value="${format.date}"/>
+    </bean>
+    <bean id="jsonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="dateFormat" ref="jsonDateFormat"/>
+    </bean>
 
     <!-- Scan packages for services, etc. -->
     <context:annotation-config/>

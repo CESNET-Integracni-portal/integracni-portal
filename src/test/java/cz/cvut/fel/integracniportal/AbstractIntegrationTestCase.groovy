@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
+import com.github.springtestdbunit.annotation.DbUnitConfiguration
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4SpringockitoContextTests
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "file:src/main/webapp/WEB-INF/test/test-applicationContext.xml"
 ])
 @TestExecutionListeners(TransactionDbUnitTestExecutionListener)
+@DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
 public abstract class AbstractIntegrationTestCase extends AbstractJUnit4SpringockitoContextTests {
 
     protected MockMvc mockMvc

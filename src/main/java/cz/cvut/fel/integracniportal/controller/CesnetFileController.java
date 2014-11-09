@@ -111,7 +111,7 @@ public class CesnetFileController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<Object> cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
-                                                                   @RequestBody FolderRepresentation folderRepresentation) {
+													 @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             folderService.updateFolder(folderId, folderRepresentation);

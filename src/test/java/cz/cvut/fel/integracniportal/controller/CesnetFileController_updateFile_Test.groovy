@@ -3,19 +3,19 @@ package cz.cvut.fel.integracniportal.controller
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
+import cz.cvut.fel.integracniportal.cesnet.FileState
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao
-import org.junit.Ignore
+import org.apache.commons.io.IOUtils
 import org.junit.Test
 import org.kubek2k.springockito.annotations.ReplaceWithMock
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ContextConfiguration
 
-import static org.mockito.Matchers.any
+import static org.junit.Assert.assertEquals
 import static org.mockito.Mockito.when
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
@@ -28,28 +28,31 @@ public class CesnetFileController_updateFile_Test extends AbstractIntegrationTes
 
     @Autowired
     @ReplaceWithMock
-    CesnetService cesnetService;
+    CesnetService cesnetService
 
     @Autowired
-    FileMetadataDao metadataDao;
+    FileMetadataDao metadataDao
 
     @Test
-    @Ignore
-    void "should update the file data"() {
-        when(cesnetService.uploadFile(any(InputStream), "2"))
+    void "should update the file's metadata"() {
+        when(cesnetService.getFileMetadata("2"))
+                .thenReturn(new CesnetFileMetadata(filename: "2", filesize: 100, state: FileState.REG))
 
-        def file = new MockMultipartFile("x.json", "x.json", "application/json", "{}".getBytes())
+        def body = IOUtils.toString(getClass().getResourceAsStream("putFileMetadata.json"))
 
-        mockMvc.perform(fileUpload(fromApi("archive/2")).file(file))
+        apiPut("archive/file/2", body)
                 .andExpect(status().isNoContent())
 
-        def meta = metadataDao.getFileMetadataByUuid("2");
+        def meta = metadataDao.getFileMetadataByUuid("2")
+
+        assertEquals "x.jpg", meta.filename
+        assertEquals "image/jpeg", meta.mimetype
     }
 
 
     @Test
     void "should return 404 Not Found for non existing file"() {
-        apiGet("archive/666")
+        apiGet("archive/file/666")
                 .andExpect(status().isNotFound())
     }
 

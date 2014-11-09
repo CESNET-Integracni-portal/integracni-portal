@@ -5,9 +5,9 @@ import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
+import cz.cvut.fel.integracniportal.cesnet.FileState
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException
-import org.apache.commons.io.IOUtils
 import org.junit.Test
 import org.kubek2k.springockito.annotations.ReplaceWithMock
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
 import static org.mockito.Mockito.when
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * @author Radek Jezdik
@@ -27,29 +28,28 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
 
     @Autowired
     @ReplaceWithMock
-    CesnetService cesnetService;
+    CesnetService cesnetService
 
     @Test
-    void "should return the content of the file"() {
-        def returnBody = "<html></html>"
-
+    void "should return the file metadata json"() {
         when(cesnetService.getFileMetadata("2"))
-                .thenReturn(new CesnetFileMetadata(filename: "2"))
+                .thenReturn(new CesnetFileMetadata(filename: "2", filesize: 100, state: FileState.REG))
 
-        when(cesnetService.getFile("2"))
-                .thenReturn(IOUtils.toInputStream(returnBody, "UTF-8"))
-
-        apiGet("archive/2")
+        apiGet("archive/file/2")
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", 'attachment; filename=\"b.html\"'))
-                .andExpect(content().contentType("text/html"))
-                .andExpect(content().string(returnBody))
+                .andExpect(jsonPath('$.uuid').value("2"))
+                .andExpect(jsonPath('$.filename').value("b.html"))
+                .andExpect(jsonPath('$.filesize').value(100))
+                .andExpect(jsonPath('$.state').value("REG"))
+                .andExpect(jsonPath('$.mimetype').value("text/html"))
+                .andExpect(jsonPath('$.createdOn').value("2014-01-01T00:00+0100"))
+                .andExpect(jsonPath('$.changedOn').value("2014-01-01T00:00+0100"))
     }
 
 
     @Test
     void "should return 404 Not Found for non existing file"() {
-        apiGet("archive/666")
+        apiGet("archive/file/666")
                 .andExpect(status().isNotFound())
     }
 
@@ -59,7 +59,7 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
         when(cesnetService.getFileMetadata("2"))
                 .thenThrow(new ServiceAccessException("cesnet.service.unavailable"))
 
-        apiGet("archive/2")
+        apiGet("archive/file/2")
                 .andExpect(status().isServiceUnavailable())
     }
 
@@ -69,7 +69,7 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
         when(cesnetService.getFileMetadata("2"))
                 .thenThrow(new FileAccessException("cesnet.service.unavailable"))
 
-        apiGet("archive/2")
+        apiGet("archive/file/2")
                 .andExpect(status().isServiceUnavailable())
     }
 
@@ -79,7 +79,7 @@ public class CesnetFileController_getFile_Test extends AbstractIntegrationTestCa
         when(cesnetService.getFileMetadata("2"))
                 .thenThrow(new FileNotFoundException("Not found"))
 
-        apiGet("archive/2")
+        apiGet("archive/file/2")
                 .andExpect(status().isNotFound())
     }
 

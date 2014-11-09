@@ -6,13 +6,13 @@ import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao
-import org.junit.Assert
 import org.junit.Test
 import org.kubek2k.springockito.annotations.ReplaceWithMock
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
+import static org.junit.Assert.fail
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -27,19 +27,19 @@ public class CesnetFileController_deleteFile_Test extends AbstractIntegrationTes
 
     @Autowired
     @ReplaceWithMock
-    CesnetService cesnetService;
+    CesnetService cesnetService
 
     @Autowired
-    FileMetadataDao metadataDao;
+    FileMetadataDao metadataDao
 
     @Test
     void "should delete the file and its metadata"() {
-        apiDelete("archive/2")
+        apiDelete("archive/file/2")
                 .andExpect(status().isNoContent())
 
         try {
             metadataDao.getFileMetadataByUuid("2")
-            Assert.fail("File metadata still exist")
+            fail("File metadata still exist")
 
         } catch (FileNotFoundException e) {
             // OK
@@ -54,14 +54,14 @@ public class CesnetFileController_deleteFile_Test extends AbstractIntegrationTes
         when(cesnetService.deleteFile("2"))
                 .thenThrow(new SftpException(0, ""))
 
-        apiDelete("archive/2")
+        apiDelete("archive/file/2")
                 .andExpect(status().isServiceUnavailable())
     }
 
 
     @Test
     void "should return 404 Not Found for non existing file"() {
-        apiGet("archive/666")
+        apiGet("archive/file/666")
                 .andExpect(status().isNotFound())
     }
 
