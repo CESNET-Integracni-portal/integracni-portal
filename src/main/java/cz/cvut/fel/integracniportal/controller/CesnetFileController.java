@@ -92,7 +92,7 @@ public class CesnetFileController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
-                                                        @RequestBody FolderRepresentation folderRepresentation) {
+                                                @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
@@ -111,7 +111,7 @@ public class CesnetFileController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
-													 @RequestBody FolderRepresentation folderRepresentation) {
+                                             @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             folderService.updateFolder(folderId, folderRepresentation);
@@ -174,7 +174,7 @@ public class CesnetFileController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
-                                                                   @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
+                                             @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
         FileMetadata fileMetadata = null;
         try {
             fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
