@@ -49,33 +49,33 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
+    public ResponseEntity createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<Object>(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
 
         try {
 
             UserDetails userDetails = userDetailsService.createUser(userDetailsResource);
-            return new ResponseEntity<Object>(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
+            return new ResponseEntity(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
 
         } catch (AlreadyExistsException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
         } catch (UserRoleNotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getUser(@PathVariable("userid") Long userId) {
+    public ResponseEntity getUser(@PathVariable("userid") Long userId) {
         try {
 
             UserDetails userDetails = userDetailsService.getUserById(userId);
-            return new ResponseEntity<Object>(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
+            return new ResponseEntity(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 

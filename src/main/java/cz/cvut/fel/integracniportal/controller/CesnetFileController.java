@@ -60,14 +60,14 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> cesnetGetFolder(@PathVariable("folderid") Long folderId) {
+    public ResponseEntity cesnetGetFolder(@PathVariable("folderid") Long folderId) {
         try {
 
             FolderRepresentation folderRepresentation = folderService.getFolderRepresentationById(folderId);
-            return new ResponseEntity<Object>(folderRepresentation, HttpStatus.OK);
+            return new ResponseEntity(folderRepresentation, HttpStatus.OK);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -91,15 +91,15 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
+    public ResponseEntity cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
                                                         @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
-            return new ResponseEntity<Object>(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
+            return new ResponseEntity(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -110,15 +110,15 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<Object> cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
+    public ResponseEntity cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
 													 @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
             folderService.updateFolder(folderId, folderRepresentation);
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -149,18 +149,18 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
+    public ResponseEntity cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
 
             CesnetFileMetadataRepresentation fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
-            return new ResponseEntity<Object>(fileMetadataResource, HttpStatus.OK);
+            return new ResponseEntity(fileMetadataResource, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -173,13 +173,13 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<Object> cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
+    public ResponseEntity cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                                                    @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
         FileMetadata fileMetadata = null;
         try {
             fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         FileState newFileState = fileMetadataRepresentation.getState();
@@ -193,12 +193,12 @@ public class CesnetFileController extends AbstractController {
                         cesnetService.moveFileOffline(fileuuid);
                         break;
                     default:
-                        return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(HttpStatus.BAD_REQUEST);
                 }
             } catch (ServiceAccessException e) {
-                return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+                return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
             } catch (FileNotFoundException e) {
-                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
         }
 
@@ -207,7 +207,7 @@ public class CesnetFileController extends AbstractController {
         fileMetadata.setArchiveOn(fileMetadataRepresentation.getArchiveOn());
         fileMetadata.setDeleteOn(fileMetadataRepresentation.getDeleteOn());
         fileMetadataService.updateFileMetadata(fileMetadata);
-        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -284,18 +284,18 @@ public class CesnetFileController extends AbstractController {
      */
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}/files", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
+    public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
             FileMetadata fileMetadata = fileMetadataService.uploadFile(folderId, file);
-            return new ResponseEntity<Object>(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
+            return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (IOException e) {
-            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
