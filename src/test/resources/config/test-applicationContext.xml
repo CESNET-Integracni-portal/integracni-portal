@@ -7,20 +7,20 @@
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <import resource="test-databaseConfig.xml"/>
-    <import resource="../springSecurity.xml"/>
-    <import resource="../client-details.xml"/>
-    <import resource="../oauth2-configuration.xml"/>
-    <import resource="../token-store.xml"/>
-    <import resource="../cesnet.xml"/>
-    <import resource="../alfresco.xml"/>
-    <import resource="../cron.xml"/>
+    <import resource="springSecurity.xml"/>
+    <import resource="client-details.xml"/>
+    <import resource="oauth2-configuration.xml"/>
+    <import resource="token-store.xml"/>
+    <import resource="cesnet.xml"/>
+    <import resource="alfresco.xml"/>
+    <import resource="cron.xml"/>
 
     <!-- Load application.properties file -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath*:application.properties</value>
-                <value>classpath*:test.properties</value>
+                <value>classpath*:test-application.properties</value>
             </list>
         </property>
     </bean>

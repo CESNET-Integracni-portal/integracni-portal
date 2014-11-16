@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebAppConfiguration
 @ContextConfiguration(locations = [
         "file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml",
-        "file:src/main/webapp/WEB-INF/test/test-applicationContext.xml"
+        "classpath:config/test-applicationContext.xml"
 ])
 @TestExecutionListeners(TransactionDbUnitTestExecutionListener)
 @DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
