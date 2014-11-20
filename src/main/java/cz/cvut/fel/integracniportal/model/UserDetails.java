@@ -21,6 +21,9 @@ public class UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private String alfrescoPassword;
+
     @ManyToMany
     private List<UserRole> userRoles;
 
@@ -44,6 +47,13 @@ public class UserDetails {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAlfrescoPassword() {
+        return alfrescoPassword;
+    }
+    public void setAlfrescoPassword(String alfrescoPassword) {
+        this.alfrescoPassword = alfrescoPassword;
     }
 
     public List<UserRole> getUserRoles() {

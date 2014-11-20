@@ -12,7 +12,7 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {
 
-    private long id;
+    private String id;
 
     private String name;
 
@@ -30,12 +30,26 @@ public class FolderRepresentation {
 
     public FolderRepresentation() {}
 
+    public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder) {
+        id = folder.getId();
+        name = folder.getName();
+        breadcrumbs = new ArrayList<Map<String, String>>();
+        org.apache.chemistry.opencmis.client.api.Folder currentParent = folder.getFolderParent();
+        while (currentParent != null) {
+            Map<String, String> breadcrumbEntry = new HashMap<String, String>();
+            breadcrumbEntry.put("id", currentParent.getId());
+            breadcrumbEntry.put("name", currentParent.getName());
+            breadcrumbs.add(breadcrumbEntry);
+            currentParent = currentParent.getFolderParent();
+        }
+    }
+
     public FolderRepresentation(Folder folder) {
         this(folder, true);
     }
 
     public FolderRepresentation(Folder folder, boolean deepCopy) {
-        id = folder.getFolderId();
+        id = folder.getFolderId().toString();
         name = folder.getName();
         if (folder.getOwner() != null) {
             owner = new UserDetailsRepresentation();
@@ -67,11 +81,11 @@ public class FolderRepresentation {
         }
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -5,10 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-    <bean id="cmisSessionFactory" class="cz.cvut.fel.integracniportal.cmis.CmisSessionFactory"/>
-
-    <bean id="alfrescoSession" factory-bean="cmisSessionFactory" factory-method="createSession">
-        <constructor-arg>
+    <bean id="cmisSessionFactory" class="cz.cvut.fel.integracniportal.cmis.CmisSessionFactory">
+        <property name="adminUsername" value="${alfresco.username}"/>
+        <property name="adminPassword" value="${alfresco.password}"/>
+        <property name="defaultParameters">
             <map>
                 <!-- Alfresco AtomPub URL -->
                 <entry>
@@ -30,20 +30,6 @@
                     </key>
                     <value>${alfresco.repositoryId}</value>
                 </entry>
-                <!-- Username -->
-                <entry>
-                    <key>
-                        <util:constant static-field="org.apache.chemistry.opencmis.commons.SessionParameter.USER"/>
-                    </key>
-                    <value>${alfresco.username}</value>
-                </entry>
-                <!-- Password -->
-                <entry>
-                    <key>
-                        <util:constant static-field="org.apache.chemistry.opencmis.commons.SessionParameter.PASSWORD"/>
-                    </key>
-                    <value>${alfresco.password}</value>
-                </entry>
                 <!-- Use Alfresco specific ObjectFactory -->
                 <!--<entry>
                     <key>
@@ -52,7 +38,7 @@
                     <value>org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl</value>
                 </entry>-->
             </map>
-        </constructor-arg>
+        </property>
     </bean>
 
 </beans>

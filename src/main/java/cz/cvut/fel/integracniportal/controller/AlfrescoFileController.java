@@ -3,9 +3,12 @@ package cz.cvut.fel.integracniportal.controller;
 import cz.cvut.fel.integracniportal.cmis.AlfrescoService;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
+import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,7 @@ import java.io.InputStream;
 
 @Controller
 @RequestMapping("/rest")
-public class AlfrescoFileController {
+public class AlfrescoFileController extends AbstractController {
 
     private static final Logger logger = Logger.getLogger(AlfrescoFileController.class);
 
@@ -33,9 +36,9 @@ public class AlfrescoFileController {
      * @param fileUri    The URI of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "/v0.1/file/{fileuri}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<FileMetadataRepresentation> alfrescoGetFileMetadata(@PathVariable("fileuri") String fileUri) {
+    public ResponseEntity<Object> alfrescoGetFileMetadata(@PathVariable("fileuri") String fileUri) {
         try {
 
             Document document = alfrescoService.getFile(fileUri);
@@ -45,10 +48,12 @@ public class AlfrescoFileController {
             metadata.setCreatedOn(document.getCreationDate().getTime());
             metadata.setChangedOn(document.getLastModificationDate().getTime());
             metadata.setMimetype(document.getContentStreamMimeType());
-            return new ResponseEntity<FileMetadataRepresentation>(metadata, HttpStatus.OK);
+            return new ResponseEntity<Object>(metadata, HttpStatus.OK);
 
         } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<FileMetadataRepresentation>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -56,13 +61,13 @@ public class AlfrescoFileController {
      * Download a file.
      * @param fileUri    The URI of the file.
      */
-    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/file/{fileuri}/content", method = RequestMethod.GET)
     public void alfrescoGet(HttpServletResponse response, @PathVariable("fileuri") String fileUri) {
         try {
 
             Document document = alfrescoService.getFile(fileUri);
             response.setContentType(document.getContentStreamMimeType());
-            response.setHeader("Content-Disposition", "attachment; filename=\""+document.getName()+"\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
             InputStream documentContentStream = alfrescoService.getFileContent(document);
             IOUtils.copy(documentContentStream, response.getOutputStream());
             response.flushBuffer();
@@ -70,6 +75,8 @@ public class AlfrescoFileController {
         } catch (CmisObjectNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        } catch (ServiceAccessException e) {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         }
     }
@@ -79,18 +86,20 @@ public class AlfrescoFileController {
      * @param fileUri    The URI of the file.
      * @param file        New file to replace the original one.
      */
-    @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.1/file/{fileuri}/content", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> alfrescoUpdate(@PathVariable("fileuri") String fileUri, @RequestParam(value = "file", required = true) MultipartFile file) {
+    public ResponseEntity<Object> alfrescoUpdate(@PathVariable("fileuri") String fileUri, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
             alfrescoService.updateFileContents(fileUri, file.getInputStream(), file.getSize(), file.getContentType());
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 
         } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         } catch (IOException e) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -99,12 +108,35 @@ public class AlfrescoFileController {
      * @param fileUri    The URI of the file.
      */
     @RequestMapping(value = "/v0.1/file/{fileuri}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> alfrescoDelete(@PathVariable("fileuri") String fileUri) {
+    public ResponseEntity<Object> alfrescoDelete(@PathVariable("fileuri") String fileUri) {
         try {
             alfrescoService.deleteFile(fileUri);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
         } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    /**
+     * Get contents of the root folder.
+     */
+    @RequestMapping(value = "/v0.1/files", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Object> alfrescoGetRoot() {
+        try {
+
+            Folder rootFolder = alfrescoService.getAlfrescoRootFolder(alfrescoService.getSessionForCurrentUser());
+            FolderRepresentation rootFolderRepresentation = new FolderRepresentation(rootFolder);
+            return new ResponseEntity<Object>(rootFolderRepresentation, HttpStatus.OK);
+
+        } catch (CmisContentAlreadyExistsException e) {
+            return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
+        } catch (CmisPermissionDeniedException e) {
+            return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -117,7 +149,8 @@ public class AlfrescoFileController {
     public ResponseEntity<String> alfrescoUpload(@RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
-            Document document = alfrescoService.uploadFile(file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
+            // TODO: upload to a selected folder
+            Document document = alfrescoService.uploadFile(alfrescoService.getAlfrescoRootFolder(alfrescoService.getSessionForCurrentUser()), file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
             if (document == null) {
                 return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
             }
@@ -129,6 +162,8 @@ public class AlfrescoFileController {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         } catch (ServiceAccessException e) {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
+        } catch (CmisPermissionDeniedException e) {
+            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
     }
 }
