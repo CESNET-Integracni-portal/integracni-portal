@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.apache.log4j.Logger;
@@ -42,7 +43,9 @@ public class AuthenticationService implements org.springframework.security.core.
         // For security purposes, we should return new Spring User object, not an entity
         List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
         for (UserRole userRole: userEntity.getUserRoles()) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getName()));
+            for (Permission permission: userRole.getPermissions()) {
+                grantedAuthorities.add(new SimpleGrantedAuthority(permission.toString()));
+            }
         }
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getUsername(),

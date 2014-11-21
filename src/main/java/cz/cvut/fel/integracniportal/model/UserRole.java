@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Entity for user roles used in Spring authorisation.
@@ -18,6 +19,10 @@ public class UserRole {
     private String name;
 
     private String description;
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private Set<Permission> permissions;
 
     public long getUserRoleId() {
         return userRoleId;
@@ -38,5 +43,12 @@ public class UserRole {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
     }
 }
