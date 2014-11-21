@@ -25,8 +25,8 @@ public class CesnetFileController_listRootFolders_Test extends AbstractIntegrati
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$').isArray())
                 .andExpect(jsonPath('$', hasSize(2)))
-                .andExpect(jsonPath('$[0].id').value(1))
-                .andExpect(jsonPath('$[1].id').value(2))
+                .andExpect(jsonPath('$[0].id').value("1"))
+                .andExpect(jsonPath('$[1].id').value("2"))
                 .andExpect(jsonPath('$[0].name').value("root1"))
                 .andExpect(jsonPath('$[1].name').value("root2"))
     }

@@ -23,7 +23,7 @@ public class CesnetFileController_getFolder_Test extends AbstractIntegrationTest
     void "should return the folder resource"() {
         apiGet("archive/folder/2")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.id').value(2))
+                .andExpect(jsonPath('$.id').value("2"))
                 .andExpect(jsonPath('$.name').value("root2"))
 
                 .andExpect(jsonPath('$.files').isArray())
@@ -32,7 +32,7 @@ public class CesnetFileController_getFolder_Test extends AbstractIntegrationTest
 
                 .andExpect(jsonPath('$.folders').isArray())
                 .andExpect(jsonPath('$.folders', hasSize(1)))
-                .andExpect(jsonPath('$.folders[0].id').value(3))
+                .andExpect(jsonPath('$.folders[0].id').value("3"))
     }
 
 }
