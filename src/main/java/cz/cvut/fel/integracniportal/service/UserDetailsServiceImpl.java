@@ -69,9 +69,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         UserDetails user = new UserDetails();
-        if (userDetailsResource.getUserRoles() != null) {
-            List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getUserRoles().size());
-            for (String userRoleName : userDetailsResource.getUserRoles()) {
+        if (userDetailsResource.getRoles() != null) {
+            List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getRoles().size());
+            for (String userRoleName : userDetailsResource.getRoles()) {
                 UserRole userRole = userRoleService.getRoleByName(userRoleName);
                 if (userRole == null) {
                     throw new UserRoleNotFoundException("role.notFound", userRoleName);
@@ -98,9 +98,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             String encodedPassword = passwordEncoder.encode(userDetailsResource.getPassword());
             userDetails.setPassword(encodedPassword);
         }
-        if (userDetailsResource.getUserRoles() != null) {
+        if (userDetailsResource.getRoles() != null) {
             userDetails.getUserRoles().clear();
-            for (String roleName: userDetailsResource.getUserRoles()) {
+            for (String roleName: userDetailsResource.getRoles()) {
                 UserRole role = userRoleService.getRoleByName(roleName);
                 if (role == null) {
                     throw new UserRoleNotFoundException("role.notFound", roleName);

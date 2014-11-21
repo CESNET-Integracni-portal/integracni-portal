@@ -42,8 +42,8 @@ public class UserDetailsResourceValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.empty");
         UserDetailsRepresentation userDetailsResource = (UserDetailsRepresentation) o;
 
-        if (userDetailsResource.getUserRoles() != null) {
-            for (String userRoleName : userDetailsResource.getUserRoles()) {
+        if (userDetailsResource.getRoles() != null) {
+            for (String userRoleName : userDetailsResource.getRoles()) {
                 UserRole userRole = userRoleService.getRoleByName(userRoleName);
                 if (userRole == null) {
                     Object[] args = {userRoleName};

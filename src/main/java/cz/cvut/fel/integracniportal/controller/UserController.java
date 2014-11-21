@@ -36,7 +36,6 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/v0.1/users", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     public List<UserDetailsRepresentation> getAllUsers() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
@@ -72,7 +71,8 @@ public class UserController extends AbstractController {
         try {
 
             UserDetails userDetails = userDetailsService.getUserById(userId);
-            return new ResponseEntity(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
+            UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation(userDetails);
+            return new ResponseEntity(userDetailsRepresentation, HttpStatus.OK);
 
         } catch (NotFoundException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);

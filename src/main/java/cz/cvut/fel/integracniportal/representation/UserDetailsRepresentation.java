@@ -1,11 +1,14 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Resource class for user details.
@@ -19,16 +22,20 @@ public class UserDetailsRepresentation {
 
     private String password;
 
-    private List<String> userRoles;
+    private List<String> roles = new ArrayList<String>();
+
+    private Set<Permission> permissions = new HashSet<Permission>();
 
     public UserDetailsRepresentation() {}
     public UserDetailsRepresentation(UserDetails userDetails) {
         this.id = userDetails.getUserId();
         this.username = userDetails.getUsername();
-        List<String> roles =  new ArrayList<String>();
         if (userDetails.getUserRoles() != null) {
             for (UserRole role : userDetails.getUserRoles()) {
                 roles.add(role.getName());
+                for (Permission permission: role.getPermissions()) {
+                    permissions.add(permission);
+                }
             }
         }
     }
@@ -54,11 +61,17 @@ public class UserDetailsRepresentation {
         this.password = password;
     }
 
-    public List<String> getUserRoles() {
-        return userRoles;
+    public List<String> getRoles() {
+        return roles;
     }
-    public void setUserRoles(List<String> userRoles) {
-        this.userRoles = userRoles;
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
+    }
 }
