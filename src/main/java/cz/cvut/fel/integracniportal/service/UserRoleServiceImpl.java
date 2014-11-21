@@ -1,9 +1,12 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.UserRoleDao;
+import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,8 +21,12 @@ public class UserRoleServiceImpl implements UserRoleService {
 
 
     @Override
-    public UserRole getRoleById(long id) {
-        return userRoleDao.getRoleById(id);
+    public UserRole getRoleById(long id) throws NotFoundException {
+        UserRole userRole = userRoleDao.getRoleById(id);
+        if (userRole == null) {
+            throw new NotFoundException("role.notFound", id);
+        }
+        return userRole;
     }
 
     @Override
@@ -33,6 +40,17 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
+    public void createRole(UserRole role) throws AlreadyExistsException {
+        // Check whether a different role with the same name exists
+        UserRole existingRole = userRoleDao.getRoleByName(role.getName());
+        if (existingRole != null) {
+            throw new AlreadyExistsException("role.alreadyExists", role.getName());
+        }
+        saveRole(role);
+    }
+
+    @Override
+    @Transactional
     public void saveRole(UserRole role) {
         userRoleDao.saveRole(role);
     }

@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.List;
@@ -11,15 +13,16 @@ public interface UserRoleService {
 
     /**
      * Finds a user role in database by its id.
-     * @param id    Id of the role.
-     * @return UserRole.
+     * @param id Id of the role.
+     * @return The user role.
+     * @throws NotFoundException role not found
      */
-    public UserRole getRoleById(long id);
+    public UserRole getRoleById(long id) throws NotFoundException;
 
     /**
      * Finds a user role in database by its name.
-     * @param name  Name of the role.
-     * @return UserRole.
+     * @param name Name of the role.
+     * @return The user role.
      */
     public UserRole getRoleByName(String name);
 
@@ -30,14 +33,22 @@ public interface UserRoleService {
     public List<UserRole> getAllRoles();
 
     /**
+     * Create a new user role.
+     *
+     * @param role The user role to save to database
+     * @throws AlreadyExistsException role already exists
+     */
+    public void createRole(UserRole role) throws AlreadyExistsException;
+
+    /**
      * Saves the user role into database.
-     * @param role    UserRole to be saved.
+     * @param role UserRole to be saved.
      */
     public void saveRole(UserRole role);
 
     /**
      * Removes the user role from database.
-     * @param role  UserRole to be removed.
+     * @param role UserRole to be removed.
      */
     public void deleteRole(UserRole role);
 }

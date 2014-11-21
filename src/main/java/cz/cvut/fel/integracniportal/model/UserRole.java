@@ -13,7 +13,7 @@ public class UserRole {
     @Id
     @GeneratedValue
     @Column(name = "user_role_id")
-    private long userRoleId;
+    private Long userRoleId;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -24,10 +24,10 @@ public class UserRole {
     @Enumerated(EnumType.STRING)
     private Set<Permission> permissions;
 
-    public long getUserRoleId() {
+    public Long getUserRoleId() {
         return userRoleId;
     }
-    public void setUserRoleId(long userRoleId) {
+    public void setUserRoleId(Long userRoleId) {
         this.userRoleId = userRoleId;
     }
 
