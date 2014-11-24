@@ -35,7 +35,7 @@ public class UserController extends AbstractController {
         binder.setValidator(userDetailsResourceValidator);
     }
 
-    @RequestMapping(value = "/v0.1/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.1/user", method = RequestMethod.GET)
     @ResponseBody
     public List<UserDetailsRepresentation> getAllUsers() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
@@ -46,7 +46,7 @@ public class UserController extends AbstractController {
         return result;
     }
 
-    @RequestMapping(value = "/v0.1/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/user", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
