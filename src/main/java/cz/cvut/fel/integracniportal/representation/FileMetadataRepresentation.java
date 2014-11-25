@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.util.Date;
@@ -26,6 +27,15 @@ public class FileMetadataRepresentation {
     private Date changedOn;
 
     public FileMetadataRepresentation() {}
+
+    public FileMetadataRepresentation(org.apache.chemistry.opencmis.client.api.Document document) {
+        uuid = AlfrescoUtils.parseId(document);
+        filename = document.getName();
+        mimetype = document.getContentStreamMimeType();
+        filesize = document.getContentStreamLength();
+        createdOn = document.getCreationDate().getTime();
+        changedOn = document.getLastModificationDate().getTime();
+    }
 
     public FileMetadataRepresentation(FileMetadata fileMetadata) {
         uuid = fileMetadata.getUuid();

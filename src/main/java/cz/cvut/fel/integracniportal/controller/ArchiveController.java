@@ -30,9 +30,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
-public class CesnetFileController extends AbstractController {
+public class ArchiveController extends AbstractController {
 
-    private static final Logger logger = Logger.getLogger(CesnetFileController.class);
+    private static final Logger logger = Logger.getLogger(ArchiveController.class);
 
     @Autowired
     private CesnetService cesnetService;

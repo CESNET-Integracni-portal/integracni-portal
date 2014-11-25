@@ -9,7 +9,8 @@ import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.*;
+import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
@@ -26,29 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AlfrescoServiceImpl implements AlfrescoService {
-
-    public enum Permissions {
-        READ("cmis:read"),
-        WRITE("cmis:write"),
-        ALL("cmis:all");
-
-        private final String value;
-
-        Permissions(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-    }
 
     private static final Logger logger = Logger.getLogger(AlfrescoServiceImpl.class);
 
@@ -73,20 +55,10 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     @Transactional(rollbackFor = ServiceAccessException.class)
     public Session getSessionForCurrentUser() throws ServiceAccessException {
         UserDetails currentUser = userDetailsService.getCurrentUser();
-        StringBuilder sb = new StringBuilder("int-portal-");
-        sb.append(currentUser.getUsername());
-        String alfrescoUsername = sb.toString();
-        String alfrescoPassword = currentUser.getAlfrescoPassword();
-
         // Create alfresco account for the user if he doesn't have one.
-        if (alfrescoPassword == null) {
-            alfrescoPassword = UUID.randomUUID().toString();
-            createAlfrescoAccount(alfrescoUsername, alfrescoPassword);
-            currentUser.setAlfrescoPassword(alfrescoPassword);
-            userDetailsService.saveUser(currentUser);
-        }
+        createAlfrescoAccountIfNotExist(currentUser);
 
-        return alfrescoSessionFactory.createSessionForUser(alfrescoUsername, alfrescoPassword);
+        return alfrescoSessionFactory.createSessionForUser(currentUser.getAlfrescoUsername(), currentUser.getAlfrescoPassword());
     }
 
     @Override
@@ -124,8 +96,30 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public Folder getFolder(String id) throws CmisObjectNotFoundException, ServiceAccessException {
-        CmisObject foldertObject = getObjectById(id);
+    public Folder getHomeFolderForCurrentUser() throws ServiceAccessException {
+        return getHomeFolderForUser(userDetailsService.getCurrentUser(), getSessionForCurrentUser());
+    }
+
+    @Override
+    public Folder getHomeFolderForUser(UserDetails userDetails, Session session) throws ServiceAccessException {
+        Folder folder = getFolderByName(getAlfrescoRootFolder(session), userDetails.getAlfrescoUsername() + "/home", session);
+        return folder;
+    }
+
+    @Override
+    public Folder getSharedFolderForCurrentUser() throws ServiceAccessException {
+        return getSharedFolderForUser(userDetailsService.getCurrentUser(), getSessionForCurrentUser());
+    }
+
+    @Override
+    public Folder getSharedFolderForUser(UserDetails userDetails, Session session) throws ServiceAccessException {
+        Folder folder = getFolderByName(getAlfrescoRootFolder(session), userDetails.getAlfrescoUsername() + "/shared", session);
+        return folder;
+    }
+
+    @Override
+    public Folder getFolder(String id, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        CmisObject foldertObject = getObjectById(id, session);
         if (foldertObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
             return (Folder) foldertObject;
         } else {
@@ -134,8 +128,18 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public Document getFile(String id) throws CmisObjectNotFoundException, ServiceAccessException {
-        CmisObject documentObject = getObjectById(id);
+    public Folder getFolderByName(Folder parent, String folderName, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        CmisObject folderObject = getObjectByName(parent, folderName, session);
+        if (folderObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
+            return (Folder) folderObject;
+        } else {
+            throw new CmisObjectNotFoundException();
+        }
+    }
+
+    @Override
+    public Document getFile(String id, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        CmisObject documentObject = getObjectById(id, session);
         if (documentObject.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
             return (Document) documentObject;
         } else {
@@ -144,8 +148,18 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public InputStream getFileContent(String id) throws CmisObjectNotFoundException, ServiceAccessException {
-        Document document = getFile(id);
+    public Document getFileByName(Folder parent, String fileName, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        CmisObject documentObject = getObjectByName(parent, fileName, session);
+        if (documentObject.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
+            return (Document) documentObject;
+        } else {
+            throw new CmisObjectNotFoundException();
+        }
+    }
+
+    @Override
+    public InputStream getFileContent(String id, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        Document document = getFile(id, session);
         return getFileContent(document);
     }
 
@@ -161,6 +175,15 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
+    public Folder createFolder(Folder parent, String folderName) {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
+        properties.put(PropertyIds.NAME, folderName);
+        Folder folder = parent.createFolder(properties);
+        return folder;
+    }
+
+    @Override
     public Document uploadFile(Folder parent, String filename, InputStream fileStream, long filesize, String contentType) throws ServiceAccessException, CmisContentAlreadyExistsException, CmisPermissionDeniedException {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
@@ -172,27 +195,108 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public void updateFileMetadata(String id, Map<String, String> metadata) throws CmisObjectNotFoundException, ServiceAccessException {
-        Document document = getFile(id);
+    public void updateFileMetadata(String id, Map<String, String> metadata, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        Document document = getFile(id, session);
         document.updateProperties(metadata, true);
     }
 
     @Override
-    public void updateFileContents(String id, InputStream fileStream, long filesize, String contentType) throws CmisObjectNotFoundException, ServiceAccessException {
-        Document document = getFile(id);
+    public void updateFileContents(String id, InputStream fileStream, long filesize, String contentType, Session session) throws CmisObjectNotFoundException, ServiceAccessException {
+        Document document = getFile(id, session);
         ContentStream contentStream = getSessionForCurrentUser().getObjectFactory().createContentStream(document.getName(), filesize, contentType, fileStream);
         document.setContentStream(contentStream, true);
     }
 
     @Override
-    public void deleteFile(String id) throws CmisObjectNotFoundException, ServiceAccessException {
-        Document document = getFile(id);
-        document.delete();
+    public void shareFolderWithUser(String folderId, UserDetails targetUser) throws ServiceAccessException {
+        // First, make sure that the folder is accessible to current user
+        getFolder(folderId, getSessionForCurrentUser());
+
+        // Make sure that the target user has an Alfresco account created
+        createAlfrescoAccountIfNotExist(targetUser);
+
+        // Add the folder to 'shared' folder in target user's home
+        Session adminSession = getSessionForAdmin();
+        Folder folder = getFolder(folderId, adminSession);
+        Folder targetUserHomeFolder = getHomeFolderForUser(targetUser, adminSession);
+        Folder targetUserShareFolder = getFolderByName(targetUserHomeFolder, "shared", adminSession);
+        folder.addToFolder(targetUserShareFolder, true);
     }
 
-    private CmisObject getObjectById(String id) throws ServiceAccessException {
-        CmisObject object = getSessionForCurrentUser().getObject(id);
+    @Override
+    public void addPermission(CmisObject object, String principal, String ... permissions) {
+        Session adminSession = getSessionForAdmin();
+        RepositoryInfo repositoryInfo = adminSession.getRepositoryInfo();
+        AclCapabilities aclCapabilities = repositoryInfo.getAclCapabilities();
+        Map<String, PermissionMapping> permissionMappings = aclCapabilities.getPermissionMapping();
+
+        List<Ace> addAces = new LinkedList<Ace>();
+        for (String permission: permissions) {
+            PermissionMapping permissionMapping = permissionMappings.get(permission);
+            List<String> permissionList = permissionMapping.getPermissions();
+            // We need to filter out all "cmis:*" permissions, because those cause problems when they are inherited
+            List<String> addPermissionList = new ArrayList<String>();
+            for (String p: permissionList) {
+                if (!p.startsWith("cmis:")) {
+                    addPermissionList.add(p);
+                }
+            }
+            Ace addAce = adminSession.getObjectFactory().createAce(principal, addPermissionList);
+            addAces.add(addAce);
+        }
+        object.addAcl(addAces, AclPropagation.REPOSITORYDETERMINED);
+    }
+
+    private Folder getUserFolderForUser(UserDetails userDetails, Session session) throws ServiceAccessException {
+        Folder folder = getFolderByName(getAlfrescoRootFolder(session), userDetails.getAlfrescoUsername(), session);
+        return folder;
+    }
+
+    private CmisObject getObjectById(String id, Session session) throws ServiceAccessException {
+        CmisObject object = session.getObject(id);
         return object;
+    }
+
+    private CmisObject getObjectByName(Folder parent, String objectName, Session session) throws ServiceAccessException {
+        StringBuilder pathBuilder = new StringBuilder();
+        if (parent == null) {
+            pathBuilder.append("/");
+        } else {
+            pathBuilder.append(parent.getPath());
+            pathBuilder.append("/");
+        }
+        pathBuilder.append(objectName);
+        CmisObject object = session.getObjectByPath(pathBuilder.toString());
+        return object;
+    }
+
+    private void createAlfrescoAccountIfNotExist(UserDetails user) throws ServiceAccessException {
+        if (user.getAlfrescoUsername() == null) {
+            StringBuilder sb = new StringBuilder("int-portal-");
+            sb.append(user.getUsername());
+            String alfrescoUsername = sb.toString();
+            String alfrescoPassword = UUID.randomUUID().toString();
+            createAlfrescoAccount(alfrescoUsername, alfrescoPassword);
+            user.setAlfrescoUsername(alfrescoUsername);
+            user.setAlfrescoPassword(alfrescoPassword);
+            userDetailsService.saveUser(user);
+
+            // Create user folder for the newly created user. Currently, the name will be the same as username.
+            Session adminSession = getSessionForAdmin();
+            Folder userFolder = createFolder(getAlfrescoRootFolder(adminSession), alfrescoUsername);
+
+            // Create home folder
+            Folder homeFolder = createFolder(userFolder, "home");
+            addPermission(homeFolder, alfrescoUsername, PermissionMapping.CAN_GET_CHILDREN_FOLDER, PermissionMapping.CAN_VIEW_CONTENT_OBJECT,
+                    PermissionMapping.CAN_GET_PARENTS_FOLDER, PermissionMapping.CAN_GET_ALL_VERSIONS_VERSION_SERIES,
+                    PermissionMapping.CAN_CREATE_DOCUMENT_FOLDER, PermissionMapping.CAN_CREATE_FOLDER_FOLDER, PermissionMapping.CAN_UPDATE_PROPERTIES_OBJECT,
+                    PermissionMapping.CAN_DELETE_OBJECT, PermissionMapping.CAN_SET_CONTENT_DOCUMENT);
+
+            // Create shared folder
+            Folder sharedFolder = createFolder(userFolder, "shared");
+            addPermission(sharedFolder, alfrescoUsername, PermissionMapping.CAN_GET_CHILDREN_FOLDER, PermissionMapping.CAN_VIEW_CONTENT_OBJECT,
+                    PermissionMapping.CAN_GET_PARENTS_FOLDER, PermissionMapping.CAN_GET_ALL_VERSIONS_VERSION_SERIES);
+        }
     }
 
 }

@@ -22,6 +22,9 @@ public class UserDetails {
     private String password;
 
     @Column(nullable = true)
+    private String alfrescoUsername;
+
+    @Column(nullable = true)
     private String alfrescoPassword;
 
     @ManyToMany
@@ -47,6 +50,13 @@ public class UserDetails {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAlfrescoUsername() {
+        return alfrescoUsername;
+    }
+    public void setAlfrescoUsername(String alfrescoUsername) {
+        this.alfrescoUsername = alfrescoUsername;
     }
 
     public String getAlfrescoPassword() {
