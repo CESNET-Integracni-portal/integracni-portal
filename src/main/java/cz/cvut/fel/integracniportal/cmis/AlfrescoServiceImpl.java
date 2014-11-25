@@ -28,6 +28,8 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AlfrescoServiceImpl implements AlfrescoService {
@@ -40,11 +42,26 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     @Value("${alfresco.path}")
     private String rootFolder;
 
+    @Value("${alfresco.usernamePrefix}")
+    private String usernamePrefix;
+
     @Autowired
     private CmisSessionFactory alfrescoSessionFactory;
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private Pattern sharedFolderPathPattern;
+
+    @PostConstruct
+    private void prepareSharedFolderPathPattern() {
+        StringBuilder sb = new StringBuilder(rootFolder);
+        if (!rootFolder.endsWith("/")) {
+            sb.append("/");
+        }
+        sb.append("([^/]*)/shared(?:/.*)?");
+        sharedFolderPathPattern = Pattern.compile(sb.toString());
+    }
 
     @Override
     public Session getSessionForUser(String username, String password) {
@@ -84,7 +101,7 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     @Override
     public Folder getAlfrescoRootFolder(Session session) throws ServiceAccessException {
         try {
-            CmisObject folderObject = session.getObjectByPath("/Integracni-portal");
+            CmisObject folderObject = session.getObjectByPath(rootFolder);
             if (folderObject != null && folderObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
                 return (Folder) folderObject;
             } else {
@@ -208,19 +225,44 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public void shareFolderWithUser(String folderId, UserDetails targetUser) throws ServiceAccessException {
-        // First, make sure that the folder is accessible to current user
-        getFolder(folderId, getSessionForCurrentUser());
+    public void shareFileWithUsers(String fileId, List<UserDetails> targetUsers) throws ServiceAccessException {
+        // First, make sure that the file is accessible to current user
+        getFile(fileId, getSessionForCurrentUser());
 
-        // Make sure that the target user has an Alfresco account created
-        createAlfrescoAccountIfNotExist(targetUser);
-
-        // Add the folder to 'shared' folder in target user's home
         Session adminSession = getSessionForAdmin();
-        Folder folder = getFolder(folderId, adminSession);
-        Folder targetUserHomeFolder = getHomeFolderForUser(targetUser, adminSession);
-        Folder targetUserShareFolder = getFolderByName(targetUserHomeFolder, "shared", adminSession);
-        folder.addToFolder(targetUserShareFolder, true);
+        Document document = getFile(fileId, adminSession);
+
+        // Remove the file from all shared folders
+        List<Folder> fileParents = new ArrayList<Folder>(document.getParents());
+        for (Folder fileParent: fileParents) {
+            String path = fileParent.getPath();
+            if (sharedFolderPathPattern.matcher(path).matches()) {
+                document.removeFromFolder(fileParent);
+            }
+        }
+
+        for (UserDetails targetUser: targetUsers) {
+            // Make sure that the target user has an Alfresco account created
+            createAlfrescoAccountIfNotExist(targetUser);
+
+            // Add the folder to 'shared' folder in target user's home
+            Folder targetUserShareFolder = getSharedFolderForUser(targetUser, adminSession);
+            document.addToFolder(targetUserShareFolder, true);
+        }
+    }
+
+    @Override
+    public List<String> getSharedWith(Document document) {
+        List<String> sharedWithList = new ArrayList<String>();
+        for (Folder fileParent: document.getParents()) {
+            String path = fileParent.getPath();
+            Matcher pathMatcher = sharedFolderPathPattern.matcher(path);
+            if (pathMatcher.matches()) {
+                String sharedWith = pathMatcher.group(1).replaceFirst(usernamePrefix, "");
+                sharedWithList.add(sharedWith);
+            }
+        }
+        return sharedWithList;
     }
 
     @Override
@@ -272,7 +314,7 @@ public class AlfrescoServiceImpl implements AlfrescoService {
 
     private void createAlfrescoAccountIfNotExist(UserDetails user) throws ServiceAccessException {
         if (user.getAlfrescoUsername() == null) {
-            StringBuilder sb = new StringBuilder("int-portal-");
+            StringBuilder sb = new StringBuilder(usernamePrefix);
             sb.append(user.getUsername());
             String alfrescoUsername = sb.toString();
             String alfrescoPassword = UUID.randomUUID().toString();
