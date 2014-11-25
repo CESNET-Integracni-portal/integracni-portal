@@ -6,8 +6,8 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <bean id="cmisSessionFactory" class="cz.cvut.fel.integracniportal.cmis.CmisSessionFactory">
-        <property name="adminUsername" value="${alfresco.username}"/>
-        <property name="adminPassword" value="${alfresco.password}"/>
+        <property name="adminUsername" value="${alfresco.admin.username}"/>
+        <property name="adminPassword" value="${alfresco.admin.password}"/>
         <property name="defaultParameters">
             <map>
                 <!-- Alfresco AtomPub URL -->

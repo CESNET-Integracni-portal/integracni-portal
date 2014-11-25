@@ -16,7 +16,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailsRepresentation {
 
-    private long id;
+    private Long id;
 
     private String username;
 
@@ -28,6 +28,9 @@ public class UserDetailsRepresentation {
 
     public UserDetailsRepresentation() {}
     public UserDetailsRepresentation(UserDetails userDetails) {
+        this(userDetails, true);
+    }
+    public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getUserId();
         this.username = userDetails.getUsername();
         if (userDetails.getUserRoles() != null) {
@@ -40,10 +43,10 @@ public class UserDetailsRepresentation {
         }
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

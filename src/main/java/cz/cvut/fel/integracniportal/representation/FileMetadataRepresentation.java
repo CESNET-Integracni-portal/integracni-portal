@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Resource class for file metadata.
@@ -21,6 +22,8 @@ public class FileMetadataRepresentation {
     private Long filesize;
 
     private UserDetailsRepresentation owner;
+
+    private List<String> sharedWith;
 
     private Date createdOn;
 
@@ -89,6 +92,14 @@ public class FileMetadataRepresentation {
 
     public void setOwner(UserDetailsRepresentation owner) {
         this.owner = owner;
+    }
+
+    public List<String> getSharedWith() {
+        return sharedWith;
+    }
+
+    public void setSharedWith(List<String> sharedWith) {
+        this.sharedWith = sharedWith;
     }
 
     public Date getCreatedOn() {

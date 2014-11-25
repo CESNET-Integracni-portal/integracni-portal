@@ -36,7 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails getUserById(long userId) throws NotFoundException {
         UserDetails userDetails = userDao.getUserById(userId);
         if (userDetails == null) {
-            throw new NotFoundException("user.notFound", userId);
+            throw new NotFoundException("user.notFound.id", userId);
         }
         return userDetails;
     }

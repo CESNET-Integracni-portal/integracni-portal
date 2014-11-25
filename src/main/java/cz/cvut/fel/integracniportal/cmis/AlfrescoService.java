@@ -11,6 +11,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 public interface AlfrescoService {
@@ -53,7 +54,9 @@ public interface AlfrescoService {
 
     public void updateFileContents(String id, InputStream fileStream, long filesize, String contentType, Session session) throws CmisObjectNotFoundException, ServiceAccessException;
 
-    public void shareFolderWithUser(String folderId, UserDetails targetUser) throws ServiceAccessException;
+    public void shareFileWithUsers(String fileId, List<UserDetails> targetUsers) throws ServiceAccessException;
+
+    public List<String> getSharedWith(Document document);
 
     public void addPermission(CmisObject object, String principal, String ... permissions);
 

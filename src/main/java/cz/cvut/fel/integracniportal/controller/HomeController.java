@@ -2,9 +2,12 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.cmis.AlfrescoService;
 import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
+import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
@@ -22,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
@@ -31,6 +36,9 @@ public class HomeController extends AbstractController {
 
     @Autowired
     private AlfrescoService alfrescoService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     /**
      * Get contents of the home folder.
@@ -106,18 +114,14 @@ public class HomeController extends AbstractController {
      * @param uuid    The uuid of the file.
      * @return File metadata.
      */
-    @RequestMapping(value = "/v0.1/home/file/{uuid}", method = RequestMethod.GET)
+    @RequestMapping(value = {"/v0.1/home/file/{uuid}", "/v0.1/shared/file/{uuid}"}, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> alfrescoGetFileMetadata(@PathVariable("uuid") String uuid) {
         try {
 
             Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            FileMetadataRepresentation metadata = new FileMetadataRepresentation();
-            metadata.setFilename(document.getName());
-            metadata.setFilesize(document.getContentStreamLength());
-            metadata.setCreatedOn(document.getCreationDate().getTime());
-            metadata.setChangedOn(document.getLastModificationDate().getTime());
-            metadata.setMimetype(document.getContentStreamMimeType());
+            FileMetadataRepresentation metadata = new FileMetadataRepresentation(document);
+            metadata.setSharedWith(alfrescoService.getSharedWith(document));
             return new ResponseEntity<Object>(metadata, HttpStatus.OK);
 
         } catch (CmisObjectNotFoundException e) {
@@ -138,13 +142,30 @@ public class HomeController extends AbstractController {
         try {
 
             Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            document.rename(fileMetadataRepresentation.getFilename());
+            if (fileMetadataRepresentation.getFilename() != null) {
+                document.rename(fileMetadataRepresentation.getFilename());
+            }
+
+            if (fileMetadataRepresentation.getSharedWith() != null) {
+                List<UserDetails> shareWithList = new ArrayList<UserDetails>();
+                for (String shareWithUsername: fileMetadataRepresentation.getSharedWith()) {
+                    UserDetails shareWith = userDetailsService.getUserByUsername(shareWithUsername);
+                    if (shareWith == null) {
+                        throw new NotFoundException("user.notFound.name", shareWithUsername);
+                    }
+                    shareWithList.add(shareWith);
+                }
+                alfrescoService.shareFileWithUsers(uuid, shareWithList);
+            }
+
             return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 
         } catch (CmisObjectNotFoundException e) {
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         } catch (ServiceAccessException e) {
             return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -171,7 +192,7 @@ public class HomeController extends AbstractController {
      * Download a file.
      * @param uuid    The uuid of the file.
      */
-    @RequestMapping(value = "/v0.1/home/file/{uuid}/content", method = RequestMethod.GET)
+    @RequestMapping(value = {"/v0.1/home/file/{uuid}/content", "/v0.1/shared/file/{uuid}/content"}, method = RequestMethod.GET)
     public void alfrescoGet(HttpServletResponse response, @PathVariable("uuid") String uuid) {
         try {
 
@@ -247,13 +268,16 @@ public class HomeController extends AbstractController {
         try {
 
             Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            folder.rename(folderRepresentation.getName());
+            if (folderRepresentation.getName() != null) {
+                folder.rename(folderRepresentation.getName());
+            }
+
             return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 
         } catch (CmisObjectNotFoundException e) {
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (CmisPermissionDeniedException e) {
             return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
         }
@@ -329,6 +353,23 @@ public class HomeController extends AbstractController {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (CmisPermissionDeniedException e) {
             return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    /**
+     * Get contents of the shared folder.
+     */
+    @RequestMapping(value = "/v0.1/shared", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Object> alfrescoGetShared() {
+        try {
+
+            Folder homeFolder = alfrescoService.getSharedFolderForCurrentUser();
+            FolderRepresentation homeFolderRepresentation = new FolderRepresentation(homeFolder, homeFolder);
+            return new ResponseEntity<Object>(homeFolderRepresentation, HttpStatus.OK);
+
+        } catch (ServiceAccessException e) {
+            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
