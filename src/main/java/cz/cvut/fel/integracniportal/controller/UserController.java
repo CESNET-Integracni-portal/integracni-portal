@@ -96,4 +96,12 @@ public class UserController extends AbstractController {
         }
     }
 
+    @RequestMapping(value = "/v0.1/user/current", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity getCurrentUser() {
+        UserDetails userDetails = userDetailsService.getCurrentUser();
+        UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation(userDetails);
+        return new ResponseEntity(userDetailsRepresentation, HttpStatus.OK);
+    }
+
 }
