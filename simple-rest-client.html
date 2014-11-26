@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+    <meta name="generator" content="PSPad editor, www.pspad.com">
+    <title></title>
+    <style type="text/css">
+        form:not(.js_login) {
+            border: 1px solid gray;
+            padding: 10px;
+            line-height: 2em;
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="application/javascript">
+        function sendRequest(formElement, type) {
+            $.ajax({
+                type: type,
+                url: formElement.data("action")+formElement.find(".js_requestPath").val(),
+                headers: {
+                    Authorization: formElement.data("authorization")
+                },
+                data: formElement.find(".js_requestData").val(),
+                contentType: "application/json; charset=UTF-8"
+            });
+        }
+
+        $(document).ready(function() {
+            $(document).ajaxComplete(function(event, XMLHttpRequest) {
+                var responseText;
+                try {
+                    var json = $.parseJSON(XMLHttpRequest.responseText);
+                    responseText = JSON.stringify(json, undefined, 4).replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
+                } catch(e) {
+                    responseText = this.responseText;
+                }
+                $("#js_lastResponse").html("["+XMLHttpRequest.status+"] " + XMLHttpRequest.statusText + "<br/><br/>" + responseText);
+            });
+
+            $("form.js_login").submit(function() {
+                var formElement = $(this);
+                var username = formElement.find("input#username").val();
+                $.ajax({
+                    type: "GET",
+                    url: formElement.attr("action"),
+                    headers: {
+                        Authorization: formElement.data("authorization")
+                    },
+                    data: formElement.serialize()
+                }).done(function (data, textStatus) {
+                    $(".js_loggedAs").html("(logged as " + username + ")");
+                    $("form.js_authReq").data("authorization", "Bearer "+data.access_token);
+                });
+                return false;
+            });
+
+            $(".js_sendRequest").click(function() {
+                sendRequest($(this).parents("form"), $(this).data("type"));
+                $("#requestSubmit").click();
+            });
+
+            $("form.js_uploadCesnet").submit(function() {
+                var formElement = $(this);
+                var data = new FormData(formElement[0]);
+//                    jQuery.each(formElement.find("input[type='file']")[0].files, function(i, file) {
+//                        data.append('file-'+i, file);
+//                    });
+                var folderId = formElement.find(".js_folderId").val();
+                $.ajax({
+                    type: "POST",
+                    url: formElement.attr("action")+folderId+"/files",
+                    data: data,
+//                        dataType: "json",
+                    headers: {
+                        Authorization: formElement.data("authorization")
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                return false;
+            });
+            $("form.js_uploadAlfresco").submit(function() {
+                var formElement = $(this);
+                var data = new FormData(formElement[0]);
+//                    jQuery.each(formElement.find("input[type='file']")[0].files, function(i, file) {
+//                        data.append('file-'+i, file);
+//                    });
+                var folderId = formElement.find(".js_alfrescoFolderId").val();
+                var url = formElement.attr("action");
+                if (folderId) {
+                    url += "folder/" + folderId;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+//                        dataType: "json",
+                    headers: {
+                        Authorization: formElement.data("authorization")
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+Login <span class="js_loggedAs"></span>
+<form class="js_login" action="http://147.32.80.219:8080/integracni-portal/oauth/token"
+      data-authorization="Basic ODU5NWM4Mjg0YTUyNDc1ZTUxNGQ2NjdlNDMxM2U4NmE6MjI2ZDI0NjE3ZTY1NTRkNzFhNjg2MTRjMzQ0MzZkNjc=">
+    <input type="text" name="username" id="username" value="admin"/>
+    <input type="password" name="password" value="admin"/>
+    <input type="hidden" name="grant_type" value="password"/>
+    <button type="submit">Login</button>
+</form>
+
+Last Response
+<div id="js_lastResponse" style="border: 1px solid black; margin: 10px 0; min-height: 1em;"></div>
+
+Request
+<form id="requestForm" class="js_authReq" action="about:blank" data-action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/" target="rememberIframe" method="post">
+    <label for="requestPath">http://147.32.80.219:8080/integracni-portal/rest/v0.1/</label>
+    <input name="requestPath" class="js_requestPath" id="requestPath" autocomplete="on"/>
+    <br/>
+    <label for="requestData">Data:</label>
+    <input name="requestData" class="js_requestData" id="requestData" autocomplete="on"/>
+    <br/>
+    <button type="button" id="requestGet" class="js_sendRequest" data-type="GET">GET</button>
+    <button type="button" id="requestPost" class="js_sendRequest" data-type="POST">POST</button>
+    <button type="button" id="requestPut" class="js_sendRequest" data-type="PUT">PUT</button>
+    <button type="button" id="requestDelete" class="js_sendRequest" data-type="DELETE">DELETE</button>
+    <button type="submit" id="requestSubmit" style="display: none;">submit</button>
+</form>
+<iframe name="rememberIframe" src="about:blank" style="display: none;"></iframe>
+
+Cesnet
+<form class="js_uploadCesnet js_authReq" action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
+    <label for="folderId">Folder id to upload to: </label><input type="text" id="folderId" class="js_folderId" /><br/>
+    <input type="file" name="file" /><button type="submit">Upload</button>
+</form>
+
+Alfresco
+<form class="js_uploadAlfresco js_authReq" action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/home/" data-method="POST" enctype="multipart/form-data">
+    <label for="alfrescoFolderId">Folder id to upload to: </label><input type="text" id="alfrescoFolderId" class="js_alfrescoFolderId" /><br/>
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+</form>
+</body>
+</html>
