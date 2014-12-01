@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="organizationalUnitServiceMock" class="cz.cvut.fel.integracniportal.service.OrganizationalUnitServiceMock">
+        <property name="organizationalUnitMocks">
+            <map>
+                <!-- Map of mocked Organizational Units. The scope is set to prototype to simulate getting the data from KOS. -->
+                <entry key="1">
+                    <bean class="cz.cvut.fel.integracniportal.model.OrganizationalUnit" scope="prototype">
+                        <property name="unitId" value="1"/>
+                        <property name="name" value="Katedra Počítačů"/>
+                        <property name="size" value="1000000000"/>
+                        <property name="admins">
+                            <list></list>
+                        </property>
+                        <property name="members">
+                            <list></list>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="2">
+                    <bean class="cz.cvut.fel.integracniportal.model.OrganizationalUnit" scope="prototype">
+                        <property name="unitId" value="2"/>
+                        <property name="name" value="Katedra Počítačové Grafiky a Interakce"/>
+                        <property name="size" value="1000000000"/>
+                        <property name="admins">
+                            <list></list>
+                        </property>
+                        <property name="members">
+                            <list></list>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+</beans>
