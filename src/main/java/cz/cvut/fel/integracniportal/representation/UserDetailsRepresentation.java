@@ -6,12 +6,12 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
- * Resource class for user details.
+ * Representation class for user details.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailsRepresentation {
@@ -24,7 +24,7 @@ public class UserDetailsRepresentation {
 
     private List<String> roles = new ArrayList<String>();
 
-    private Set<Permission> permissions = new HashSet<Permission>();
+    private Map<Permission, Boolean> permissions = new HashMap<Permission, Boolean>();
 
     public UserDetailsRepresentation() {}
     public UserDetailsRepresentation(UserDetails userDetails) {
@@ -33,11 +33,14 @@ public class UserDetailsRepresentation {
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getUserId();
         this.username = userDetails.getUsername();
+        for (Permission permission: Permission.values()) {
+            permissions.put(permission, false);
+        }
         if (userDetails.getUserRoles() != null) {
             for (UserRole role : userDetails.getUserRoles()) {
                 roles.add(role.getName());
                 for (Permission permission: role.getPermissions()) {
-                    permissions.add(permission);
+                    permissions.put(permission, true);
                 }
             }
         }
@@ -71,10 +74,10 @@ public class UserDetailsRepresentation {
         this.roles = roles;
     }
 
-    public Set<Permission> getPermissions() {
+    public Map<Permission, Boolean> getPermissions() {
         return permissions;
     }
-    public void setPermissions(Set<Permission> permissions) {
+    public void setPermissions(Map<Permission, Boolean> permissions) {
         this.permissions = permissions;
     }
 }
