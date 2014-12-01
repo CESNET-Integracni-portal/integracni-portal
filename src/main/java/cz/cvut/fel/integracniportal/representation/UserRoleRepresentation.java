@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resource class for user roles.
+ * Representation class for user roles.
  */
 public class UserRoleRepresentation {
 

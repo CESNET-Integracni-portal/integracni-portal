@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Resource class for file metadata.
+ * Representation class for file metadata.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileMetadataRepresentation {

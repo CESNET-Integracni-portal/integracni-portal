@@ -11,7 +11,7 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import java.util.*;
 
 /**
- * Resource class for folder.
+ * Representation class for folder.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {

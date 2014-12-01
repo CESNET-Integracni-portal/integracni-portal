@@ -8,7 +8,7 @@ import cz.cvut.fel.integracniportal.model.FileMetadata;
 import java.util.Date;
 
 /**
- * Resource class for file metadata.
+ * Representation class for file metadata.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CesnetFileMetadataRepresentation extends FileMetadataRepresentation {

@@ -21,6 +21,9 @@ public class UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "org_unit_id", nullable = true)
+    private Long organizationalUnitId;
+
     @Column(nullable = true)
     private String alfrescoUsername;
 
@@ -50,6 +53,13 @@ public class UserDetails {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getOrganizationalUnitId() {
+        return organizationalUnitId;
+    }
+    public void setOrganizationalUnitId(Long organizationalUnitId) {
+        this.organizationalUnitId = organizationalUnitId;
     }
 
     public String getAlfrescoUsername() {

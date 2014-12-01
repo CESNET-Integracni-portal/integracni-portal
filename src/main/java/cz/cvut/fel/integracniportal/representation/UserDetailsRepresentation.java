@@ -22,6 +22,8 @@ public class UserDetailsRepresentation {
 
     private String password;
 
+    private Long unitId;
+
     private List<String> roles = new ArrayList<String>();
 
     private Map<Permission, Boolean> permissions = new HashMap<Permission, Boolean>();
@@ -33,6 +35,7 @@ public class UserDetailsRepresentation {
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getUserId();
         this.username = userDetails.getUsername();
+        this.unitId = userDetails.getOrganizationalUnitId();
         for (Permission permission: Permission.values()) {
             permissions.put(permission, false);
         }
@@ -65,6 +68,13 @@ public class UserDetailsRepresentation {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
     public List<String> getRoles() {

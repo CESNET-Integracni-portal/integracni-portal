@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
+import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
@@ -29,8 +30,17 @@ public class UserDetailsDaoImpl extends HibernateDao implements UserDetailsDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDetails> getAllUsers() {
         Criteria criteria = getCriteria(UserDetails.class, "user");
+        return criteria.list();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId) {
+        Criteria criteria = getCriteria(UserDetails.class, "user");
+        criteria.add(Restrictions.eq("user.organizationalUnitId", organizationalUnitId));
         return criteria.list();
     }
 
