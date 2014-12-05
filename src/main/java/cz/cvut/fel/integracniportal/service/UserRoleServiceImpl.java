@@ -3,6 +3,8 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.dao.UserRoleDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotAssignableToRoleException;
+import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,8 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public void createRole(UserRole role) throws AlreadyExistsException {
+    @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
+    public void createRole(UserRole role) throws AlreadyExistsException, PermissionNotAssignableToRoleException {
         // Check whether a different role with the same name exists
         UserRole existingRole = userRoleDao.getRoleByName(role.getName());
         if (existingRole != null) {
@@ -50,8 +53,13 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    @Transactional
-    public void saveRole(UserRole role) {
+    @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
+    public void saveRole(UserRole role) throws PermissionNotAssignableToRoleException {
+        for (Permission permission: role.getPermissions()) {
+            if (!permission.isRoleAssignable()) {
+                throw new PermissionNotAssignableToRoleException("permission.notAssignableToRole", permission.toString());
+            }
+        }
         userRoleDao.saveRole(role);
     }
 

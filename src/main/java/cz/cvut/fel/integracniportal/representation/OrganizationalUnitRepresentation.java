@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.representation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.Set;
 /**
  * Representation class for organizational units.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganizationalUnitRepresentation {
 
     private Long id;
@@ -17,6 +19,7 @@ public class OrganizationalUnitRepresentation {
 
     private Set<String> admins;
 
+    public OrganizationalUnitRepresentation() {}
     public OrganizationalUnitRepresentation(OrganizationalUnit organizationalUnit) {
         this.id = organizationalUnit.getUnitId();
         this.name = organizationalUnit.getName();

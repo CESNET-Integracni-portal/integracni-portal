@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotAssignableToRoleException;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.List;
@@ -38,13 +39,13 @@ public interface UserRoleService {
      * @param role The user role to save to database
      * @throws AlreadyExistsException role already exists
      */
-    public void createRole(UserRole role) throws AlreadyExistsException;
+    public void createRole(UserRole role) throws AlreadyExistsException, PermissionNotAssignableToRoleException;
 
     /**
      * Saves the user role into database.
      * @param role UserRole to be saved.
      */
-    public void saveRole(UserRole role);
+    public void saveRole(UserRole role) throws PermissionNotAssignableToRoleException;
 
     /**
      * Removes the user role from database.

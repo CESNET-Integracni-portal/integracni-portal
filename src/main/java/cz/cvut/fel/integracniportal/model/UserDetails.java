@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Entity for user login credentials and list of assigned roles.
@@ -32,6 +33,10 @@ public class UserDetails {
 
     @ManyToMany
     private List<UserRole> userRoles;
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private Set<Permission> permissions;
 
 
     public long getUserId() {
@@ -81,5 +86,12 @@ public class UserDetails {
     }
     public void setUserRoles(List<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

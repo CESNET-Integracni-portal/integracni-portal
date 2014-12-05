@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Service used by Spring to get access to user credentials during authentication.
@@ -41,7 +41,10 @@ public class AuthenticationService implements org.springframework.security.core.
         }
 
         // For security purposes, we should return new Spring User object, not an entity
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+        for (Permission permission: userEntity.getPermissions()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(permission.toString()));
+        }
         for (UserRole userRole: userEntity.getUserRoles()) {
             for (Permission permission: userRole.getPermissions()) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(permission.toString()));

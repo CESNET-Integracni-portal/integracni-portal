@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
@@ -92,6 +93,8 @@ public class UserController extends AbstractController {
         } catch (NotFoundException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (UserRoleNotFoundException e) {
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
+        } catch (PermissionNotFoundException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }

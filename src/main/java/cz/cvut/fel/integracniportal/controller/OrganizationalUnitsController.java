@@ -70,20 +70,10 @@ public class OrganizationalUnitsController extends AbstractController {
         }
 
         // Currently, the only thing that can be updated is list of admins
-        // TODO
-//        if (organizationalUnitRepresentation.getAdmins() != null) {
-//            // Remove admins who are not in the new list
-//            for (String oldAdmin: unit.getAdmins()) {
-//                if (!organizationalUnitRepresentation.getAdmins().contains(oldAdmin)) {
-//                    UserDetails oldAdminDetails = userDetailsService.getUserByUsername(oldAdmin);
-//                    userDetailsService.removePermissionFromUser(oldAdminDetails, Permission.EDIT_ORGANIZATIONAL_UNITS);
-//                }
-//            }
-//            // Add new admins
-//            for (String newAdmin: organizationalUnitRepresentation.getAdmins()) {
-//                if (unit.)
-//            }
-//        }
+        if (organizationalUnitRepresentation.getAdmins() != null) {
+            organizationalUnitService.setAdmins(unit, organizationalUnitRepresentation.getAdmins());
+        }
+
         return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 

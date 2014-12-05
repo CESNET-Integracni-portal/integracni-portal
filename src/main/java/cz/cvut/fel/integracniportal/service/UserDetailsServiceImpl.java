@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -68,20 +69,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public List<UserDetails> getAdminsForOrganizationalUnit(Long organizationalUnitId) {
-        List<UserDetails> members = getAllUsersInOrganizationalUnit(organizationalUnitId);
-        List<UserDetails> admins = new ArrayList<UserDetails>();
-        for (UserDetails member: members) {
-            for (UserRole role: member.getUserRoles()) {
-                if (role.getPermissions().contains(Permission.EDIT_ORGANIZATIONAL_UNITS)) {
-                    admins.add(member);
-                }
-            }
-        }
-        return admins;
-    }
-
-    @Override
     @Transactional
     public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException {
         if (getUserByUsername(userDetailsResource.getUsername()) != null) {
@@ -110,7 +97,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional(rollbackFor = {UserRoleNotFoundException.class, NotFoundException.class})
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException {
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException {
         UserDetails userDetails = getUserById(userId);
         if (userDetailsResource.getUsername() != null) {
             userDetails.setUsername(userDetailsResource.getUsername());
@@ -121,6 +108,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         if (userDetailsResource.getUnitId() != null) {
             userDetails.setOrganizationalUnitId(userDetailsResource.getUnitId());
+        }
+        if (userDetailsResource.getDirectPermissions() != null) {
+            userDetails.getPermissions().clear();
+            for (String permissionName: userDetailsResource.getDirectPermissions()) {
+                Permission permission = Permission.create(permissionName);
+                userDetails.getPermissions().add(permission);
+            }
         }
         if (userDetailsResource.getRoles() != null) {
             userDetails.getUserRoles().clear();
@@ -134,21 +128,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         userDao.saveUser(userDetails);
         return userDetails;
-    }
-
-    @Override
-    public void removePermissionFromUser(UserDetails userDetails, Permission permission) {
-        List<UserRole> newRoles = new ArrayList<UserRole>();
-        for (UserRole role: userDetails.getUserRoles()) {
-            for (Permission rolePermission: role.getPermissions()) {
-                if (rolePermission.equals(permission)) {
-                    continue;
-                }
-            }
-            newRoles.add(role);
-        }
-        userDetails.setUserRoles(newRoles);
-        saveUser(userDetails);
     }
 
     @Override

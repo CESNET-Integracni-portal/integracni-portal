@@ -3,7 +3,7 @@ package cz.cvut.fel.integracniportal.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,23 +16,32 @@ public enum Permission {
     /**
      * Permission to edit organizational units.
      */
-    EDIT_ORGANIZATIONAL_UNITS("units"),
+    EDIT_ORGANIZATIONAL_UNITS("units", false),
 
     /**
      * Permission to edit externists.
      */
-    EDIT_EXTERNISTS("externists"),
+    EDIT_EXTERNISTS("externists", true),
 
     /**
      * Permission to change my own password.
      */
-    CHANGE_PASSWORD("password");
+    CHANGE_PASSWORD("password", true);
 
     private final String name;
 
-    private Permission(String name) {
+    private final Boolean roleAssignable;
+
+    private Permission(String name, Boolean roleAssignable) {
         this.name = name;
+        this.roleAssignable = roleAssignable;
     }
+
+    public Boolean isRoleAssignable() {
+        return roleAssignable;
+    }
+
+
 
     //Serialization
     @JsonValue
@@ -43,10 +52,10 @@ public enum Permission {
 
     // Deserialization
     @JsonCreator
-    public static Permission create(String name) throws JsonMappingException {
+    public static Permission create(String name) throws PermissionNotFoundException {
         Permission permission = permissions.get(name);
         if (permission == null) {
-            throw new JsonMappingException("permission.notFound");
+            throw new PermissionNotFoundException("permission.notFound", name);
         }
         return permission;
     }

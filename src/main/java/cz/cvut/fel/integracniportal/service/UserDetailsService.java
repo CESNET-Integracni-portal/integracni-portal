@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -51,14 +52,6 @@ public interface UserDetailsService {
     public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId);
 
     /**
-     * Finds admins for an organizational unit.
-     *
-     * @param organizationalUnitId Id of the organizational unit.
-     * @return List of admins for the organizational unit
-     */
-    public List<UserDetails> getAdminsForOrganizationalUnit(Long organizationalUnitId);
-
-    /**
      * Creates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
      *
      * @param userDetailsResource the user details
@@ -77,15 +70,7 @@ public interface UserDetailsService {
      * @throws UserRoleNotFoundException the user role not found exception
      * @throws NotFoundException the not found exception
      */
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException;
-
-    /**
-     * Removes a permission from user.
-     *
-     * @param userDetails the user
-     * @param permission the permission to be removed from user
-     */
-    public void removePermissionFromUser(UserDetails userDetails, Permission permission);
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException;
 
     /**
      * Saves the user into database.

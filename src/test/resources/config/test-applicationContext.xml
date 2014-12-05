@@ -14,6 +14,7 @@
     <import resource="cesnet.xml"/>
     <import resource="alfresco.xml"/>
     <import resource="cron.xml"/>
+    <import resource="dataMocks.xml"/>
 
     <!-- Load application.properties file -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotAssignableToRoleException;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserRoleRepresentation;
@@ -51,11 +52,12 @@ public class UserRolesController extends AbstractController {
             userRole.setDescription(userRoleRepresentation.getDescription());
             userRole.setPermissions(new HashSet<Permission>(userRoleRepresentation.getPermissions()));
             userRoleService.createRole(userRole);
-
             return new ResponseEntity(new UserRoleRepresentation(userRole), HttpStatus.OK);
 
         } catch (AlreadyExistsException e) {
             return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
+        } catch (PermissionNotAssignableToRoleException e) {
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -80,14 +82,22 @@ public class UserRolesController extends AbstractController {
         try {
 
             UserRole userRole = userRoleService.getRoleById(roleId);
-            userRole.setName(userRoleRepresentation.getName());
-            userRole.setDescription(userRoleRepresentation.getDescription());
-            userRole.setPermissions(new HashSet<Permission>(userRoleRepresentation.getPermissions()));
+            if (userRoleRepresentation.getName() != null) {
+                userRole.setName(userRoleRepresentation.getName());
+            }
+            if (userRoleRepresentation.getDescription() != null) {
+                userRole.setDescription(userRoleRepresentation.getDescription());
+            }
+            if (userRoleRepresentation.getPermissions() != null) {
+                userRole.setPermissions(new HashSet<Permission>(userRoleRepresentation.getPermissions()));
+            }
             userRoleService.saveRole(userRole);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 
         } catch (NotFoundException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+        } catch (PermissionNotAssignableToRoleException e) {
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 
