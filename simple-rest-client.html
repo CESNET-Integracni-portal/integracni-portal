@@ -166,17 +166,18 @@ Request
 </form>
 <iframe name="rememberIframe" src="about:blank" style="display: none;"></iframe>
 
-Cesnet
-<form class="js_uploadCesnet js_authReq" action="rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
-    <label for="folderId">Folder id to upload to: </label><input type="text" id="folderId" class="js_folderId" /><br/>
-    <input type="file" name="file" /><button type="submit">Upload</button>
-</form>
-
-Alfresco
+Upload to home
 <form class="js_uploadAlfresco js_authReq" action="rest/v0.1/home/" data-method="POST" enctype="multipart/form-data">
     <label for="alfrescoFolderId">Folder id to upload to: </label><input type="text" id="alfrescoFolderId" class="js_alfrescoFolderId" /><br/>
     <input type="file" name="file" />
     <button type="submit">Upload</button>
 </form>
+
+Upload to archive
+<form class="js_uploadCesnet js_authReq" action="rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
+    <label for="folderId">Folder id to upload to: </label><input type="text" id="folderId" class="js_folderId" /><br/>
+    <input type="file" name="file" /><button type="submit">Upload</button>
+</form>
+
 </body>
 </html>
