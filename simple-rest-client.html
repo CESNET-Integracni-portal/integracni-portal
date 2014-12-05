@@ -13,10 +13,36 @@
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script type="application/javascript">
+        function getServerUrl() {
+            var url = $("#js_serverUrlSelect").val();
+            if (url.slice(-1) != "/") {
+                url += "/";
+            }
+            return url;
+        }
+
+        function insertServerUrlToSpans() {
+            $(".js_insertServerUrl").text(getServerUrl());
+        }
+
+        function initServerUrlSelect() {
+            insertServerUrlToSpans();
+            $("#js_serverUrlSelect").change(function() {
+                var localhostSelected = $(this).find("option:selected").hasClass("js_localhostOption");
+                $("#js_serverUrl").prop("disabled", localhostSelected);
+                insertServerUrlToSpans();
+            });
+            $("#js_serverUrl").change(function() {
+                var serverUrl = $(this).val();
+                $(".js_serverUrlOption").val(serverUrl);
+                insertServerUrlToSpans();
+            });
+        }
+
         function sendRequest(formElement, type) {
             $.ajax({
                 type: type,
-                url: formElement.data("action")+formElement.find(".js_requestPath").val(),
+                url: getServerUrl()+formElement.data("action")+formElement.find(".js_requestPath").val(),
                 headers: {
                     Authorization: formElement.data("authorization")
                 },
@@ -26,6 +52,8 @@
         }
 
         $(document).ready(function() {
+            initServerUrlSelect();
+
             $(document).ajaxComplete(function(event, XMLHttpRequest) {
                 var responseText;
                 try {
@@ -42,7 +70,7 @@
                 var username = formElement.find("input#username").val();
                 $.ajax({
                     type: "GET",
-                    url: formElement.attr("action"),
+                    url: getServerUrl()+formElement.attr("action"),
                     headers: {
                         Authorization: formElement.data("authorization")
                     },
@@ -62,15 +90,11 @@
             $("form.js_uploadCesnet").submit(function() {
                 var formElement = $(this);
                 var data = new FormData(formElement[0]);
-//                    jQuery.each(formElement.find("input[type='file']")[0].files, function(i, file) {
-//                        data.append('file-'+i, file);
-//                    });
                 var folderId = formElement.find(".js_folderId").val();
                 $.ajax({
                     type: "POST",
-                    url: formElement.attr("action")+folderId+"/files",
+                    url: getServerUrl()+formElement.attr("action")+folderId+"/files",
                     data: data,
-//                        dataType: "json",
                     headers: {
                         Authorization: formElement.data("authorization")
                     },
@@ -83,11 +107,8 @@
             $("form.js_uploadAlfresco").submit(function() {
                 var formElement = $(this);
                 var data = new FormData(formElement[0]);
-//                    jQuery.each(formElement.find("input[type='file']")[0].files, function(i, file) {
-//                        data.append('file-'+i, file);
-//                    });
                 var folderId = formElement.find(".js_alfrescoFolderId").val();
-                var url = formElement.attr("action");
+                var url = getServerUrl()+formElement.attr("action");
                 if (folderId) {
                     url += "folder/" + folderId;
                 }
@@ -95,7 +116,6 @@
                     type: "POST",
                     url: url,
                     data: data,
-//                        dataType: "json",
                     headers: {
                         Authorization: formElement.data("authorization")
                     },
@@ -109,8 +129,17 @@
     </script>
 </head>
 <body>
+Server URL
+<form>
+    <select id="js_serverUrlSelect">
+        <option class="js_localhostOption" value="http://localhost:8089/">localhost:8089</option>
+        <option class="js_serverUrlOption" value="http://147.32.80.219:8080/integracni-portal/" selected="selected">URL</option>
+    </select>
+    <input type="text" id="js_serverUrl" value="http://147.32.80.219:8080/integracni-portal/" size="100" />
+</form>
+
 Login <span class="js_loggedAs"></span>
-<form class="js_login" action="http://147.32.80.219:8080/integracni-portal/oauth/token"
+<form class="js_login" action="oauth/token"
       data-authorization="Basic ODU5NWM4Mjg0YTUyNDc1ZTUxNGQ2NjdlNDMxM2U4NmE6MjI2ZDI0NjE3ZTY1NTRkNzFhNjg2MTRjMzQ0MzZkNjc=">
     <input type="text" name="username" id="username" value="admin"/>
     <input type="password" name="password" value="admin"/>
@@ -122,12 +151,12 @@ Last Response
 <div id="js_lastResponse" style="border: 1px solid black; margin: 10px 0; min-height: 1em;"></div>
 
 Request
-<form id="requestForm" class="js_authReq" action="about:blank" data-action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/" target="rememberIframe" method="post">
-    <label for="requestPath">http://147.32.80.219:8080/integracni-portal/rest/v0.1/</label>
-    <input name="requestPath" class="js_requestPath" id="requestPath" autocomplete="on"/>
+<form id="requestForm" class="js_authReq" action="about:blank" data-action="rest/v0.1/" target="rememberIframe" method="post">
+    <label for="requestPath"><span class="js_insertServerUrl"></span>rest/v0.1/</label>
+    <input name="requestPath" class="js_requestPath" id="requestPath" autocomplete="on" size="70"/>
     <br/>
     <label for="requestData">Data:</label>
-    <input name="requestData" class="js_requestData" id="requestData" autocomplete="on"/>
+    <input name="requestData" class="js_requestData" id="requestData" autocomplete="on" size="150"/>
     <br/>
     <button type="button" id="requestGet" class="js_sendRequest" data-type="GET">GET</button>
     <button type="button" id="requestPost" class="js_sendRequest" data-type="POST">POST</button>
@@ -138,13 +167,13 @@ Request
 <iframe name="rememberIframe" src="about:blank" style="display: none;"></iframe>
 
 Cesnet
-<form class="js_uploadCesnet js_authReq" action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
+<form class="js_uploadCesnet js_authReq" action="rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
     <label for="folderId">Folder id to upload to: </label><input type="text" id="folderId" class="js_folderId" /><br/>
     <input type="file" name="file" /><button type="submit">Upload</button>
 </form>
 
 Alfresco
-<form class="js_uploadAlfresco js_authReq" action="http://147.32.80.219:8080/integracni-portal/rest/v0.1/home/" data-method="POST" enctype="multipart/form-data">
+<form class="js_uploadAlfresco js_authReq" action="rest/v0.1/home/" data-method="POST" enctype="multipart/form-data">
     <label for="alfrescoFolderId">Folder id to upload to: </label><input type="text" id="alfrescoFolderId" class="js_alfrescoFolderId" /><br/>
     <input type="file" name="file" />
     <button type="submit">Upload</button>
