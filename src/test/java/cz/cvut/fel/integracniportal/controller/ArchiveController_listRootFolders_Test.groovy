@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CesnetFileController_listRootFolders_Test extends AbstractIntegrationTestCase {
+public class ArchiveController_listRootFolders_Test extends AbstractIntegrationTestCase {
 
     @Test
     void "should return list of all root folders"() {

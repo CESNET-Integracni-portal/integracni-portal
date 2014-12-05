@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CesnetFileController_deleteFile_Test extends AbstractIntegrationTestCase {
+public class ArchiveController_deleteFile_Test extends AbstractIntegrationTestCase {
 
     @Autowired
     @ReplaceWithMock

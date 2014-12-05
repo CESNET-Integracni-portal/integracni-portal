@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DatabaseSetup("fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CesnetFileController_deleteFolder_Test extends AbstractIntegrationTestCase {
+public class ArchiveController_deleteFolder_Test extends AbstractIntegrationTestCase {
 
     @Autowired
     FolderDao folderDao
