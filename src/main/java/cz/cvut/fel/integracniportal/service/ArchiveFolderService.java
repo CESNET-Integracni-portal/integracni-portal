@@ -6,13 +6,12 @@ import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
  * Service for for {@link cz.cvut.fel.integracniportal.model.Folder}.
  */
-public interface FolderService {
+public interface ArchiveFolderService {
 
     /**
      * Finds a folder in database by its id.

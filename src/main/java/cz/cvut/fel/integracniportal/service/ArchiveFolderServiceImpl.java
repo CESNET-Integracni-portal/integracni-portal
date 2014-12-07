@@ -15,16 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of the {@link cz.cvut.fel.integracniportal.service.FolderService}.
+ * Implementation of the {@link ArchiveFolderService}.
  */
 @Service
-public class FolderServiceImpl implements FolderService {
+public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Autowired
     private FolderDao folderDao;
 
     @Autowired
-    private FileMetadataService fileMetadataService;
+    private ArchiveFileMetadataService archiveFileMetadataService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -121,7 +121,7 @@ public class FolderServiceImpl implements FolderService {
     @Transactional(rollbackFor = ServiceAccessException.class)
     public void removeFolder(Folder folder) throws ServiceAccessException {
         for (FileMetadata fileMetadata: folder.getFiles()) {
-            fileMetadataService.deleteFile(fileMetadata);
+            archiveFileMetadataService.deleteFile(fileMetadata);
         }
         for (Folder subFolder: folder.getFolders()) {
             removeFolder(subFolder);

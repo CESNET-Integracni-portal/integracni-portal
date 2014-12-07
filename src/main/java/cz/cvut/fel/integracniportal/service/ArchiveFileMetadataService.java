@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Service for FileMetadata metadata.
  */
-public interface FileMetadataService {
+public interface ArchiveFileMetadataService {
 
     /**
      * Finds a file metadata in database by its uuid.

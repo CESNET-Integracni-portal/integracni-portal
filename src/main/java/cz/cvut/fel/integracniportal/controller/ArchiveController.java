@@ -11,8 +11,8 @@ import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
-import cz.cvut.fel.integracniportal.service.FileMetadataService;
-import cz.cvut.fel.integracniportal.service.FolderService;
+import cz.cvut.fel.integracniportal.service.ArchiveFileMetadataService;
+import cz.cvut.fel.integracniportal.service.ArchiveFolderService;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +38,10 @@ public class ArchiveController extends AbstractController {
     private CesnetService cesnetService;
 
     @Autowired
-    private FileMetadataService fileMetadataService;
+    private ArchiveFileMetadataService archiveFileMetadataService;
 
     @Autowired
-    private FolderService folderService;
+    private ArchiveFolderService archiveFolderService;
 
     /**
      * Returns list of all top level folders.
@@ -50,7 +50,7 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<FolderRepresentation>> cesnetGetTopLevelFolders() {
-        List<FolderRepresentation> folderRepresentations = folderService.getTopLevelFolderRepresentations();
+        List<FolderRepresentation> folderRepresentations = archiveFolderService.getTopLevelFolderRepresentations();
         return new ResponseEntity<List<FolderRepresentation>>(folderRepresentations, HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class ArchiveController extends AbstractController {
     public ResponseEntity cesnetGetFolder(@PathVariable("folderid") Long folderId) {
         try {
 
-            FolderRepresentation folderRepresentation = folderService.getFolderRepresentationById(folderId);
+            FolderRepresentation folderRepresentation = archiveFolderService.getFolderRepresentationById(folderId);
             return new ResponseEntity(folderRepresentation, HttpStatus.OK);
 
         } catch (NotFoundException e) {
@@ -79,7 +79,7 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<FolderRepresentation> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
-        Folder newFolder = folderService.createTopLevelFolder(folderRepresentation.getName());
+        Folder newFolder = archiveFolderService.createTopLevelFolder(folderRepresentation.getName());
         return new ResponseEntity<FolderRepresentation>(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
     }
 
@@ -95,7 +95,7 @@ public class ArchiveController extends AbstractController {
                                                 @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
-            Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
+            Folder newFolder = archiveFolderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
             return new ResponseEntity(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {
@@ -114,7 +114,7 @@ public class ArchiveController extends AbstractController {
                                              @RequestBody FolderRepresentation folderRepresentation) {
         try {
 
-            folderService.updateFolder(folderId, folderRepresentation);
+            archiveFolderService.updateFolder(folderId, folderRepresentation);
             return new ResponseEntity(HttpStatus.NO_CONTENT);
 
         } catch (NotFoundException e) {
@@ -130,7 +130,7 @@ public class ArchiveController extends AbstractController {
     public ResponseEntity<String> cesnetDeleteFolder(@PathVariable("folderid") Long folderId) {
         try {
 
-            folderService.removeFolder(folderId);
+            archiveFolderService.removeFolder(folderId);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 
         } catch (NotFoundException e) {
@@ -152,7 +152,7 @@ public class ArchiveController extends AbstractController {
     public ResponseEntity cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
         try {
 
-            CesnetFileMetadataRepresentation fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
+            CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
             return new ResponseEntity(fileMetadataResource, HttpStatus.OK);
 
         } catch (ServiceAccessException e) {
@@ -177,7 +177,7 @@ public class ArchiveController extends AbstractController {
                                              @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
         FileMetadata fileMetadata = null;
         try {
-            fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
+            fileMetadata = archiveFileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -206,7 +206,7 @@ public class ArchiveController extends AbstractController {
         fileMetadata.setMimetype(fileMetadataRepresentation.getMimetype());
         fileMetadata.setArchiveOn(fileMetadataRepresentation.getArchiveOn());
         fileMetadata.setDeleteOn(fileMetadataRepresentation.getDeleteOn());
-        fileMetadataService.updateFileMetadata(fileMetadata);
+        archiveFileMetadataService.updateFileMetadata(fileMetadata);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -218,7 +218,7 @@ public class ArchiveController extends AbstractController {
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
 
-            CesnetFileMetadataRepresentation fileMetadataResource = fileMetadataService.getFileMetadataResource(fileuuid);
+            CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
             response.setContentType(fileMetadataResource.getMimetype());
             response.setHeader("Content-Disposition", "attachment; filename=\""+fileMetadataResource.getFilename()+"\"");
             InputStream remoteFileInputStream = cesnetService.getFile(fileuuid);
@@ -249,7 +249,7 @@ public class ArchiveController extends AbstractController {
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
-            fileMetadataService.updateFile(fileuuid, file);
+            archiveFileMetadataService.updateFile(fileuuid, file);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 
         } catch (FileNotFoundException e) {
@@ -268,7 +268,7 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("fileuuid") String fileuuid) {
         try {
-            fileMetadataService.deleteFile(fileuuid);
+            archiveFileMetadataService.deleteFile(fileuuid);
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
         } catch (ServiceAccessException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
@@ -287,7 +287,7 @@ public class ArchiveController extends AbstractController {
     public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
 
-            FileMetadata fileMetadata = fileMetadataService.uploadFile(folderId, file);
+            FileMetadata fileMetadata = archiveFileMetadataService.uploadFile(folderId, file);
             return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
 
         } catch (NotFoundException e) {

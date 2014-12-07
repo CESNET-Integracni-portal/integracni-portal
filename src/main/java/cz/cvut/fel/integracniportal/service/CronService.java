@@ -16,16 +16,16 @@ public class CronService {
     private static final Logger logger = Logger.getLogger(CronService.class);
 
     @Autowired
-    private FileMetadataService fileMetadataService;
+    private ArchiveFileMetadataService archiveFileMetadataService;
 
     @Scheduled(cron="${cron.deleteOldArchivedFiles}")
     public void deleteOldArchivedFiles() {
-        List<FileMetadata> fileMetadataList = fileMetadataService.getOldFilesForDeletion();
+        List<FileMetadata> fileMetadataList = archiveFileMetadataService.getOldFilesForDeletion();
         logger.info("Deleting " + fileMetadataList.size() + " old archived files.");
         try {
             for (FileMetadata fileMetadata : fileMetadataList) {
                 try {
-                    fileMetadataService.deleteFile(fileMetadata.getUuid());
+                    archiveFileMetadataService.deleteFile(fileMetadata.getUuid());
                 }  catch (FileNotFoundException e) {
                     logger.error("Unable to delete old archived file '" + fileMetadata.getFilename() + "' (UUID " + fileMetadata.getUuid() + "): file not found.");
                 }

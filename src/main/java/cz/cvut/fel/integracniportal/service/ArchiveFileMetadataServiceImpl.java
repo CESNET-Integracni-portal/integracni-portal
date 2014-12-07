@@ -23,16 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of the {@link FileMetadataService}.
+ * Implementation of the {@link ArchiveFileMetadataService}.
  */
 @Service
-public class FileMetadataServiceImpl implements FileMetadataService {
+public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataService {
 
     @Autowired
     private FileMetadataDao fileMetadataDao;
 
     @Autowired
-    private FolderService folderService;
+    private ArchiveFolderService archiveFolderService;
 
     @Autowired
     private CesnetService cesnetService;
@@ -68,7 +68,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, NotFoundException.class})
     public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, NotFoundException {
-        Folder parent = folderService.getFolderById(folderId);
+        Folder parent = archiveFolderService.getFolderById(folderId);
         return uploadFile(parent, file);
     }
 
@@ -85,7 +85,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
         try {
             cesnetService.uploadFile(file.getInputStream(), uuid);
-            folderService.updateFolder(folder);
+            archiveFolderService.updateFolder(folder);
             return fileMetadata;
         } catch (SftpException e) {
             throw new ServiceAccessException("cesnet.service.unavailable");
