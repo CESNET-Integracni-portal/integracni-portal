@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <table name="user_details">
+        <column>user_id</column>
+        <column>username</column>
+        <column>password</column>
+        <column>org_unit_id</column>
+        <column>alfrescoUsername</column>
+        <column>alfrescoPassword</column>
+        <row>
+            <value>101</value>
+            <value>a</value>
+            <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
+            <value>1</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>102</value>
+            <value>b</value>
+            <value>$2a$10$FkLUz0Zk1f6r4Q4Vlq5kKuETA/GAKukxLtOgDdkzkAfT648nHL2dy</value>
+            <value>2</value>
+            <null/>
+            <null/>
+        </row>
+    </table>
+
+    <table name="userrole_permissions">
+        <column>userrole_user_role_id</column>
+        <column>permissions</column>
+    </table>
+
+    <table name="user_role">
+        <column>user_role_id</column>
+        <column>description</column>
+        <column>name</column>
+        <row>
+            <value>101</value>
+            <value>Can edit externists.</value>
+            <value>externists</value>
+        </row>
+    </table>
+
+    <table name="user_details_user_role">
+        <column>user_details_user_id</column>
+        <column>userroles_user_role_id</column>
+        <row>
+            <value>101</value>
+            <value>101</value>
+        </row>
+    </table>
+</dataset>

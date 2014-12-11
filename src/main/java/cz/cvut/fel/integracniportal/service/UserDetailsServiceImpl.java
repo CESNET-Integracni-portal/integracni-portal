@@ -10,7 +10,7 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,13 +26,16 @@ import java.util.List;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    UserDetailsDao userDao;
+    private AuthenticationService authenticationService;
 
     @Autowired
-    UserRoleService userRoleService;
+    private UserDetailsDao userDao;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private UserRoleService userRoleService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails getUserById(long userId) throws NotFoundException {
@@ -50,7 +53,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails getCurrentUser() {
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = authenticationService.getCurrentAuthentication();
+        User loggedUser = (User) authentication.getPrincipal();
         if (loggedUser == null) {
             return null;
         }
@@ -138,5 +142,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public void removeUser(UserDetails user) {
         userDao.removeUser(user);
+    }
+
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    public void setUserDao(UserDetailsDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public void setUserRoleService(UserRoleService userRoleService) {
+        this.userRoleService = userRoleService;
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 }

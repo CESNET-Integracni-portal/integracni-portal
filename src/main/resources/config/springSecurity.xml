@@ -21,7 +21,7 @@
     <!-- Create authentication manager for Spring security-->
     <security:authentication-manager alias="authenticationManager">
         <!-- DB authentication -->
-        <security:authentication-provider user-service-ref="authenticationService">
+        <security:authentication-provider user-service-ref="authenticationServiceImpl">
             <security:password-encoder ref="passwordEncoder"/>
         </security:authentication-provider>
         <!-- Default admin user -->
