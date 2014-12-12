@@ -1,12 +1,10 @@
-package cz.cvut.fel.integracniportal.controller
+package cz.cvut.fel.integracniportal.service
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException
 import cz.cvut.fel.integracniportal.model.UserDetails
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation
-import cz.cvut.fel.integracniportal.service.AuthenticationService
-import cz.cvut.fel.integracniportal.service.UserDetailsServiceImpl
 import org.junit.Before
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
