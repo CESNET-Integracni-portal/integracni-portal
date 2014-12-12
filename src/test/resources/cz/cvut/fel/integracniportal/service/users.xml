@@ -25,8 +25,8 @@
         </row>
     </table>
 
-    <table name="userrole_permissions">
-        <column>userrole_user_role_id</column>
+    <table name="userdetails_permissions">
+        <column>userdetails_user_id</column>
         <column>permissions</column>
     </table>
 
@@ -38,6 +38,24 @@
             <value>101</value>
             <value>Can edit externists.</value>
             <value>externists</value>
+        </row>
+        <row>
+            <value>102</value>
+            <value>A role that is not used by any user.</value>
+            <value>unused</value>
+        </row>
+    </table>
+
+    <table name="userrole_permissions">
+        <column>userrole_user_role_id</column>
+        <column>permissions</column>
+        <row>
+            <value>101</value>
+            <value>EDIT_EXTERNISTS</value>
+        </row>
+        <row>
+            <value>102</value>
+            <value>CHANGE_PASSWORD</value>
         </row>
     </table>
 
