@@ -20,6 +20,8 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <mvc:default-servlet-handler/>
+
     <!-- Allow the use of @Secured and @PreAuthorize in controllers -->
     <security:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" proxy-target-class="true"/>
 
