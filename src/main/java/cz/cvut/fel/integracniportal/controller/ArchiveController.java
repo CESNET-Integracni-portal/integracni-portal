@@ -202,10 +202,18 @@ public class ArchiveController extends AbstractController {
             }
         }
 
-        fileMetadata.setFilename(fileMetadataRepresentation.getFilename());
-        fileMetadata.setMimetype(fileMetadataRepresentation.getMimetype());
-        fileMetadata.setArchiveOn(fileMetadataRepresentation.getArchiveOn());
-        fileMetadata.setDeleteOn(fileMetadataRepresentation.getDeleteOn());
+        if (fileMetadataRepresentation.getFilename() != null) {
+            fileMetadata.setFilename(fileMetadataRepresentation.getFilename());
+        }
+        if (fileMetadataRepresentation.getMimetype() != null) {
+            fileMetadata.setMimetype(fileMetadataRepresentation.getMimetype());
+        }
+        if (fileMetadataRepresentation.getArchiveOn() != null) {
+            fileMetadata.setArchiveOn(fileMetadataRepresentation.getArchiveOn());
+        }
+        if (fileMetadataRepresentation.getDeleteOn() != null) {
+            fileMetadata.setDeleteOn(fileMetadataRepresentation.getDeleteOn());
+        }
         archiveFileMetadataService.updateFileMetadata(fileMetadata);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
