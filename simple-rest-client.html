@@ -60,7 +60,7 @@
                     var json = $.parseJSON(XMLHttpRequest.responseText);
                     responseText = JSON.stringify(json, undefined, 4).replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
                 } catch(e) {
-                    responseText = this.responseText;
+                    responseText = XMLHttpRequest.responseText;
                 }
                 $("#js_lastResponse").html("["+XMLHttpRequest.status+"] " + XMLHttpRequest.statusText + "<br/><br/>" + responseText);
             });
