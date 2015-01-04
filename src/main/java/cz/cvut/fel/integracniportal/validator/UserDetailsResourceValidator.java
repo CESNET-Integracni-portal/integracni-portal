@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.validator;
 
+import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
+import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import cz.cvut.fel.integracniportal.service.UserRoleService;
@@ -40,14 +42,24 @@ public class UserDetailsResourceValidator implements Validator {
     public void validate(Object o, Errors errors) {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "username.empty");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.empty");
-        UserDetailsRepresentation userDetailsResource = (UserDetailsRepresentation) o;
+        UserDetailsRepresentation userDetailsRepresentation = (UserDetailsRepresentation) o;
 
-        if (userDetailsResource.getRoles() != null) {
-            for (String userRoleName : userDetailsResource.getRoles()) {
+        if (userDetailsRepresentation.getDirectPermissions() != null) {
+            for (String permissionName: userDetailsRepresentation.getDirectPermissions()) {
+                try {
+                    Permission permission = Permission.create(permissionName);
+                } catch (PermissionNotFoundException e) {
+                    Object[] args = {permissionName};
+                    errors.rejectValue("directPermissions", "permission.notFound", args, "Permission does not exist.");
+                }
+            }
+        }
+        if (userDetailsRepresentation.getRoles() != null) {
+            for (String userRoleName : userDetailsRepresentation.getRoles()) {
                 UserRole userRole = userRoleService.getRoleByName(userRoleName);
                 if (userRole == null) {
                     Object[] args = {userRoleName};
-                    errors.rejectValue("userRoles", "role.notFound", args, "User role does not exist.");
+                    errors.rejectValue("roles", "role.notFound", args, "User role does not exist.");
                 }
             }
         }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -74,55 +75,55 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException {
-        if (getUserByUsername(userDetailsResource.getUsername()) != null) {
+    public UserDetails createUser(UserDetailsRepresentation userDetailsRepresentation) throws UserRoleNotFoundException, AlreadyExistsException, PermissionNotFoundException {
+        if (getUserByUsername(userDetailsRepresentation.getUsername()) != null) {
             throw new AlreadyExistsException("user.alreadyExists");
         }
 
         UserDetails user = new UserDetails();
-        if (userDetailsResource.getRoles() != null) {
-            List<UserRole> userRoles = new ArrayList<UserRole>(userDetailsResource.getRoles().size());
-            for (String userRoleName : userDetailsResource.getRoles()) {
-                UserRole userRole = userRoleService.getRoleByName(userRoleName);
-                if (userRole == null) {
-                    throw new UserRoleNotFoundException("role.notFound", userRoleName);
-                }
-                userRoles.add(userRole);
-            }
-            user.setUserRoles(userRoles);
-        }
-        user.setUsername(userDetailsResource.getUsername());
-        String encodedPassword = passwordEncoder.encode(userDetailsResource.getPassword());
-        user.setPassword(encodedPassword);
-        user.setOrganizationalUnitId(userDetailsResource.getUnitId());
+        updateUserFromRepresentation(user, userDetailsRepresentation);
         userDao.saveUser(user);
         return user;
     }
 
     @Override
     @Transactional(rollbackFor = {UserRoleNotFoundException.class, NotFoundException.class})
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException {
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException {
         UserDetails userDetails = getUserById(userId);
-        if (userDetailsResource.getUsername() != null) {
-            userDetails.setUsername(userDetailsResource.getUsername());
+        updateUserFromRepresentation(userDetails, userDetailsRepresentation);
+        userDao.saveUser(userDetails);
+        return userDetails;
+    }
+
+    private void updateUserFromRepresentation(UserDetails userDetails, UserDetailsRepresentation userDetailsRepresentation) throws PermissionNotFoundException, UserRoleNotFoundException {
+        if (userDetailsRepresentation.getUsername() != null) {
+            userDetails.setUsername(userDetailsRepresentation.getUsername());
         }
-        if (userDetailsResource.getPassword() != null) {
-            String encodedPassword = passwordEncoder.encode(userDetailsResource.getPassword());
+        if (userDetailsRepresentation.getPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(userDetailsRepresentation.getPassword());
             userDetails.setPassword(encodedPassword);
         }
-        if (userDetailsResource.getUnitId() != null) {
-            userDetails.setOrganizationalUnitId(userDetailsResource.getUnitId());
+        if (userDetailsRepresentation.getUnitId() != null) {
+            userDetails.setOrganizationalUnitId(userDetailsRepresentation.getUnitId());
         }
-        if (userDetailsResource.getDirectPermissions() != null) {
-            userDetails.getPermissions().clear();
-            for (String permissionName: userDetailsResource.getDirectPermissions()) {
+        if (userDetailsRepresentation.getDirectPermissions() != null) {
+            if (userDetails.getPermissions() == null) {
+                userDetails.setPermissions(new HashSet<Permission>());
+            } else {
+                userDetails.getPermissions().clear();
+            }
+            for (String permissionName: userDetailsRepresentation.getDirectPermissions()) {
                 Permission permission = Permission.create(permissionName);
                 userDetails.getPermissions().add(permission);
             }
         }
-        if (userDetailsResource.getRoles() != null) {
-            userDetails.getUserRoles().clear();
-            for (String roleName: userDetailsResource.getRoles()) {
+        if (userDetailsRepresentation.getRoles() != null) {
+            if (userDetails.getUserRoles() == null) {
+                userDetails.setUserRoles(new ArrayList<UserRole>());
+            } else {
+                userDetails.getUserRoles().clear();
+            }
+            for (String roleName: userDetailsRepresentation.getRoles()) {
                 UserRole role = userRoleService.getRoleByName(roleName);
                 if (role == null) {
                     throw new UserRoleNotFoundException("role.notFound", roleName);
@@ -130,8 +131,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 userDetails.getUserRoles().add(role);
             }
         }
-        userDao.saveUser(userDetails);
-        return userDetails;
     }
 
     @Override

@@ -58,8 +58,9 @@ public interface UserDetailsService {
      * @return the user details
      * @throws UserRoleNotFoundException the user role not found exception
      * @throws AlreadyExistsException the already exists exception
+     * @throws PermissionNotFoundException the permission not found exception
      */
-    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException;
+    public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException, PermissionNotFoundException;
 
     /**
      * Updates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
@@ -69,6 +70,7 @@ public interface UserDetailsService {
      * @return the user details
      * @throws UserRoleNotFoundException the user role not found exception
      * @throws NotFoundException the not found exception
+     * @throws PermissionNotFoundException the permission not found exception
      */
     public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException;
 

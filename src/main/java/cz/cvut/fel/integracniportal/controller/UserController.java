@@ -63,6 +63,8 @@ public class UserController extends AbstractController {
             return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
         } catch (UserRoleNotFoundException e) {
             return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
+        } catch (PermissionNotFoundException e) {
+            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 
