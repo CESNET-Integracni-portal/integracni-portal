@@ -10,6 +10,7 @@ import cz.cvut.fel.integracniportal.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +27,7 @@ public class UserRolesController extends AbstractController {
     @Autowired
     private UserRoleService userRoleService;
 
+    @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.1/role", method = RequestMethod.GET)
     @ResponseBody
     public List<UserRoleRepresentation> getAllRoles() {
@@ -38,6 +40,7 @@ public class UserRolesController extends AbstractController {
         return userRoleRepresentations;
     }
 
+    @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.1/role", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createRole(@Validated @RequestBody UserRoleRepresentation userRoleRepresentation, BindingResult bindingResult) {
@@ -61,6 +64,7 @@ public class UserRolesController extends AbstractController {
         }
     }
 
+    @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.1/role/{roleid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getRole(@PathVariable("roleid") Long roleId) {
@@ -74,6 +78,7 @@ public class UserRolesController extends AbstractController {
         }
     }
 
+    @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.1/role/{roleid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateRole(@PathVariable("roleid") Long roleId,
@@ -101,6 +106,7 @@ public class UserRolesController extends AbstractController {
         }
     }
 
+    @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.1/permission", method = RequestMethod.GET)
     @ResponseBody
     public Permission[] getAllPermissions() {

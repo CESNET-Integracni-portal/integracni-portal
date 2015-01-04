@@ -36,6 +36,7 @@ public class UserController extends AbstractController {
         binder.setValidator(userDetailsResourceValidator);
     }
 
+    @PreAuthorize("hasAnyRole('externists', 'main_admin')")
     @RequestMapping(value = "/v0.1/user", method = RequestMethod.GET)
     @ResponseBody
     public List<UserDetailsRepresentation> getAllUsers() {
@@ -47,6 +48,7 @@ public class UserController extends AbstractController {
         return result;
     }
 
+    @PreAuthorize("hasRole('externists')")
     @RequestMapping(value = "/v0.1/user", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
@@ -68,6 +70,7 @@ public class UserController extends AbstractController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('externists', 'main_admin')")
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getUser(@PathVariable("userid") Long userId) {
@@ -82,6 +85,7 @@ public class UserController extends AbstractController {
         }
     }
 
+    @PreAuthorize("hasRole('externists')")
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateUser(@PathVariable("userid") Long userId,

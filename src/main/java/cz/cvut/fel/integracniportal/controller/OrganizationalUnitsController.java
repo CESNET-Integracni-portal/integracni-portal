@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class OrganizationalUnitsController extends AbstractController {
     /**
      * Get all organizational units.
      */
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.1/unit", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getAllUnits() {
@@ -45,6 +47,7 @@ public class OrganizationalUnitsController extends AbstractController {
      * @param id    Id of the organizational unit.
      * @return Organizational unit.
      */
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getUnit(@PathVariable("id") Long id) {
@@ -60,6 +63,7 @@ public class OrganizationalUnitsController extends AbstractController {
      * Update a organizational unit.
      * @param id    Id of the organizational unit.
      */
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<Object> alfrescoUpdateFileMetadata(@PathVariable("id") Long id,

@@ -14,6 +14,10 @@ import java.util.Map;
 public enum Permission {
 
     /**
+     * The MAIN_ADMIN.
+     */
+    MAIN_ADMIN("main_admin", true),
+    /**
      * Permission to edit organizational units.
      */
     EDIT_ORGANIZATIONAL_UNITS("units", false),
@@ -37,20 +41,33 @@ public enum Permission {
         this.roleAssignable = roleAssignable;
     }
 
+    /**
+     * Indicates, whether the permission can be assigned to a role.
+     *
+     * @return boolean representing whether this permission is role assignable
+     */
     public Boolean isRoleAssignable() {
         return roleAssignable;
     }
 
 
-
-    //Serialization
+    /**
+     * Method used for serialization of the permission.
+     * @return serialized string representing the permission
+     */
     @JsonValue
     @Override
     public String toString() {
         return name;
     }
 
-    // Deserialization
+    /**
+     * Create permission.
+     *
+     * @param name name of the permission
+     * @return the permission
+     * @throws PermissionNotFoundException indicates that the permission does not exist
+     */
     @JsonCreator
     public static Permission create(String name) throws PermissionNotFoundException {
         Permission permission = permissions.get(name);
