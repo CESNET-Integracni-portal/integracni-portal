@@ -76,7 +76,7 @@ public class ArchiveController extends AbstractController {
      * @param folderRepresentation    Folder representation of the folder to be created.
      * @return
      */
-    @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity<FolderRepresentation> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
         Folder newFolder = archiveFolderService.createTopLevelFolder(folderRepresentation.getName());
@@ -89,7 +89,7 @@ public class ArchiveController extends AbstractController {
      * @param folderRepresentation    Folder representation of the folder to be created.
      * @return
      */
-    @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
                                                 @RequestBody FolderRepresentation folderRepresentation) {
@@ -290,7 +290,7 @@ public class ArchiveController extends AbstractController {
      * @param file    File to be uploaded.
      * @return
      */
-    @RequestMapping(value = "/v0.1/archive/folder/{folderid}/files", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
         try {

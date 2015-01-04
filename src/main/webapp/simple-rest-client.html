@@ -93,7 +93,7 @@
                 var folderId = formElement.find(".js_folderId").val();
                 $.ajax({
                     type: "POST",
-                    url: getServerUrl()+formElement.attr("action")+folderId+"/files",
+                    url: getServerUrl()+formElement.attr("action")+folderId,
                     data: data,
                     headers: {
                         Authorization: formElement.data("authorization")
