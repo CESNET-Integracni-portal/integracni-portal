@@ -105,6 +105,7 @@ public class UserController extends AbstractController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/user/current", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getCurrentUser() {

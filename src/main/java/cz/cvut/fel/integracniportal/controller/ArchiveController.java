@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +48,7 @@ public class ArchiveController extends AbstractController {
      * Returns list of all top level folders.
      * @return List of {@link cz.cvut.fel.integracniportal.representation.FolderRepresentation}.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<FolderRepresentation>> cesnetGetTopLevelFolders() {
@@ -58,6 +60,7 @@ public class ArchiveController extends AbstractController {
      * Returns a folder by its id.
      * @return A folder representation object.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity cesnetGetFolder(@PathVariable("folderid") Long folderId) {
@@ -76,6 +79,7 @@ public class ArchiveController extends AbstractController {
      * @param folderRepresentation    Folder representation of the folder to be created.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity<FolderRepresentation> cesnetCreateTopLevelFolder(@RequestBody FolderRepresentation folderRepresentation) {
@@ -89,6 +93,7 @@ public class ArchiveController extends AbstractController {
      * @param folderRepresentation    Folder representation of the folder to be created.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{parentfolderid}", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
@@ -108,6 +113,7 @@ public class ArchiveController extends AbstractController {
      * @param folderRepresentation  A folder representation containing new metadata. Currently, only 'name' field is supported.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
@@ -126,6 +132,7 @@ public class ArchiveController extends AbstractController {
      * Delete a folder.
      * @param folderId  Id of the folder to be deleted.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDeleteFolder(@PathVariable("folderid") Long folderId) {
         try {
@@ -147,6 +154,7 @@ public class ArchiveController extends AbstractController {
      * @param fileuuid    The uuid identifier of the file.
      * @return File metadata.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
@@ -171,6 +179,7 @@ public class ArchiveController extends AbstractController {
      *                                      The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
@@ -222,6 +231,7 @@ public class ArchiveController extends AbstractController {
      * Download a file.
      * @param fileuuid    The uuid identifier of the file.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.GET)
     public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
         try {
@@ -252,6 +262,7 @@ public class ArchiveController extends AbstractController {
      * @param file        New file to replace the original one.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
@@ -273,6 +284,7 @@ public class ArchiveController extends AbstractController {
      * Delete a file.
      * @param fileuuid    The uuid identifier of the file.
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("fileuuid") String fileuuid) {
         try {
@@ -290,6 +302,7 @@ public class ArchiveController extends AbstractController {
      * @param file    File to be uploaded.
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
