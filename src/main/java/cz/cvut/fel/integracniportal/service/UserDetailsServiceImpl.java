@@ -82,7 +82,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         UserDetails user = new UserDetails();
         updateUserFromRepresentation(user, userDetailsRepresentation);
-        userDao.saveUser(user);
+        userDao.save(user);
         return user;
     }
 
@@ -91,7 +91,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException {
         UserDetails userDetails = getUserById(userId);
         updateUserFromRepresentation(userDetails, userDetailsRepresentation);
-        userDao.saveUser(userDetails);
+        userDao.save(userDetails);
         return userDetails;
     }
 
@@ -135,12 +135,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public void saveUser(UserDetails user) {
-        userDao.saveUser(user);
+        userDao.save(user);
     }
 
     @Override
     public void removeUser(UserDetails user) {
-        userDao.removeUser(user);
+        userDao.delete(user);
     }
 
     public void setAuthenticationService(AuthenticationService authenticationService) {

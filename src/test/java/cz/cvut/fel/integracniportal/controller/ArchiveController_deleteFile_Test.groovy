@@ -38,7 +38,7 @@ public class ArchiveController_deleteFile_Test extends AbstractIntegrationTestCa
                 .andExpect(status().isNoContent())
 
         try {
-            metadataDao.getFileMetadataByUuid("2")
+            metadataDao.getByUUID("2")
             fail("File metadata still exist")
 
         } catch (FileNotFoundException e) {

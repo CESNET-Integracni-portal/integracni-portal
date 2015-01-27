@@ -8,7 +8,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_role")
-public class UserRole {
+public class UserRole extends AbstractEntity<Long> {
 
     @Id
     @GeneratedValue
@@ -24,16 +24,20 @@ public class UserRole {
     @Enumerated(EnumType.STRING)
     private Set<Permission> permissions;
 
-    public Long getUserRoleId() {
+    @Override
+    public Long getId() {
         return userRoleId;
     }
-    public void setUserRoleId(Long userRoleId) {
+
+    @Override
+    public void setId(Long userRoleId) {
         this.userRoleId = userRoleId;
     }
 
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -41,6 +45,7 @@ public class UserRole {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -48,6 +53,7 @@ public class UserRole {
     public Set<Permission> getPermissions() {
         return permissions;
     }
+
     public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }

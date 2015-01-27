@@ -10,7 +10,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "filename"}))
-public class FileMetadata {
+public class FileMetadata extends AbstractEntity<String> {
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -46,6 +46,16 @@ public class FileMetadata {
 
     @Column(name = "delete_on", nullable = true)
     private Date deleteOn;
+
+    @Override
+    public String getId() {
+        return uuid;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.uuid = id;
+    }
 
     public String getUuid() {
         return uuid;

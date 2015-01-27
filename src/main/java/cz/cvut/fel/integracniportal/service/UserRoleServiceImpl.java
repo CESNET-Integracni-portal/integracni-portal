@@ -24,7 +24,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public UserRole getRoleById(long id) throws NotFoundException {
-        UserRole userRole = userRoleDao.getRoleById(id);
+        UserRole userRole = userRoleDao.get(id);
         if (userRole == null) {
             throw new NotFoundException("role.notFound", id);
         }
@@ -60,11 +60,11 @@ public class UserRoleServiceImpl implements UserRoleService {
                 throw new PermissionNotAssignableToRoleException("permission.notAssignableToRole", permission.toString());
             }
         }
-        userRoleDao.saveRole(role);
+        userRoleDao.save(role);
     }
 
     @Override
     public void deleteRole(UserRole role) {
-        userRoleDao.deleteRole(role);
+        userRoleDao.delete(role);
     }
 }

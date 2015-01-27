@@ -1,58 +1,51 @@
 package cz.cvut.fel.integracniportal.dao;
 
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static cz.cvut.fel.integracniportal.model.QUserDetails.userDetails;
+
 /**
  * Hibernate implementation of the UserDetailsDao interface.
  */
 @Repository
-public class UserDetailsDaoImpl extends HibernateDao implements UserDetailsDao {
+@Transactional
+public class UserDetailsDaoImpl extends GenericHibernateDao<UserDetails> implements UserDetailsDao {
+
+    public UserDetailsDaoImpl() {
+        super(UserDetails.class);
+    }
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails getUserById(long userId) {
-        return getHibernateTemplate().get(UserDetails.class, userId);
+        return get(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails getUserByUsername(String username) {
-        Criteria criteria = getCriteria(UserDetails.class, "user");
-        criteria.add(Restrictions.eq("user.username", username));
-        return (UserDetails) criteria.uniqueResult();
+        return from(userDetails)
+                .where(userDetails.username.eq(username))
+                .uniqueResult(userDetails);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserDetails> getAllUsers() {
-        Criteria criteria = getCriteria(UserDetails.class, "user");
-        return criteria.list();
+        return from(userDetails)
+                .list(userDetails);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId) {
-        Criteria criteria = getCriteria(UserDetails.class, "user");
-        criteria.add(Restrictions.eq("user.organizationalUnitId", organizationalUnitId));
-        return criteria.list();
+        return from(userDetails)
+                .where(userDetails.organizationalUnitId.eq(organizationalUnitId))
+                .list(userDetails);
     }
 
-    @Override
-    @Transactional
-    public void saveUser(UserDetails user) {
-        getHibernateTemplate().saveOrUpdate(user);
-    }
-
-    @Override
-    @Transactional
-    public void removeUser(UserDetails user) {
-        getHibernateTemplate().delete(user);
-    }
 }

@@ -43,7 +43,7 @@ public class ArchiveController_updateFile_Test extends AbstractIntegrationTestCa
         apiPut("archive/file/2", body)
                 .andExpect(status().isNoContent())
 
-        def meta = metadataDao.getFileMetadataByUuid("2")
+        def meta = metadataDao.getByUUID("2")
 
         assertEquals "x.jpg", meta.filename
         assertEquals "image/jpeg", meta.mimetype

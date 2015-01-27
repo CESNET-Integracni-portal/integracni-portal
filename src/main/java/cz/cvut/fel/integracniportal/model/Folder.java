@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "resource_folder", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "name"}))
-public class Folder {
+public class Folder extends AbstractEntity<Long> {
 
     @Id
     @Column(name = "folder_id", unique = true)
@@ -42,11 +42,13 @@ public class Folder {
     @JoinColumn(name = "owner", referencedColumnName = "user_id")
     private UserDetails owner;
 
-    public Long getFolderId() {
+    @Override
+    public Long getId() {
         return folderId;
     }
 
-    public void setFolderId(Long folderId) {
+    @Override
+    public void setId(Long folderId) {
         this.folderId = folderId;
     }
 

@@ -41,12 +41,12 @@ public interface UserDetailsDao {
      * Saves the user into database.
      * @param user UserDetails login credentials which are to be saved.
      */
-    public void saveUser(UserDetails user);
+    public void save(UserDetails user);
 
     /**
      * Removes the user from database.
      * @param user UserDetails login credentials which are to be removed.
      */
-    public void removeUser(UserDetails user);
+    public void delete(UserDetails user);
 
 }

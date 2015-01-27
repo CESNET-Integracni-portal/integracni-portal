@@ -28,7 +28,7 @@ public class ArchiveController_deleteFolder_Test extends AbstractIntegrationTest
         apiDelete("archive/folder/2")
                 .andExpect(status().isNoContent())
 
-        def folder = folderDao.getFolderById(2)
+        def folder = folderDao.get(2L)
 
         assertNull folder
     }

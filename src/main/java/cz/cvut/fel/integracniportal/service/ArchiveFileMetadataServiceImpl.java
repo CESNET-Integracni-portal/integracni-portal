@@ -42,7 +42,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
 
     @Override
     public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) throws FileNotFoundException {
-        return fileMetadataDao.getFileMetadataByUuid(fileMetadataUuid);
+        return fileMetadataDao.getByUUID(fileMetadataUuid);
     }
 
     @Override
@@ -52,12 +52,12 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
 
     @Override
     public void updateFileMetadata(FileMetadata fileMetadata) {
-        fileMetadataDao.updateFileMetadata(fileMetadata);
+        fileMetadataDao.update(fileMetadata);
     }
 
     @Override
     public void removeFileMetadata(FileMetadata fileMetadata) {
-        fileMetadataDao.removeFileMetadata(fileMetadata);
+        fileMetadataDao.delete(fileMetadata);
     }
 
     @Override

@@ -1,43 +1,24 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Folder;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * Data Access Object interface for {@link cz.cvut.fel.integracniportal.model.Folder} entity.
+ * @author Radek Jezdik
  */
 public interface FolderDao {
 
-    /**
-     * Finds a folder in database by its id.
-     * @param id    Id of the folder.
-     * @return The folder.
-     */
-    public Folder getFolderById(long id);
+    Folder get(Serializable id);
 
-    /**
-     * Finds all top level folders.
-     * @return List of top level folders.
-     */
-    public List<Folder> getTopLevelFolders();
+    void update(Folder folder);
 
-    /**
-     * Creates new folder in database.
-     * @param folder    Folder which is to be created in the database.
-     */
-    public void createFolder(Folder folder);
+    void delete(Folder folder);
 
-    /**
-     * Updates existing folder in the database.
-     * @param folder    Folder which is to be updated in the database.
-     */
-    public void updateFolder(Folder folder);
+    @Transactional(readOnly = true)
+    List<Folder> getTopLevelFolders();
 
-    /**
-     * Removes a folder from the database.
-     * @param folder  Folder to be removed from the database.
-     */
-    public void removeFolder(Folder folder);
-
+    void createFolder(Folder folder);
 }

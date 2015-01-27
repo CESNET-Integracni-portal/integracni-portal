@@ -21,7 +21,7 @@ public class UserRoleRepresentation {
 
     public UserRoleRepresentation() {}
     public UserRoleRepresentation(UserRole userRole) {
-        this.id = userRole.getUserRoleId();
+        this.id = userRole.getId();
         this.name = userRole.getName();
         this.description = userRole.getDescription();
         this.permissions.addAll(userRole.getPermissions());

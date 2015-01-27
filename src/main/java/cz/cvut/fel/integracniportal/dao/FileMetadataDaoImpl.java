@@ -1,9 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,16 +8,22 @@ import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.List;
 
+import static cz.cvut.fel.integracniportal.model.QFileMetadata.fileMetadata;
+
 /**
  * Hibernate implementation of the FileMetadataDao interface.
  */
 @Repository
-public class FileMetadataDaoImpl extends HibernateDao implements FileMetadataDao {
+public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> implements FileMetadataDao {
+
+    public FileMetadataDaoImpl() {
+        super(FileMetadata.class);
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) throws FileNotFoundException {
-        FileMetadata fileMetadata = getHibernateTemplate().get(FileMetadata.class, fileMetadataUuid);
+    public FileMetadata getByUUID(String fileMetadataUuid) throws FileNotFoundException {
+        FileMetadata fileMetadata = get(fileMetadataUuid);
         if (fileMetadata == null) {
             throw new FileNotFoundException();
         }
@@ -29,9 +32,9 @@ public class FileMetadataDaoImpl extends HibernateDao implements FileMetadataDao
 
     @Override
     public List<FileMetadata> getAllFileMetadatas() {
-        Criteria c = getCriteria(FileMetadata.class, "rf");
-        c.addOrder(Order.asc("rf.createdOn"));
-        return c.list();
+        return from(fileMetadata)
+                .orderBy(fileMetadata.createdOn.asc())
+                .list(fileMetadata);
     }
 
     @Override
@@ -40,26 +43,20 @@ public class FileMetadataDaoImpl extends HibernateDao implements FileMetadataDao
         Date currentDate = new Date();
         fileMetadata.setCreatedOn(currentDate);
         fileMetadata.setChangedOn(currentDate);
-        getHibernateTemplate().save(fileMetadata);
+        save(fileMetadata);
     }
 
     @Override
-    public void updateFileMetadata(FileMetadata fileMetadata) {
+    public void update(FileMetadata fileMetadata) {
         fileMetadata.setChangedOn(new Date());
-        getHibernateTemplate().update(fileMetadata);
-    }
-
-    @Override
-    @Transactional
-    public void removeFileMetadata(FileMetadata fileMetadata) {
-        getHibernateTemplate().delete(fileMetadata);
+        super.update(fileMetadata);
     }
 
     @Override
     public List<FileMetadata> getFilesForDeletion() {
-        Criteria c = getCriteria(FileMetadata.class, "rf");
-        c.add(Restrictions.isNotNull("rf.deleteOn"));
-        c.add(Restrictions.lt("rf.deleteOn", new Date()));
-        return c.list();
+        return from(fileMetadata)
+                .where(fileMetadata.deleteOn.isNotNull())
+                .where(fileMetadata.deleteOn.lt(new Date()))
+                .list(fileMetadata);
     }
 }

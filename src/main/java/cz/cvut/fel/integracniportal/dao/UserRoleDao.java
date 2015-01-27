@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.UserRole;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,14 +10,14 @@ import java.util.List;
  */
 public interface UserRoleDao {
 
-    public UserRole getRoleById(long id);
+    public UserRole get(Serializable id);
 
     public UserRole getRoleByName(String name);
 
     public List<UserRole> getAllRoles();
 
-    public void saveRole(UserRole role);
+    public void save(UserRole role);
 
-    public void deleteRole(UserRole role);
+    public void delete(UserRole role);
 
 }

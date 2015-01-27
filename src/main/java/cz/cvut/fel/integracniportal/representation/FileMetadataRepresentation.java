@@ -47,7 +47,7 @@ public class FileMetadataRepresentation {
         filesize = fileMetadata.getFilesize();
         if (fileMetadata.getOwner() != null) {
             owner = new UserDetailsRepresentation();
-            owner.setId(fileMetadata.getOwner().getUserId());
+            owner.setId(fileMetadata.getOwner().getId());
             owner.setUsername(fileMetadata.getOwner().getUsername());
         }
         createdOn = fileMetadata.getCreatedOn();

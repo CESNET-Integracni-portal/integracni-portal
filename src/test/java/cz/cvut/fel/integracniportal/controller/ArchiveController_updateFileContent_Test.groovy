@@ -43,7 +43,7 @@ public class ArchiveController_updateFileContent_Test extends AbstractIntegratio
         mockMvc.perform(fileUpload(fromApi("archive/file/2/content")).file(file))
                 .andExpect(status().isNoContent())
 
-        def meta = metadataDao.getFileMetadataByUuid("2")
+        def meta = metadataDao.getByUUID("2")
     }
 
 

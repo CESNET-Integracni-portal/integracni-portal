@@ -30,7 +30,7 @@ public class ArchiveController_updateFolder_Test extends AbstractIntegrationTest
         apiPut("archive/folder/2", content)
                 .andExpect(status().isNoContent())
 
-        def folder = folderDao.getFolderById(2)
+        def folder = folderDao.get(2L)
 
         assertEquals "renamed", folder.name
     }

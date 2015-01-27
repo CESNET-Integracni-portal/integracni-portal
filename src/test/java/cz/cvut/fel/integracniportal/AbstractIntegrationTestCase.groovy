@@ -8,6 +8,8 @@ import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4Spr
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
@@ -37,10 +39,15 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     @Autowired
 	protected WebApplicationContext wac
 
+    protected userPrincipal
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this)
 		this.mockMvc = webAppContextSetup(this.wac).build()
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin", "admin"))
 	}
 
 	public ResultActions apiGet(String urlTemplate) throws Exception {

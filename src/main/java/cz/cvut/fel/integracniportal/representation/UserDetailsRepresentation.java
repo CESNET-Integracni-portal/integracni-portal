@@ -35,7 +35,7 @@ public class UserDetailsRepresentation {
         this(userDetails, true);
     }
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
-        this.id = userDetails.getUserId();
+        this.id = userDetails.getId();
         this.username = userDetails.getUsername();
         this.unitId = userDetails.getOrganizationalUnitId();
         if (withRoles) {

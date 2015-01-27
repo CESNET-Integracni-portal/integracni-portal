@@ -69,11 +69,11 @@ public class FolderRepresentation {
     }
 
     public FolderRepresentation(Folder folder, boolean deepCopy) {
-        id = folder.getFolderId().toString();
+        id = folder.getId().toString();
         name = folder.getName();
         if (folder.getOwner() != null) {
             owner = new UserDetailsRepresentation();
-            owner.setId(folder.getOwner().getUserId());
+            owner.setId(folder.getOwner().getId());
             owner.setUsername(folder.getOwner().getUsername());
         }
         createdOn = folder.getCreatedOn();
@@ -114,7 +114,7 @@ public class FolderRepresentation {
         Folder current = folder;
         while (current != null) {
             Map<String, String> breadcrumbEntry = new HashMap<String, String>();
-            breadcrumbEntry.put("id", current.getFolderId().toString());
+            breadcrumbEntry.put("id", current.getId().toString());
             breadcrumbEntry.put("name", current.getName());
             breadcrumbs.add(breadcrumbEntry);
             current = current.getParent();

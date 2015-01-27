@@ -31,7 +31,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Override
     public Folder getFolderById(long id) throws NotFoundException {
-        Folder folder = folderDao.getFolderById(id);
+        Folder folder = folderDao.get(id);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
         }
@@ -106,7 +106,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Override
     public Folder updateFolder(Folder folder) {
-        folderDao.updateFolder(folder);
+        folderDao.update(folder);
         return folder;
     }
 
@@ -126,6 +126,6 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
         for (Folder subFolder: folder.getFolders()) {
             removeFolder(subFolder);
         }
-        folderDao.removeFolder(folder);
+        folderDao.delete(folder);
     }
 }

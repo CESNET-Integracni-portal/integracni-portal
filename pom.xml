@@ -12,6 +12,7 @@
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <spring.integration.version>3.0.4.RELEASE</spring.integration.version>
         <jackson.version>2.3.2</jackson.version>
+        <querydsl.version>3.5.1</querydsl.version>
     </properties>
 
     <repositories>
@@ -216,6 +217,16 @@
             <artifactId>postgresql</artifactId>
             <version>9.3-1100-jdbc4</version>
         </dependency>
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
 
         <!-- Cesnet -->
         <dependency>
@@ -230,12 +241,6 @@
             <artifactId>chemistry-opencmis-client-impl</artifactId>
             <version>0.12.0</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.alfresco.cmis.client</groupId>
-            <artifactId>alfresco-opencmis-extension</artifactId>
-            <version>0.2</version>
-            <type>jar</type>
-        </dependency>-->
 
         <!-- Apache Commons Upload -->
         <dependency>
@@ -369,6 +374,24 @@
                                     </includes>
                                 </fileset>
                             </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>maven-apt-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/generated-sources</outputDirectory>
+                            <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
                 </executions>
