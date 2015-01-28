@@ -74,8 +74,8 @@ public class CesnetServiceImpl implements CesnetService {
             return Collections.emptyList();
         } else {
             List<CesnetFileMetadata> fileMetadataList = new ArrayList<CesnetFileMetadata>(lsOutput.size());
-            for (int i = 0; i < lsOutput.size(); ++i) {
-                fileMetadataList.add(parseFileMetadata(lsOutput.get(i)));
+            for (String aLsOutput : lsOutput) {
+                fileMetadataList.add(parseFileMetadata(aLsOutput));
             }
             return fileMetadataList;
         }
@@ -104,8 +104,7 @@ public class CesnetServiceImpl implements CesnetService {
             throw new FileNotFoundException();
         }
 
-        CesnetFileMetadata fileMetadata = parseFileMetadata(lsOutput.get(0));
-        return fileMetadata;
+        return parseFileMetadata(lsOutput.get(0));
     }
 
     @Override
@@ -137,7 +136,7 @@ public class CesnetServiceImpl implements CesnetService {
 
     private CesnetFileMetadata parseFileMetadata(String lsOutput) throws FileAccessException {
         String[] parts = lsOutput.split("\\s+");
-        if (parts == null || parts.length < 9) {
+        if (parts.length < 9) {
             throw new FileAccessException("cesnet.parseError");
         }
 

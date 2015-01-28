@@ -191,7 +191,7 @@ public class ArchiveController extends AbstractController {
     @ResponseBody
     public ResponseEntity cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                              @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
-        FileMetadata fileMetadata = null;
+        FileMetadata fileMetadata;
         try {
             fileMetadata = archiveFileMetadataService.getFileMetadataByUuid(fileuuid);
         } catch (FileNotFoundException e) {

@@ -102,7 +102,7 @@ public class UserRolesController extends AbstractController {
         } catch (NotFoundException e) {
             return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
         } catch (PermissionNotAssignableToRoleException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
         }
     }
 

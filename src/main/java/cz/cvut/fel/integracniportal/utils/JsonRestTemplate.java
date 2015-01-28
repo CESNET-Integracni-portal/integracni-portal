@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by pstrnad on 14.11.2014.
+ * @author Petr Strnad
  */
 public class JsonRestTemplate extends RestTemplate {
 

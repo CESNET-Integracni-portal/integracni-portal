@@ -59,8 +59,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (loggedUser == null) {
             return null;
         }
-        UserDetails userDetails = getUserByUsername(loggedUser.getUsername());
-        return userDetails;
+        return getUserByUsername(loggedUser.getUsername());
     }
 
     @Override

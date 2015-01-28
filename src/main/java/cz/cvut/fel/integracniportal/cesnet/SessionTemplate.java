@@ -24,6 +24,7 @@ class SessionTemplate implements SessionOperations {
         lock = new ReentrantLock();
     }
 
+    @Override
     public final <T> T execute(SessionCallback<T> callback) throws Exception {
         return doExecute(callback);
     }

@@ -36,7 +36,6 @@ public abstract class AbstractController {
     }
 
     protected String resolveError(MessageSourceResolvable error) {
-        String message = messageSource.getMessage(error, Locale.getDefault());
-        return message;
+        return messageSource.getMessage(error, Locale.getDefault());
     }
 }

@@ -47,7 +47,7 @@ public class UserDetailsResourceValidator implements Validator {
         if (userDetailsRepresentation.getDirectPermissions() != null) {
             for (String permissionName : userDetailsRepresentation.getDirectPermissions()) {
                 try {
-                    Permission permission = Permission.create(permissionName);
+                    Permission.create(permissionName);
                 } catch (PermissionNotFoundException e) {
                     Object[] args = {permissionName};
                     errors.rejectValue("directPermissions", "permission.notFound", args, "Permission does not exist.");

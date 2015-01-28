@@ -126,8 +126,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     public CesnetFileMetadataRepresentation getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileMetadataUuid);
         CesnetFileMetadata cesnetFileMetadata = cesnetService.getFileMetadata(fileMetadataUuid);
-        CesnetFileMetadataRepresentation fileMetadataResource = new CesnetFileMetadataRepresentation(fileMetadata, cesnetFileMetadata);
-        return fileMetadataResource;
+        return new CesnetFileMetadataRepresentation(fileMetadata, cesnetFileMetadata);
     }
 
     @Override

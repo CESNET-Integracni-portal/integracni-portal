@@ -42,8 +42,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     @Transactional(readOnly = true)
     public FolderRepresentation getFolderRepresentationById(long id) throws NotFoundException {
         Folder folder = getFolderById(id);
-        FolderRepresentation folderRepresentation = new FolderRepresentation(folder);
-        return folderRepresentation;
+        return new FolderRepresentation(folder);
     }
 
     @Override

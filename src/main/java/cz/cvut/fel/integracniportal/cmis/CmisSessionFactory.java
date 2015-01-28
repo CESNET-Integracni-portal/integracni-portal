@@ -21,8 +21,7 @@ public class CmisSessionFactory {
     protected Map<String, String> defaultParameters;
 
     protected Session createSession(Map<String, String> parameters) {
-        Session session = sessionFactory.getRepositories(parameters).get(0).createSession();
-        return session;
+        return sessionFactory.getRepositories(parameters).get(0).createSession();
     }
 
     public Session createSessionForUser(String user, String password) {

@@ -36,6 +36,7 @@ public class GenericHibernateDao<ENTITY extends AbstractEntity> {
         this.hibernateTemplate = new HibernateTemplate(sessionFactory);
     }
 
+    @SuppressWarnings("unchecked")
     public ENTITY get(Serializable id) {
         return (ENTITY) hibernateTemplate.get(entityClass, id);
     }
