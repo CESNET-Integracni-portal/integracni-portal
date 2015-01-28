@@ -46,6 +46,7 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Returns list of all top level folders.
+     *
      * @return List of {@link cz.cvut.fel.integracniportal.representation.FolderRepresentation}.
      */
     @PreAuthorize("isAuthenticated()")
@@ -58,6 +59,7 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Returns a folder by its id.
+     *
      * @return A folder representation object.
      */
     @PreAuthorize("isAuthenticated()")
@@ -76,7 +78,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Create a top level folder.
-     * @param folderRepresentation    Folder representation of the folder to be created.
+     *
+     * @param folderRepresentation Folder representation of the folder to be created.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -89,8 +92,9 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Create a subfolder.
-     * @param parentFolderId    Id of a parent folder in which the new one should be created.
-     * @param folderRepresentation    Folder representation of the folder to be created.
+     *
+     * @param parentFolderId       Id of a parent folder in which the new one should be created.
+     * @param folderRepresentation Folder representation of the folder to be created.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -110,7 +114,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Update folder metadata.
-     * @param folderRepresentation  A folder representation containing new metadata. Currently, only 'name' field is supported.
+     *
+     * @param folderRepresentation A folder representation containing new metadata. Currently, only 'name' field is supported.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -130,7 +135,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Delete a folder.
-     * @param folderId  Id of the folder to be deleted.
+     *
+     * @param folderId Id of the folder to be deleted.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.DELETE)
@@ -148,10 +154,10 @@ public class ArchiveController extends AbstractController {
     }
 
 
-
     /**
      * Return metadata of a file.
-     * @param fileuuid    The uuid identifier of the file.
+     *
+     * @param fileuuid The uuid identifier of the file.
      * @return File metadata.
      */
     @PreAuthorize("isAuthenticated()")
@@ -174,9 +180,10 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Updates metadata for file
-     * @param fileuuid                      The uuid identifier of the file.
-     * @param fileMetadataRepresentation    New metadata, see {@link cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation} for the list of fields.
-     *                                      The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
+     *
+     * @param fileuuid                   The uuid identifier of the file.
+     * @param fileMetadataRepresentation New metadata, see {@link cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation} for the list of fields.
+     *                                   The only accepted values for 'state' field are OFL and REG for archiving/restoring a file.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -229,7 +236,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Download a file.
-     * @param fileuuid    The uuid identifier of the file.
+     *
+     * @param fileuuid The uuid identifier of the file.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.GET)
@@ -238,7 +246,7 @@ public class ArchiveController extends AbstractController {
 
             CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
             response.setContentType(fileMetadataResource.getMimetype());
-            response.setHeader("Content-Disposition", "attachment; filename=\""+fileMetadataResource.getFilename()+"\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadataResource.getFilename() + "\"");
             InputStream remoteFileInputStream = cesnetService.getFile(fileuuid);
             IOUtils.copy(remoteFileInputStream, response.getOutputStream());
             response.flushBuffer();
@@ -258,8 +266,9 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Update a file.
-     * @param fileuuid    The uuid identifier of the file.
-     * @param file        New file to replace the original one.
+     *
+     * @param fileuuid The uuid identifier of the file.
+     * @param file     New file to replace the original one.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -282,7 +291,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Delete a file.
-     * @param fileuuid    The uuid identifier of the file.
+     *
+     * @param fileuuid The uuid identifier of the file.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.DELETE)
@@ -299,7 +309,8 @@ public class ArchiveController extends AbstractController {
 
     /**
      * Upload a file.
-     * @param file    File to be uploaded.
+     *
+     * @param file File to be uploaded.
      * @return
      */
     @PreAuthorize("isAuthenticated()")

@@ -42,7 +42,7 @@ public class UserController extends AbstractController {
     public List<UserDetailsRepresentation> getAllUsers() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
         List<UserDetailsRepresentation> result = new ArrayList<UserDetailsRepresentation>(userDetailsList.size());
-        for (UserDetails userDetails: userDetailsList) {
+        for (UserDetails userDetails : userDetailsList) {
             result.add(new UserDetailsRepresentation(userDetails));
         }
         return result;

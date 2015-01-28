@@ -86,7 +86,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Upload a file to home folder.
-     * @param file    File to be uploaded.
+     *
+     * @param file File to be uploaded.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home", method = RequestMethod.POST)
@@ -115,7 +116,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Return metadata of a file.
-     * @param uuid    The uuid of the file.
+     *
+     * @param uuid The uuid of the file.
      * @return File metadata.
      */
     @PreAuthorize("isAuthenticated()")
@@ -138,7 +140,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Update metadata of a file.
-     * @param uuid    The uuid of the file.
+     *
+     * @param uuid The uuid of the file.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/file/{uuid}", method = RequestMethod.PUT)
@@ -154,7 +157,7 @@ public class HomeController extends AbstractController {
 
             if (fileMetadataRepresentation.getSharedWith() != null) {
                 List<UserDetails> shareWithList = new ArrayList<UserDetails>();
-                for (String shareWithUsername: fileMetadataRepresentation.getSharedWith()) {
+                for (String shareWithUsername : fileMetadataRepresentation.getSharedWith()) {
                     UserDetails shareWith = userDetailsService.getUserByUsername(shareWithUsername);
                     if (shareWith == null) {
                         throw new NotFoundException("user.notFound.name", shareWithUsername);
@@ -177,7 +180,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Delete a file.
-     * @param uuid    The uuid of the file.
+     *
+     * @param uuid The uuid of the file.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/file/{uuid}", method = RequestMethod.DELETE)
@@ -197,7 +201,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Download a file.
-     * @param uuid    The uuid of the file.
+     *
+     * @param uuid The uuid of the file.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/v0.1/home/file/{uuid}/content", "/v0.1/shared/file/{uuid}/content"}, method = RequestMethod.GET)
@@ -222,8 +227,9 @@ public class HomeController extends AbstractController {
 
     /**
      * Update a file.
-     * @param uuid    The uuid of the file.
-     * @param file        New file to replace the original one.
+     *
+     * @param uuid The uuid of the file.
+     * @param file New file to replace the original one.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/file/{uuid}/content", method = RequestMethod.PUT)
@@ -296,7 +302,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Delete a folder.
-     * @param uuid    The uuid of the folder.
+     *
+     * @param uuid The uuid of the folder.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/folder/{uuid}", method = RequestMethod.DELETE)
@@ -342,7 +349,8 @@ public class HomeController extends AbstractController {
 
     /**
      * Upload file to a folder.
-     * @param file    File to be uploaded.
+     *
+     * @param file File to be uploaded.
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/folder/{uuid}", method = RequestMethod.POST)

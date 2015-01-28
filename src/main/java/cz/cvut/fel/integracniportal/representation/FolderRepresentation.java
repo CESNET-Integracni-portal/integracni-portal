@@ -32,7 +32,8 @@ public class FolderRepresentation {
 
     private Date changedOn;
 
-    public FolderRepresentation() {}
+    public FolderRepresentation() {
+    }
 
     public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder) {
         this(folder, topFolder, true);

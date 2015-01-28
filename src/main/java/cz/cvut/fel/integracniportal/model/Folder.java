@@ -10,7 +10,7 @@ import java.util.List;
  * Entity for folder.
  */
 @Entity
-@Table(name = "resource_folder", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "name"}))
+@Table(name = "resource_folder", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "name"}))
 public class Folder extends AbstractEntity<Long> {
 
     @Id

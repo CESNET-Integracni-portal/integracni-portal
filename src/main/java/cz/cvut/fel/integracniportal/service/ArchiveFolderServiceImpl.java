@@ -56,7 +56,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     public List<FolderRepresentation> getTopLevelFolderRepresentations() {
         List<Folder> folders = getTopLevelFolders();
         List<FolderRepresentation> folderResources = new ArrayList<FolderRepresentation>(folders.size());
-        for (Folder folder: folders) {
+        for (Folder folder : folders) {
             FolderRepresentation folderResource = new FolderRepresentation(folder, false);
             folderResources.add(folderResource);
         }
@@ -120,10 +120,10 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     @Override
     @Transactional(rollbackFor = ServiceAccessException.class)
     public void removeFolder(Folder folder) throws ServiceAccessException {
-        for (FileMetadata fileMetadata: folder.getFiles()) {
+        for (FileMetadata fileMetadata : folder.getFiles()) {
             archiveFileMetadataService.deleteFile(fileMetadata);
         }
-        for (Folder subFolder: folder.getFolders()) {
+        for (Folder subFolder : folder.getFolders()) {
             removeFolder(subFolder);
         }
         folderDao.delete(folder);

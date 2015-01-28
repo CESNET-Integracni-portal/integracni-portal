@@ -36,7 +36,7 @@ public class OrganizationalUnitsController extends AbstractController {
     public ResponseEntity<Object> getAllUnits() {
         List<OrganizationalUnit> units = organizationalUnitService.getAllOrganizationalUnits();
         List<OrganizationalUnitRepresentation> representations = new ArrayList<OrganizationalUnitRepresentation>();
-        for (OrganizationalUnit unit: units) {
+        for (OrganizationalUnit unit : units) {
             representations.add(new OrganizationalUnitRepresentation(unit));
         }
         return new ResponseEntity<Object>(representations, HttpStatus.OK);
@@ -44,7 +44,8 @@ public class OrganizationalUnitsController extends AbstractController {
 
     /**
      * Get a specific organizational unit.
-     * @param id    Id of the organizational unit.
+     *
+     * @param id Id of the organizational unit.
      * @return Organizational unit.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
@@ -61,7 +62,8 @@ public class OrganizationalUnitsController extends AbstractController {
 
     /**
      * Update a organizational unit.
-     * @param id    Id of the organizational unit.
+     *
+     * @param id Id of the organizational unit.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.PUT)

@@ -55,7 +55,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Override
     @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
     public void saveRole(UserRole role) throws PermissionNotAssignableToRoleException {
-        for (Permission permission: role.getPermissions()) {
+        for (Permission permission : role.getPermissions()) {
             if (!permission.isRoleAssignable()) {
                 throw new PermissionNotAssignableToRoleException("permission.notAssignableToRole", permission.toString());
             }

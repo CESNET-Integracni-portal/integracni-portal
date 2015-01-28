@@ -11,8 +11,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import java.util.Collections;
-
 /**
  * Validator for the {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
  */
@@ -24,7 +22,8 @@ public class UserDetailsResourceValidator implements Validator {
 
     /**
      * Checks whether the validator is eligible to validate certain class.
-     * @param aClass    Class which is being checked.
+     *
+     * @param aClass Class which is being checked.
      * @return True if the class being checked is {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}, false otherwise.
      */
     @Override
@@ -35,8 +34,9 @@ public class UserDetailsResourceValidator implements Validator {
     /**
      * Validates the supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation} for empty fields, checks whether
      * the supplied passwords match and whether the username is not already taken.
-     * @param o         Form to be validated. Must be an instance of {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}
-     * @param errors    Spring object, into which all the detected form errors will be added.
+     *
+     * @param o      Form to be validated. Must be an instance of {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}
+     * @param errors Spring object, into which all the detected form errors will be added.
      */
     @Override
     public void validate(Object o, Errors errors) {
@@ -45,7 +45,7 @@ public class UserDetailsResourceValidator implements Validator {
         UserDetailsRepresentation userDetailsRepresentation = (UserDetailsRepresentation) o;
 
         if (userDetailsRepresentation.getDirectPermissions() != null) {
-            for (String permissionName: userDetailsRepresentation.getDirectPermissions()) {
+            for (String permissionName : userDetailsRepresentation.getDirectPermissions()) {
                 try {
                     Permission permission = Permission.create(permissionName);
                 } catch (PermissionNotFoundException e) {

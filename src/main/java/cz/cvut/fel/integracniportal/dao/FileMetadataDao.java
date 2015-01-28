@@ -12,37 +12,43 @@ public interface FileMetadataDao {
 
     /**
      * Finds a file metadata in database by its uuid.
-     * @param fileMetadataUuid    Uuid of the file.
+     *
+     * @param fileMetadataUuid Uuid of the file.
      * @return FileMetadata metadata.
      */
     public FileMetadata getByUUID(String fileMetadataUuid) throws FileNotFoundException;
 
     /**
      * Finds all files in database.
+     *
      * @return List of FileMetadata metadata.
      */
     public List<FileMetadata> getAllFileMetadatas();
 
     /**
      * Creates new file metadata and saves them into database.
-     * @param fileMetadata    FileMetadata metadata which are to be saved.
+     *
+     * @param fileMetadata FileMetadata metadata which are to be saved.
      */
     public void createFileMetadata(FileMetadata fileMetadata);
 
     /**
      * Updates existing file metadata and saves them into database.
-     * @param fileMetadata    FileMetadata metadata which are to be saved.
+     *
+     * @param fileMetadata FileMetadata metadata which are to be saved.
      */
     public void update(FileMetadata fileMetadata);
 
     /**
      * Removes the file metadata from database.
-     * @param fileMetadata  FileMetadata metadata which are to be removed.
+     *
+     * @param fileMetadata FileMetadata metadata which are to be removed.
      */
     public void delete(FileMetadata fileMetadata);
 
     /**
      * Returns list of files that should be deleted according to their deleteOn field.
+     *
      * @return List of files to be deleted.
      */
     public List<FileMetadata> getFilesForDeletion();

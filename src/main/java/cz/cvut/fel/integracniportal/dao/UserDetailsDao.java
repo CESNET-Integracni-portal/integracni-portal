@@ -11,6 +11,7 @@ public interface UserDetailsDao {
 
     /**
      * Finds a user in database by his id.
+     *
      * @param userId Id of the user.
      * @return UserDetails login credentials.
      */
@@ -18,6 +19,7 @@ public interface UserDetailsDao {
 
     /**
      * Finds a user in database by his username.
+     *
      * @param username Username of the user.
      * @return UserDetails login credentials.
      */
@@ -25,6 +27,7 @@ public interface UserDetailsDao {
 
     /**
      * Finds all users in the database.
+     *
      * @return List of users.
      */
     public List<UserDetails> getAllUsers();
@@ -39,12 +42,14 @@ public interface UserDetailsDao {
 
     /**
      * Saves the user into database.
+     *
      * @param user UserDetails login credentials which are to be saved.
      */
     public void save(UserDetails user);
 
     /**
      * Removes the user from database.
+     *
      * @param user UserDetails login credentials which are to be removed.
      */
     public void delete(UserDetails user);

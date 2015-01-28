@@ -21,7 +21,7 @@ public abstract class AbstractController {
 
     protected List<String> resolveErrors(BindingResult bindingResult) {
         List<String> resolved = new ArrayList<String>();
-        for (MessageSourceResolvable error: bindingResult.getAllErrors()) {
+        for (MessageSourceResolvable error : bindingResult.getAllErrors()) {
             resolved.add(resolveError(error));
         }
         return resolved;
@@ -29,7 +29,7 @@ public abstract class AbstractController {
 
     protected List<String> resolveErrors(List<MessageSourceResolvable> errors) {
         List<String> resolved = new ArrayList<String>();
-        for (MessageSourceResolvable error: errors) {
+        for (MessageSourceResolvable error : errors) {
             resolved.add(resolveError(error));
         }
         return resolved;

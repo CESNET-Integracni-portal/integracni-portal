@@ -4,7 +4,6 @@ import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 
@@ -17,6 +16,7 @@ public interface UserDetailsService {
 
     /**
      * Finds a user in database by his id.
+     *
      * @param userId Id of the user.
      * @return UserDetails login credentials.
      * @throws NotFoundException the not found exception
@@ -25,6 +25,7 @@ public interface UserDetailsService {
 
     /**
      * Finds a user in database by his username.
+     *
      * @param username Username of the user.
      * @return UserDetails login credentials.
      */
@@ -39,6 +40,7 @@ public interface UserDetailsService {
 
     /**
      * Finds all users in the database.
+     *
      * @return List of users.
      */
     public List<UserDetails> getAllUsers();
@@ -56,8 +58,8 @@ public interface UserDetailsService {
      *
      * @param userDetailsResource the user details
      * @return the user details
-     * @throws UserRoleNotFoundException the user role not found exception
-     * @throws AlreadyExistsException the already exists exception
+     * @throws UserRoleNotFoundException   the user role not found exception
+     * @throws AlreadyExistsException      the already exists exception
      * @throws PermissionNotFoundException the permission not found exception
      */
     public UserDetails createUser(UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, AlreadyExistsException, PermissionNotFoundException;
@@ -65,23 +67,25 @@ public interface UserDetailsService {
     /**
      * Updates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
      *
-     * @param userId id of the user to be updated
+     * @param userId              id of the user to be updated
      * @param userDetailsResource the user details
      * @return the user details
-     * @throws UserRoleNotFoundException the user role not found exception
-     * @throws NotFoundException the not found exception
+     * @throws UserRoleNotFoundException   the user role not found exception
+     * @throws NotFoundException           the not found exception
      * @throws PermissionNotFoundException the permission not found exception
      */
     public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException;
 
     /**
      * Saves the user into database.
+     *
      * @param user UserDetails login credentials which are to be saved.
      */
     public void saveUser(UserDetails user);
 
     /**
      * Removes the user from database.
+     *
      * @param user UserDetails login credentials which are to be removed.
      */
     public void removeUser(UserDetails user);

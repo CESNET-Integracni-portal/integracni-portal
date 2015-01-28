@@ -17,16 +17,17 @@ package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
-import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SshChannel {

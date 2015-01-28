@@ -58,6 +58,6 @@ public interface AlfrescoService {
 
     public List<String> getSharedWith(Document document);
 
-    public void addPermission(CmisObject object, String principal, String ... permissions);
+    public void addPermission(CmisObject object, String principal, String... permissions);
 
 }

@@ -29,7 +29,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * Called by Spring during authentication in order to find a user by his username.
-     * @param username    Username of the user who is currently attempting to log in.
+     *
+     * @param username Username of the user who is currently attempting to log in.
      * @return User credentials if the user exists.
      * @throws UsernameNotFoundException
      */
@@ -44,11 +45,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // For security purposes, we should return new Spring User object, not an entity
         Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
-        for (Permission permission: userEntity.getPermissions()) {
+        for (Permission permission : userEntity.getPermissions()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(permission.toString()));
         }
-        for (UserRole userRole: userEntity.getUserRoles()) {
-            for (Permission permission: userRole.getPermissions()) {
+        for (UserRole userRole : userEntity.getUserRoles()) {
+            for (Permission permission : userRole.getPermissions()) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(permission.toString()));
             }
         }

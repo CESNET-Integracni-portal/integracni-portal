@@ -19,7 +19,8 @@ public class CesnetFileMetadataRepresentation extends FileMetadataRepresentation
 
     private FileState state;
 
-    public CesnetFileMetadataRepresentation() {}
+    public CesnetFileMetadataRepresentation() {
+    }
 
     public CesnetFileMetadataRepresentation(FileMetadata fileMetadata, CesnetFileMetadata cesnetFileMetadata) {
         super(fileMetadata);

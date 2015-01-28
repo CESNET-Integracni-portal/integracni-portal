@@ -9,7 +9,7 @@ import java.util.Date;
  * Entity for file metadata.
  */
 @Entity
-@Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames={"parent", "filename"}))
+@Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "filename"}))
 public class FileMetadata extends AbstractEntity<String> {
 
     @Id

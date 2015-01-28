@@ -21,7 +21,7 @@ public class OrganizationalUnitServiceMock implements OrganizationalUnitService 
     @Override
     public List<OrganizationalUnit> getAllOrganizationalUnits() {
         List<OrganizationalUnit> units = new ArrayList<OrganizationalUnit>();
-        for (OrganizationalUnit unit: organizationalUnitMocks.values()) {
+        for (OrganizationalUnit unit : organizationalUnitMocks.values()) {
             OrganizationalUnit copiedUnit = createCopy(unit);
             addExternistsToUnit(copiedUnit);
             units.add(copiedUnit);
@@ -43,7 +43,7 @@ public class OrganizationalUnitServiceMock implements OrganizationalUnitService 
     @Override
     public void setAdmins(OrganizationalUnit unit, Set<String> admins) {
         // Remove admins who are not in the new list
-        for (String oldAdmin: unit.getAdmins()) {
+        for (String oldAdmin : unit.getAdmins()) {
             if (!admins.contains(oldAdmin)) {
                 UserDetails oldAdminDetails = userDetailsService.getUserByUsername(oldAdmin);
                 oldAdminDetails.getPermissions().remove(Permission.EDIT_ORGANIZATIONAL_UNITS);
@@ -51,7 +51,7 @@ public class OrganizationalUnitServiceMock implements OrganizationalUnitService 
             }
         }
         // Add new admins
-        for (String newAdmin: admins) {
+        for (String newAdmin : admins) {
             if (!unit.getAdmins().contains(newAdmin)) {
                 UserDetails newAdminDetails = userDetailsService.getUserByUsername(newAdmin);
                 newAdminDetails.getPermissions().add(Permission.EDIT_ORGANIZATIONAL_UNITS);
@@ -69,7 +69,7 @@ public class OrganizationalUnitServiceMock implements OrganizationalUnitService 
         }
 
         List<UserDetails> externistsInUnit = userDetailsService.getAllUsersInOrganizationalUnit(organizationalUnit.getUnitId());
-        for (UserDetails externist: externistsInUnit) {
+        for (UserDetails externist : externistsInUnit) {
             organizationalUnit.getMembers().add(externist.getUsername());
             if (externist.getPermissions().contains(Permission.EDIT_ORGANIZATIONAL_UNITS)) {
                 organizationalUnit.getAdmins().add(externist.getUsername());

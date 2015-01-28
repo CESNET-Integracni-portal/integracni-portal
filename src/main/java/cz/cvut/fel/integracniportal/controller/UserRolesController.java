@@ -34,7 +34,7 @@ public class UserRolesController extends AbstractController {
 
         List<UserRole> userRoles = userRoleService.getAllRoles();
         List<UserRoleRepresentation> userRoleRepresentations = new ArrayList<UserRoleRepresentation>(userRoles.size());
-        for (UserRole role: userRoles) {
+        for (UserRole role : userRoles) {
             userRoleRepresentations.add(new UserRoleRepresentation(role));
         }
         return userRoleRepresentations;

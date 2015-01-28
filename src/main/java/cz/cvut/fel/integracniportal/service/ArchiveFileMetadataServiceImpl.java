@@ -146,7 +146,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
 
     private List<CesnetFileMetadataRepresentation> getFileMetadataResourcesFor(List<CesnetFileMetadata> cesnetFileMetadatas) {
         List<CesnetFileMetadataRepresentation> fileMetadataResources = new ArrayList<CesnetFileMetadataRepresentation>();
-        for (CesnetFileMetadata cesnetFileMetadata: cesnetFileMetadatas) {
+        for (CesnetFileMetadata cesnetFileMetadata : cesnetFileMetadatas) {
             try {
                 FileMetadata fileMetadata = getFileMetadataByUuid(cesnetFileMetadata.getFilename());
                 fileMetadataResources.add(new CesnetFileMetadataRepresentation(fileMetadata, cesnetFileMetadata));

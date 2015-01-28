@@ -14,6 +14,7 @@ public interface UserRoleService {
 
     /**
      * Finds a user role in database by its id.
+     *
      * @param id Id of the role.
      * @return The user role.
      * @throws NotFoundException role not found
@@ -22,6 +23,7 @@ public interface UserRoleService {
 
     /**
      * Finds a user role in database by its name.
+     *
      * @param name Name of the role.
      * @return The user role.
      */
@@ -29,6 +31,7 @@ public interface UserRoleService {
 
     /**
      * Finds all user roles in the database.
+     *
      * @return List of user roles.
      */
     public List<UserRole> getAllRoles();
@@ -43,12 +46,14 @@ public interface UserRoleService {
 
     /**
      * Saves the user role into database.
+     *
      * @param role UserRole to be saved.
      */
     public void saveRole(UserRole role) throws PermissionNotAssignableToRoleException;
 
     /**
      * Removes the user role from database.
+     *
      * @param role UserRole to be removed.
      */
     public void deleteRole(UserRole role);

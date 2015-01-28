@@ -30,10 +30,13 @@ public class UserDetailsRepresentation {
 
     private List<String> directPermissions = new ArrayList<String>();
 
-    public UserDetailsRepresentation() {}
+    public UserDetailsRepresentation() {
+    }
+
     public UserDetailsRepresentation(UserDetails userDetails) {
         this(userDetails, true);
     }
+
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getId();
         this.username = userDetails.getUsername();
@@ -44,7 +47,7 @@ public class UserDetailsRepresentation {
             }
 
             if (userDetails.getPermissions() != null) {
-                for (Permission permission: userDetails.getPermissions()) {
+                for (Permission permission : userDetails.getPermissions()) {
                     directPermissions.add(permission.toString());
                     permissions.put(permission.toString(), true);
                 }
@@ -64,6 +67,7 @@ public class UserDetailsRepresentation {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -71,6 +75,7 @@ public class UserDetailsRepresentation {
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -78,6 +83,7 @@ public class UserDetailsRepresentation {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -85,6 +91,7 @@ public class UserDetailsRepresentation {
     public Long getUnitId() {
         return unitId;
     }
+
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
     }
@@ -92,6 +99,7 @@ public class UserDetailsRepresentation {
     public List<String> getRoles() {
         return roles;
     }
+
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
@@ -99,6 +107,7 @@ public class UserDetailsRepresentation {
     public Map<String, Boolean> getPermissions() {
         return permissions;
     }
+
     public void setPermissions(Map<String, Boolean> permissions) {
         this.permissions = permissions;
     }
@@ -106,6 +115,7 @@ public class UserDetailsRepresentation {
     public List<String> getDirectPermissions() {
         return directPermissions;
     }
+
     public void setDirectPermissions(List<String> directPermissions) {
         this.directPermissions = directPermissions;
     }

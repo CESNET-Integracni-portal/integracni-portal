@@ -90,7 +90,7 @@ public class AlfrescoServiceImpl implements AlfrescoService {
         jsonRestTemplate.addParameter("userName", username);
         jsonRestTemplate.addParameter("firstName", username);
         jsonRestTemplate.addParameter("lastName", username);
-        jsonRestTemplate.addParameter("email", username+"@int-portal.cvut.cz");
+        jsonRestTemplate.addParameter("email", username + "@int-portal.cvut.cz");
         jsonRestTemplate.addParameter("password", password);
         ResponseEntity<String> response = jsonRestTemplate.post(addPersonUrl, String.class);
         if (!response.getStatusCode().series().equals(HttpStatus.Series.SUCCESSFUL)) {
@@ -234,14 +234,14 @@ public class AlfrescoServiceImpl implements AlfrescoService {
 
         // Remove the file from all shared folders
         List<Folder> fileParents = new ArrayList<Folder>(document.getParents());
-        for (Folder fileParent: fileParents) {
+        for (Folder fileParent : fileParents) {
             String path = fileParent.getPath();
             if (sharedFolderPathPattern.matcher(path).matches()) {
                 document.removeFromFolder(fileParent);
             }
         }
 
-        for (UserDetails targetUser: targetUsers) {
+        for (UserDetails targetUser : targetUsers) {
             // Make sure that the target user has an Alfresco account created
             createAlfrescoAccountIfNotExist(targetUser);
 
@@ -254,7 +254,7 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     @Override
     public List<String> getSharedWith(Document document) {
         List<String> sharedWithList = new ArrayList<String>();
-        for (Folder fileParent: document.getParents()) {
+        for (Folder fileParent : document.getParents()) {
             String path = fileParent.getPath();
             Matcher pathMatcher = sharedFolderPathPattern.matcher(path);
             if (pathMatcher.matches()) {
@@ -266,19 +266,19 @@ public class AlfrescoServiceImpl implements AlfrescoService {
     }
 
     @Override
-    public void addPermission(CmisObject object, String principal, String ... permissions) {
+    public void addPermission(CmisObject object, String principal, String... permissions) {
         Session adminSession = getSessionForAdmin();
         RepositoryInfo repositoryInfo = adminSession.getRepositoryInfo();
         AclCapabilities aclCapabilities = repositoryInfo.getAclCapabilities();
         Map<String, PermissionMapping> permissionMappings = aclCapabilities.getPermissionMapping();
 
         List<Ace> addAces = new LinkedList<Ace>();
-        for (String permission: permissions) {
+        for (String permission : permissions) {
             PermissionMapping permissionMapping = permissionMappings.get(permission);
             List<String> permissionList = permissionMapping.getPermissions();
             // We need to filter out all "cmis:*" permissions, because those cause problems when they are inherited
             List<String> addPermissionList = new ArrayList<String>();
-            for (String p: permissionList) {
+            for (String p : permissionList) {
                 if (!p.startsWith("cmis:")) {
                     addPermissionList.add(p);
                 }

@@ -53,6 +53,7 @@ public enum Permission {
 
     /**
      * Method used for serialization of the permission.
+     *
      * @return serialized string representing the permission
      */
     @JsonValue
@@ -81,7 +82,7 @@ public enum Permission {
 
     private static Map<String, Permission> initPermissionMap() {
         Map<String, Permission> result = new HashMap<String, Permission>();
-        for (Permission permission: Permission.values()) {
+        for (Permission permission : Permission.values()) {
             result.put(permission.toString(), permission);
         }
         return result;

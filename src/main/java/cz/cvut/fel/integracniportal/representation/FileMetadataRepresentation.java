@@ -29,7 +29,8 @@ public class FileMetadataRepresentation {
 
     private Date changedOn;
 
-    public FileMetadataRepresentation() {}
+    public FileMetadataRepresentation() {
+    }
 
     public FileMetadataRepresentation(org.apache.chemistry.opencmis.client.api.Document document) {
         uuid = AlfrescoUtils.parseId(document);

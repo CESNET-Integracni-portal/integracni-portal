@@ -112,7 +112,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             } else {
                 userDetails.getPermissions().clear();
             }
-            for (String permissionName: userDetailsRepresentation.getDirectPermissions()) {
+            for (String permissionName : userDetailsRepresentation.getDirectPermissions()) {
                 Permission permission = Permission.create(permissionName);
                 userDetails.getPermissions().add(permission);
             }
@@ -123,7 +123,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             } else {
                 userDetails.getUserRoles().clear();
             }
-            for (String roleName: userDetailsRepresentation.getRoles()) {
+            for (String roleName : userDetailsRepresentation.getRoles()) {
                 UserRole role = userRoleService.getRoleByName(roleName);
                 if (role == null) {
                     throw new UserRoleNotFoundException("role.notFound", roleName);

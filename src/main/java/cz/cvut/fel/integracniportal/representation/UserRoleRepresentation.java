@@ -19,7 +19,9 @@ public class UserRoleRepresentation {
 
     private List<Permission> permissions = new ArrayList<Permission>();
 
-    public UserRoleRepresentation() {}
+    public UserRoleRepresentation() {
+    }
+
     public UserRoleRepresentation(UserRole userRole) {
         this.id = userRole.getId();
         this.name = userRole.getName();
@@ -30,6 +32,7 @@ public class UserRoleRepresentation {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -37,6 +40,7 @@ public class UserRoleRepresentation {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -44,6 +48,7 @@ public class UserRoleRepresentation {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -51,6 +56,7 @@ public class UserRoleRepresentation {
     public List<Permission> getPermissions() {
         return permissions;
     }
+
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
     }
