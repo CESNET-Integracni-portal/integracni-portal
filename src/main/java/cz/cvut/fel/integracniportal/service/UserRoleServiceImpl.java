@@ -23,7 +23,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
 
     @Override
-    public UserRole getRoleById(long id) throws NotFoundException {
+    public UserRole getRoleById(long id) {
         UserRole userRole = userRoleDao.get(id);
         if (userRole == null) {
             throw new NotFoundException("role.notFound", id);
@@ -43,7 +43,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
-    public void createRole(UserRole role) throws AlreadyExistsException, PermissionNotAssignableToRoleException {
+    public void createRole(UserRole role) {
         // Check whether a different role with the same name exists
         UserRole existingRole = userRoleDao.getRoleByName(role.getName());
         if (existingRole != null) {
@@ -54,7 +54,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
-    public void saveRole(UserRole role) throws PermissionNotAssignableToRoleException {
+    public void saveRole(UserRole role) {
         for (Permission permission : role.getPermissions()) {
             if (!permission.isRoleAssignable()) {
                 throw new PermissionNotAssignableToRoleException("permission.notAssignableToRole", permission.toString());

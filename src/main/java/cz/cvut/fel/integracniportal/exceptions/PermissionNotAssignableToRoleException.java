@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class PermissionNotAssignableToRoleException extends AbstractCustomException {
-
-    public PermissionNotAssignableToRoleException(MessageSourceResolvable e) {
-        super(e);
-    }
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class PermissionNotAssignableToRoleException extends BaseException {
 
     public PermissionNotAssignableToRoleException(String code) {
         super(code);
@@ -15,4 +13,5 @@ public class PermissionNotAssignableToRoleException extends AbstractCustomExcept
     public PermissionNotAssignableToRoleException(String code, Object... args) {
         super(code, args);
     }
+
 }

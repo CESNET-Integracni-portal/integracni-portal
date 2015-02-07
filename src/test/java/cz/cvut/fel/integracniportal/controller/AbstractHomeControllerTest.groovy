@@ -9,7 +9,6 @@ import org.apache.chemistry.opencmis.client.api.Folder
 import org.apache.chemistry.opencmis.client.api.ItemIterable
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId
 import org.junit.Before
-import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -17,11 +16,8 @@ import org.mockito.MockitoAnnotations
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
-import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.when
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * @author Petr Strnad

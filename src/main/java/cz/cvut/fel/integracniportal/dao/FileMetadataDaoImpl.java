@@ -1,10 +1,10 @@
 package cz.cvut.fel.integracniportal.dao;
 
+import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
 
     @Override
     @Transactional(readOnly = true)
-    public FileMetadata getByUUID(String fileMetadataUuid) throws FileNotFoundException {
+    public FileMetadata getByUUID(String fileMetadataUuid) {
         FileMetadata fileMetadata = get(fileMetadataUuid);
         if (fileMetadata == null) {
             throw new FileNotFoundException();

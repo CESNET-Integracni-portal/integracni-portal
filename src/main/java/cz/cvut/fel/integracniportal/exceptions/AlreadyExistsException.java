@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class AlreadyExistsException extends AbstractCustomException {
-
-    public AlreadyExistsException(MessageSourceResolvable e) {
-        super(e);
-    }
+@ResponseStatus(HttpStatus.CONFLICT)
+public class AlreadyExistsException extends BaseException {
 
     public AlreadyExistsException(String code) {
         super(code);
@@ -15,4 +13,5 @@ public class AlreadyExistsException extends AbstractCustomException {
     public AlreadyExistsException(String code, Object... args) {
         super(code, args);
     }
+
 }

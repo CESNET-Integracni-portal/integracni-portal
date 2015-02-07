@@ -1,9 +1,5 @@
 package cz.cvut.fel.integracniportal.controller;
 
-import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
-import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
@@ -56,33 +52,17 @@ public class UserController extends AbstractController {
             return new ResponseEntity(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
 
-        try {
-
-            UserDetails userDetails = userDetailsService.createUser(userDetailsResource);
-            return new ResponseEntity(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
-
-        } catch (AlreadyExistsException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.CONFLICT);
-        } catch (UserRoleNotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
-        } catch (PermissionNotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
-        }
+        UserDetails userDetails = userDetailsService.createUser(userDetailsResource);
+        return new ResponseEntity(new UserDetailsRepresentation(userDetails), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('externists', 'main_admin')")
     @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getUser(@PathVariable("userid") Long userId) {
-        try {
-
-            UserDetails userDetails = userDetailsService.getUserById(userId);
-            UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation(userDetails);
-            return new ResponseEntity(userDetailsRepresentation, HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        UserDetails userDetails = userDetailsService.getUserById(userId);
+        UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation(userDetails);
+        return new ResponseEntity(userDetailsRepresentation, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('externists')")
@@ -90,19 +70,8 @@ public class UserController extends AbstractController {
     @ResponseBody
     public ResponseEntity<String> updateUser(@PathVariable("userid") Long userId,
                                              @RequestBody UserDetailsRepresentation userDetailsResource) {
-
-        try {
-
-            userDetailsService.updateUser(userId, userDetailsResource);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
-        } catch (UserRoleNotFoundException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
-        } catch (PermissionNotFoundException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.BAD_REQUEST);
-        }
+        userDetailsService.updateUser(userId, userDetailsResource);
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -6,6 +6,7 @@ import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException
+import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException
 import org.apache.commons.io.IOUtils
 import org.junit.Test

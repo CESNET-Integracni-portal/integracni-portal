@@ -1,11 +1,7 @@
 package cz.cvut.fel.integracniportal.controller;
 
-import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.cesnet.FileState;
-import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
-import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.representation.CesnetFileMetadataRepresentation;
@@ -24,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -66,14 +61,8 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity cesnetGetFolder(@PathVariable("folderid") Long folderId) {
-        try {
-
-            FolderRepresentation folderRepresentation = archiveFolderService.getFolderRepresentationById(folderId);
-            return new ResponseEntity(folderRepresentation, HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
-        }
+        FolderRepresentation folderRepresentation = archiveFolderService.getFolderRepresentationById(folderId);
+        return new ResponseEntity(folderRepresentation, HttpStatus.OK);
     }
 
     /**
@@ -102,14 +91,8 @@ public class ArchiveController extends AbstractController {
     @ResponseBody
     public ResponseEntity cesnetCreateSubFolder(@PathVariable("parentfolderid") Long parentFolderId,
                                                 @RequestBody FolderRepresentation folderRepresentation) {
-        try {
-
-            Folder newFolder = archiveFolderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
-            return new ResponseEntity(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
-        }
+        Folder newFolder = archiveFolderService.createSubFolder(folderRepresentation.getName(), parentFolderId);
+        return new ResponseEntity(new FolderRepresentation(newFolder, false), HttpStatus.CREATED);
     }
 
     /**
@@ -123,14 +106,8 @@ public class ArchiveController extends AbstractController {
     @ResponseBody
     public ResponseEntity cesnetUpdateFolder(@PathVariable("folderid") Long folderId,
                                              @RequestBody FolderRepresentation folderRepresentation) {
-        try {
-
-            archiveFolderService.updateFolder(folderId, folderRepresentation);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
-        }
+        archiveFolderService.updateFolder(folderId, folderRepresentation);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -141,16 +118,8 @@ public class ArchiveController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDeleteFolder(@PathVariable("folderid") Long folderId) {
-        try {
-
-            archiveFolderService.removeFolder(folderId);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        archiveFolderService.removeFolder(folderId);
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
 
@@ -164,18 +133,8 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity cesnetGetFileState(@PathVariable("fileuuid") String fileuuid) {
-        try {
-
-            CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
-            return new ResponseEntity(fileMetadataResource, HttpStatus.OK);
-
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (FileAccessException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
+        return new ResponseEntity(fileMetadataResource, HttpStatus.OK);
     }
 
     /**
@@ -191,30 +150,20 @@ public class ArchiveController extends AbstractController {
     @ResponseBody
     public ResponseEntity cesnetSetFileState(@PathVariable("fileuuid") String fileuuid,
                                              @RequestBody CesnetFileMetadataRepresentation fileMetadataRepresentation) {
-        FileMetadata fileMetadata;
-        try {
-            fileMetadata = archiveFileMetadataService.getFileMetadataByUuid(fileuuid);
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
 
+        FileMetadata fileMetadata = archiveFileMetadataService.getFileMetadataByUuid(fileuuid);
         FileState newFileState = fileMetadataRepresentation.getState();
+
         if (newFileState != null) {
-            try {
-                switch (newFileState) {
-                    case REG:
-                        cesnetService.moveFileOnline(fileuuid);
-                        break;
-                    case OFL:
-                        cesnetService.moveFileOffline(fileuuid);
-                        break;
-                    default:
-                        return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                }
-            } catch (ServiceAccessException e) {
-                return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-            } catch (FileNotFoundException e) {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            switch (newFileState) {
+                case REG:
+                    cesnetService.moveFileOnline(fileuuid);
+                    break;
+                case OFL:
+                    cesnetService.moveFileOffline(fileuuid);
+                    break;
+                default:
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -241,27 +190,13 @@ public class ArchiveController extends AbstractController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.GET)
-    public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) {
-        try {
-
-            CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
-            response.setContentType(fileMetadataResource.getMimetype());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadataResource.getFilename() + "\"");
-            InputStream remoteFileInputStream = cesnetService.getFile(fileuuid);
-            IOUtils.copy(remoteFileInputStream, response.getOutputStream());
-            response.flushBuffer();
-
-        } catch (ServiceAccessException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        } catch (FileAccessException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        } catch (FileNotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (SftpException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        }
+    public void cesnetGet(HttpServletResponse response, @PathVariable("fileuuid") String fileuuid) throws IOException {
+        CesnetFileMetadataRepresentation fileMetadataResource = archiveFileMetadataService.getFileMetadataResource(fileuuid);
+        response.setContentType(fileMetadataResource.getMimetype());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadataResource.getFilename() + "\"");
+        InputStream remoteFileInputStream = cesnetService.getFile(fileuuid);
+        IOUtils.copy(remoteFileInputStream, response.getOutputStream());
+        response.flushBuffer();
     }
 
     /**
@@ -275,18 +210,8 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}/content", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> cesnetUpdate(@PathVariable("fileuuid") String fileuuid, @RequestParam(value = "file", required = true) MultipartFile file) {
-        try {
-
-            archiveFileMetadataService.updateFile(fileuuid, file);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        } catch (IOException e) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        archiveFileMetadataService.updateFile(fileuuid, file);
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -297,14 +222,8 @@ public class ArchiveController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/file/{fileuuid}", method = RequestMethod.DELETE)
     public ResponseEntity<String> cesnetDelete(@PathVariable("fileuuid") String fileuuid) {
-        try {
-            archiveFileMetadataService.deleteFile(fileuuid);
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<String>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
+        archiveFileMetadataService.deleteFile(fileuuid);
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -317,18 +236,8 @@ public class ArchiveController extends AbstractController {
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
-        try {
-
-            FileMetadata fileMetadata = archiveFileMetadataService.uploadFile(folderId, file);
-            return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
-        } catch (IOException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        FileMetadata fileMetadata = archiveFileMetadataService.uploadFileToFolder(folderId, file);
+        return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
 }

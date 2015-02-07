@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class NotFoundException extends AbstractCustomException {
-
-    public NotFoundException(MessageSourceResolvable e) {
-        super(e);
-    }
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class NotFoundException extends BaseException {
 
     public NotFoundException(String code) {
         super(code);
@@ -15,4 +13,5 @@ public class NotFoundException extends AbstractCustomException {
     public NotFoundException(String code, Object... args) {
         super(code, args);
     }
+
 }

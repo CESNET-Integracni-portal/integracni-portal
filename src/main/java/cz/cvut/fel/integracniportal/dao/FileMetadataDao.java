@@ -2,7 +2,6 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -16,7 +15,7 @@ public interface FileMetadataDao {
      * @param fileMetadataUuid Uuid of the file.
      * @return FileMetadata metadata.
      */
-    public FileMetadata getByUUID(String fileMetadataUuid) throws FileNotFoundException;
+    public FileMetadata getByUUID(String fileMetadataUuid);
 
     /**
      * Finds all files in database.

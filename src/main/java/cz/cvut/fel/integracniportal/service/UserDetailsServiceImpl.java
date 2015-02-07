@@ -3,7 +3,6 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -39,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails getUserById(long userId) throws NotFoundException {
+    public UserDetails getUserById(long userId) {
         UserDetails userDetails = userDao.getUserById(userId);
         if (userDetails == null) {
             throw new NotFoundException("user.notFound.id", userId);
@@ -74,7 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails createUser(UserDetailsRepresentation userDetailsRepresentation) throws UserRoleNotFoundException, AlreadyExistsException, PermissionNotFoundException {
+    public UserDetails createUser(UserDetailsRepresentation userDetailsRepresentation) {
         if (getUserByUsername(userDetailsRepresentation.getUsername()) != null) {
             throw new AlreadyExistsException("user.alreadyExists");
         }
@@ -87,14 +86,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional(rollbackFor = {UserRoleNotFoundException.class, NotFoundException.class})
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) throws UserRoleNotFoundException, NotFoundException, PermissionNotFoundException {
+    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) {
         UserDetails userDetails = getUserById(userId);
         updateUserFromRepresentation(userDetails, userDetailsRepresentation);
         userDao.save(userDetails);
         return userDetails;
     }
 
-    private void updateUserFromRepresentation(UserDetails userDetails, UserDetailsRepresentation userDetailsRepresentation) throws PermissionNotFoundException, UserRoleNotFoundException {
+    private void updateUserFromRepresentation(UserDetails userDetails, UserDetailsRepresentation userDetailsRepresentation) {
         if (userDetailsRepresentation.getUsername() != null) {
             userDetails.setUsername(userDetailsRepresentation.getUsername());
         }

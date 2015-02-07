@@ -2,7 +2,6 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -30,7 +29,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     private UserDetailsService userDetailsService;
 
     @Override
-    public Folder getFolderById(long id) throws NotFoundException {
+    public Folder getFolderById(long id) {
         Folder folder = folderDao.get(id);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
@@ -40,7 +39,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public FolderRepresentation getFolderRepresentationById(long id) throws NotFoundException {
+    public FolderRepresentation getFolderRepresentationById(long id) {
         Folder folder = getFolderById(id);
         return new FolderRepresentation(folder);
     }
@@ -81,7 +80,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Override
     @Transactional(rollbackFor = NotFoundException.class)
-    public Folder createSubFolder(String folderName, Long parentId) throws NotFoundException {
+    public Folder createSubFolder(String folderName, Long parentId) {
         Folder parent = getFolderById(parentId);
         return createSubFolder(folderName, parent);
     }
@@ -96,8 +95,8 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional(rollbackFor = NotFoundException.class)
-    public Folder updateFolder(Long folderId, FolderRepresentation folderRepresentation) throws NotFoundException {
+    @Transactional
+    public Folder updateFolder(Long folderId, FolderRepresentation folderRepresentation) {
         Folder folder = getFolderById(folderId);
         folder.setName(folderRepresentation.getName());
         return updateFolder(folder);
@@ -110,15 +109,15 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional(rollbackFor = ServiceAccessException.class)
-    public void removeFolder(Long folderId) throws ServiceAccessException, NotFoundException {
+    @Transactional
+    public void removeFolder(Long folderId) {
         Folder folder = getFolderById(folderId);
         removeFolder(folder);
     }
 
     @Override
-    @Transactional(rollbackFor = ServiceAccessException.class)
-    public void removeFolder(Folder folder) throws ServiceAccessException {
+    @Transactional
+    public void removeFolder(Folder folder) {
         for (FileMetadata fileMetadata : folder.getFiles()) {
             archiveFileMetadataService.deleteFile(fileMetadata);
         }

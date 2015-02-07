@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class ServiceAccessException extends AbstractCustomException {
-
-    public ServiceAccessException(MessageSourceResolvable e) {
-        super(e);
-    }
+@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+public class ServiceAccessException extends BaseException {
 
     public ServiceAccessException(String code) {
         super(code);
@@ -15,4 +13,5 @@ public class ServiceAccessException extends AbstractCustomException {
     public ServiceAccessException(String code, Object... args) {
         super(code, args);
     }
+
 }

@@ -27,14 +27,6 @@ public abstract class AbstractController {
         return resolved;
     }
 
-    protected List<String> resolveErrors(List<MessageSourceResolvable> errors) {
-        List<String> resolved = new ArrayList<String>();
-        for (MessageSourceResolvable error : errors) {
-            resolved.add(resolveError(error));
-        }
-        return resolved;
-    }
-
     protected String resolveError(MessageSourceResolvable error) {
         return messageSource.getMessage(error, Locale.getDefault());
     }

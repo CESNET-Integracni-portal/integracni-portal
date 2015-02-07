@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.exceptions;
 
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class UserRoleNotFoundException extends AbstractCustomException {
-
-    public UserRoleNotFoundException(MessageSourceResolvable e) {
-        super(e);
-    }
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class UserRoleNotFoundException extends BaseException {
 
     public UserRoleNotFoundException(String code) {
         super(code);
@@ -15,4 +13,5 @@ public class UserRoleNotFoundException extends AbstractCustomException {
     public UserRoleNotFoundException(String code, Object... args) {
         super(code, args);
     }
+
 }

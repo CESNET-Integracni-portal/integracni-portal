@@ -3,16 +3,12 @@ package cz.cvut.fel.integracniportal.controller;
 import cz.cvut.fel.integracniportal.cmis.AlfrescoService;
 import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +44,9 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/home", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> alfrescoGetHome() {
-        try {
-
-            Folder homeFolder = alfrescoService.getHomeFolderForCurrentUser();
-            FolderRepresentation homeFolderRepresentation = new FolderRepresentation(homeFolder, homeFolder);
-            return new ResponseEntity<Object>(homeFolderRepresentation, HttpStatus.OK);
-
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        Folder homeFolder = alfrescoService.getHomeFolderForCurrentUser();
+        FolderRepresentation homeFolderRepresentation = new FolderRepresentation(homeFolder, homeFolder);
+        return new ResponseEntity<Object>(homeFolderRepresentation, HttpStatus.OK);
     }
 
     /**
@@ -66,22 +56,12 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/home", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity<String> alfrescoCreateFolderInHome(@RequestBody FolderRepresentation folderRepresentation) {
-        try {
-
-            Folder targetFolder = alfrescoService.getHomeFolderForCurrentUser();
-            Folder folder = alfrescoService.createFolder(targetFolder, folderRepresentation.getName());
-            if (folder == null) {
-                return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-            }
-            return new ResponseEntity<String>("/rest/v0.1/home/folder/" + AlfrescoUtils.parseId(folder), HttpStatus.CREATED);
-
-        } catch (CmisContentAlreadyExistsException e) {
-            return new ResponseEntity<String>(HttpStatus.CONFLICT);
-        } catch (ServiceAccessException e) {
+        Folder targetFolder = alfrescoService.getHomeFolderForCurrentUser();
+        Folder folder = alfrescoService.createFolder(targetFolder, folderRepresentation.getName());
+        if (folder == null) {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
+        return new ResponseEntity<String>("/rest/v0.1/home/folder/" + AlfrescoUtils.parseId(folder), HttpStatus.CREATED);
     }
 
     /**
@@ -92,25 +72,13 @@ public class HomeController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> alfrescoUploadToHome(@RequestParam(value = "file", required = true) MultipartFile file) {
-        try {
-
-            Document document = alfrescoService.uploadFile(alfrescoService.getHomeFolderForCurrentUser(),
-                    file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
-            if (document == null) {
-                return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-            }
-            return new ResponseEntity<String>("/rest/v0.1/home/file/" + document.getContentStreamFileName(), HttpStatus.CREATED);
-
-        } catch (CmisContentAlreadyExistsException e) {
-            return new ResponseEntity<String>(HttpStatus.CONFLICT);
-        } catch (IOException e) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-        } catch (ServiceAccessException e) {
+    public ResponseEntity<String> alfrescoUploadToHome(@RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
+        Document document = alfrescoService.uploadFile(alfrescoService.getHomeFolderForCurrentUser(),
+                file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
+        if (document == null) {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
+        return new ResponseEntity<String>("/rest/v0.1/home/file/" + document.getContentStreamFileName(), HttpStatus.CREATED);
     }
 
 
@@ -124,18 +92,10 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = {"/v0.1/home/file/{uuid}", "/v0.1/shared/file/{uuid}"}, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> alfrescoGetFileMetadata(@PathVariable("uuid") String uuid) {
-        try {
-
-            Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            FileMetadataRepresentation metadata = new FileMetadataRepresentation(document);
-            metadata.setSharedWith(alfrescoService.getSharedWith(document));
-            return new ResponseEntity<Object>(metadata, HttpStatus.OK);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
+        FileMetadataRepresentation metadata = new FileMetadataRepresentation(document);
+        metadata.setSharedWith(alfrescoService.getSharedWith(document));
+        return new ResponseEntity<Object>(metadata, HttpStatus.OK);
     }
 
     /**
@@ -148,34 +108,24 @@ public class HomeController extends AbstractController {
     @ResponseBody
     public ResponseEntity<Object> alfrescoUpdateFileMetadata(@PathVariable("uuid") String uuid,
                                                              @RequestBody FileMetadataRepresentation fileMetadataRepresentation) {
-        try {
-
-            Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            if (fileMetadataRepresentation.getFilename() != null) {
-                document.rename(fileMetadataRepresentation.getFilename());
-            }
-
-            if (fileMetadataRepresentation.getSharedWith() != null) {
-                List<UserDetails> shareWithList = new ArrayList<UserDetails>();
-                for (String shareWithUsername : fileMetadataRepresentation.getSharedWith()) {
-                    UserDetails shareWith = userDetailsService.getUserByUsername(shareWithUsername);
-                    if (shareWith == null) {
-                        throw new NotFoundException("user.notFound.name", shareWithUsername);
-                    }
-                    shareWithList.add(shareWith);
-                }
-                alfrescoService.shareFileWithUsers(uuid, shareWithList);
-            }
-
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.NOT_FOUND);
+        Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
+        if (fileMetadataRepresentation.getFilename() != null) {
+            document.rename(fileMetadataRepresentation.getFilename());
         }
+
+        if (fileMetadataRepresentation.getSharedWith() != null) {
+            List<UserDetails> shareWithList = new ArrayList<UserDetails>();
+            for (String shareWithUsername : fileMetadataRepresentation.getSharedWith()) {
+                UserDetails shareWith = userDetailsService.getUserByUsername(shareWithUsername);
+                if (shareWith == null) {
+                    throw new NotFoundException("user.notFound.name", shareWithUsername);
+                }
+                shareWithList.add(shareWith);
+            }
+            alfrescoService.shareFileWithUsers(uuid, shareWithList);
+        }
+
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -186,17 +136,9 @@ public class HomeController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/file/{uuid}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> alfrescoDelete(@PathVariable("uuid") String uuid) {
-        try {
-
-            Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            document.delete();
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
+        document.delete();
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -206,23 +148,13 @@ public class HomeController extends AbstractController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/v0.1/home/file/{uuid}/content", "/v0.1/shared/file/{uuid}/content"}, method = RequestMethod.GET)
-    public void alfrescoGet(HttpServletResponse response, @PathVariable("uuid") String uuid) {
-        try {
-
-            Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
-            response.setContentType(document.getContentStreamMimeType());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
-            InputStream documentContentStream = alfrescoService.getFileContent(document);
-            IOUtils.copy(documentContentStream, response.getOutputStream());
-            response.flushBuffer();
-
-        } catch (CmisObjectNotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        } catch (ServiceAccessException e) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-        }
+    public void alfrescoGet(HttpServletResponse response, @PathVariable("uuid") String uuid) throws IOException {
+        Document document = alfrescoService.getFile(uuid, alfrescoService.getSessionForCurrentUser());
+        response.setContentType(document.getContentStreamMimeType());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
+        InputStream documentContentStream = alfrescoService.getFileContent(document);
+        IOUtils.copy(documentContentStream, response.getOutputStream());
+        response.flushBuffer();
     }
 
     /**
@@ -235,20 +167,10 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/home/file/{uuid}/content", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<Object> alfrescoUpdate(@PathVariable("uuid") String uuid,
-                                                 @RequestParam(value = "file", required = true) MultipartFile file) {
-        try {
-
-            alfrescoService.updateFileContents(uuid, file.getInputStream(), file.getSize(), file.getContentType(),
-                    alfrescoService.getSessionForCurrentUser());
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (IOException e) {
-            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+                                                 @RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
+        alfrescoService.updateFileContents(uuid, file.getInputStream(), file.getSize(), file.getContentType(),
+                alfrescoService.getSessionForCurrentUser());
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
 
@@ -259,19 +181,9 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/home/folder/{uuid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> alfrescoGetFolder(@PathVariable("uuid") String uuid) {
-        try {
-
-            Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            FolderRepresentation folderRepresentation = new FolderRepresentation(folder, alfrescoService.getHomeFolderForCurrentUser());
-            return new ResponseEntity<Object>(folderRepresentation, HttpStatus.OK);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-        }
+        Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
+        FolderRepresentation folderRepresentation = new FolderRepresentation(folder, alfrescoService.getHomeFolderForCurrentUser());
+        return new ResponseEntity<Object>(folderRepresentation, HttpStatus.OK);
     }
 
     /**
@@ -282,22 +194,12 @@ public class HomeController extends AbstractController {
     @ResponseBody
     public ResponseEntity<Object> alfrescoUpdateFolder(@PathVariable("uuid") String uuid,
                                                        @RequestBody FolderRepresentation folderRepresentation) {
-        try {
-
-            Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            if (folderRepresentation.getName() != null) {
-                folder.rename(folderRepresentation.getName());
-            }
-
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+        Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
+        if (folderRepresentation.getName() != null) {
+            folder.rename(folderRepresentation.getName());
         }
+
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -308,17 +210,9 @@ public class HomeController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/home/folder/{uuid}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> alfrescoDeleteFolder(@PathVariable("uuid") String uuid) {
-        try {
-
-            Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            folder.delete();
-            return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-
-        } catch (CmisObjectNotFoundException e) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(resolveError(e.getErrorObject()), HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        Folder folder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
+        folder.delete();
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -329,22 +223,12 @@ public class HomeController extends AbstractController {
     @ResponseBody
     public ResponseEntity<String> alfrescoCreateSubfolder(@PathVariable("uuid") String uuid,
                                                           @RequestBody FolderRepresentation folderRepresentation) {
-        try {
-
-            Folder targetFolder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            Folder folder = alfrescoService.createFolder(targetFolder, folderRepresentation.getName());
-            if (folder == null) {
-                return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-            }
-            return new ResponseEntity<String>("/rest/v0.1/home/folder/" + AlfrescoUtils.parseId(folder), HttpStatus.CREATED);
-
-        } catch (CmisContentAlreadyExistsException e) {
-            return new ResponseEntity<String>(HttpStatus.CONFLICT);
-        } catch (ServiceAccessException e) {
+        Folder targetFolder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
+        Folder folder = alfrescoService.createFolder(targetFolder, folderRepresentation.getName());
+        if (folder == null) {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
+        return new ResponseEntity<String>("/rest/v0.1/home/folder/" + AlfrescoUtils.parseId(folder), HttpStatus.CREATED);
     }
 
     /**
@@ -356,26 +240,14 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/home/folder/{uuid}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> alfrescoUploadToFolder(@PathVariable("uuid") String uuid,
-                                                         @RequestParam(value = "file", required = true) MultipartFile file) {
-        try {
-
-            Folder targetFolder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
-            Document document = alfrescoService.uploadFile(targetFolder,
-                    file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
-            if (document == null) {
-                return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-            }
-            return new ResponseEntity<String>("/rest/v0.1/home/file/" + AlfrescoUtils.parseId(document), HttpStatus.CREATED);
-
-        } catch (CmisContentAlreadyExistsException e) {
-            return new ResponseEntity<String>(HttpStatus.CONFLICT);
-        } catch (IOException e) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-        } catch (ServiceAccessException e) {
+                                                         @RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
+        Folder targetFolder = alfrescoService.getFolder(uuid, alfrescoService.getSessionForCurrentUser());
+        Document document = alfrescoService.uploadFile(targetFolder,
+                file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
+        if (document == null) {
             return new ResponseEntity<String>(HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (CmisPermissionDeniedException e) {
-            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
+        return new ResponseEntity<String>("/rest/v0.1/home/file/" + AlfrescoUtils.parseId(document), HttpStatus.CREATED);
     }
 
     /**
@@ -385,15 +257,9 @@ public class HomeController extends AbstractController {
     @RequestMapping(value = "/v0.1/shared", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> alfrescoGetShared() {
-        try {
-
-            Folder homeFolder = alfrescoService.getSharedFolderForCurrentUser();
-            FolderRepresentation homeFolderRepresentation = new FolderRepresentation(homeFolder, homeFolder);
-            return new ResponseEntity<Object>(homeFolderRepresentation, HttpStatus.OK);
-
-        } catch (ServiceAccessException e) {
-            return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        Folder homeFolder = alfrescoService.getSharedFolderForCurrentUser();
+        FolderRepresentation homeFolderRepresentation = new FolderRepresentation(homeFolder, homeFolder);
+        return new ResponseEntity<Object>(homeFolderRepresentation, HttpStatus.OK);
     }
 
 }

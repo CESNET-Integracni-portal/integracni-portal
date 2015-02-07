@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.cesnet;
 
 import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
+import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Provider;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -38,7 +37,7 @@ public class CesnetServiceImpl implements CesnetService {
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Override
-    public List<CesnetFileMetadata> getFileList() throws FileAccessException, ServiceAccessException {
+    public List<CesnetFileMetadata> getFileList() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("cd ");
         stringBuilder.append(rootDir);
@@ -49,7 +48,7 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public List<CesnetFileMetadata> getFileListByType(FileState fileState) throws FileAccessException, ServiceAccessException {
+    public List<CesnetFileMetadata> getFileListByType(FileState fileState) {
         StringBuilder stringBuilder = new StringBuilder();
         // Go to root directory
         stringBuilder.append("cd ");
@@ -67,7 +66,7 @@ public class CesnetServiceImpl implements CesnetService {
         return getFileListForCommand(stringBuilder.toString());
     }
 
-    private List<CesnetFileMetadata> getFileListForCommand(String command) throws FileAccessException, ServiceAccessException {
+    private List<CesnetFileMetadata> getFileListForCommand(String command) {
         SshChannel sshChannel = sshResourceProvider.get();
         List<String> lsOutput = sshChannel.sendCommand(command);
         if (lsOutput.isEmpty()) {
@@ -82,59 +81,71 @@ public class CesnetServiceImpl implements CesnetService {
     }
 
     @Override
-    public InputStream getFile(String filename) throws SftpException, IOException {
-        SftpChannel sftpChannel = sftpChannelChannelProvider.get();
-        sftpChannel.cd(rootDir);
-        return sftpChannel.getFile(filename);
+    public InputStream getFile(String filename) {
+        try {
+            SftpChannel sftpChannel = sftpChannelChannelProvider.get();
+            sftpChannel.cd(rootDir);
+            return sftpChannel.getFile(filename);
+        } catch (Exception e) {
+            throw new FileAccessException("Could not get file", e);
+        }
     }
 
     @Override
-    public void deleteFile(String filename) throws SftpException {
-        SftpChannel sftpChannel = sftpChannelChannelProvider.get();
-        sftpChannel.cd(rootDir);
-        sftpChannel.deleteFile(filename);
+    public void deleteFile(String filename) {
+        try {
+            SftpChannel sftpChannel = sftpChannelChannelProvider.get();
+            sftpChannel.cd(rootDir);
+            sftpChannel.deleteFile(filename);
+        } catch (Exception e) {
+            throw new ServiceAccessException("Could not delete file", e);
+        }
     }
 
     @Override
-    public CesnetFileMetadata getFileMetadata(String filename) throws FileAccessException, ServiceAccessException, FileNotFoundException {
+    public CesnetFileMetadata getFileMetadata(String filename) {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> lsOutput = sshChannel.sendCommand("dmls -l " + rootDir + "/" + filename);
         if (lsOutput.size() != 1) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("Could not get file metadata from CESNET");
         }
 
         return parseFileMetadata(lsOutput.get(0));
     }
 
     @Override
-    public void moveFileOffline(String filename) throws FileNotFoundException, ServiceAccessException {
+    public void moveFileOffline(String filename) {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> response = sshChannel.sendCommand("dmput -r " + rootDir + "/" + filename);
         if (response.size() > 0) {
-            throw new FileNotFoundException(response.get(0));
+            throw new FileAccessException(response.get(0));
         }
     }
 
     @Override
-    public void moveFileOnline(String filename) throws ServiceAccessException, FileNotFoundException {
+    public void moveFileOnline(String filename) {
         SshChannel sshChannel = sshResourceProvider.get();
 
         List<String> response = sshChannel.sendCommand("dmget " + rootDir + "/" + filename);
         if (response.size() > 0) {
-            throw new FileNotFoundException(response.get(0));
+            throw new FileAccessException(response.get(0));
         }
     }
 
     @Override
-    public void uploadFile(InputStream fileStream, String filename) throws SftpException {
-        SftpChannel sftpChannel = sftpChannelChannelProvider.get();
-        sftpChannel.cd(rootDir);
-        sftpChannel.uploadFile(fileStream, filename);
+    public void uploadFile(InputStream fileStream, String filename) {
+        try {
+            SftpChannel sftpChannel = sftpChannelChannelProvider.get();
+            sftpChannel.cd(rootDir);
+            sftpChannel.uploadFile(fileStream, filename);
+        } catch (SftpException e) {
+            throw new ServiceAccessException("Could not upload file", e);
+        }
     }
 
-    private CesnetFileMetadata parseFileMetadata(String lsOutput) throws FileAccessException {
+    private CesnetFileMetadata parseFileMetadata(String lsOutput) {
         String[] parts = lsOutput.split("\\s+");
         if (parts.length < 9) {
             throw new FileAccessException("cesnet.parseError");

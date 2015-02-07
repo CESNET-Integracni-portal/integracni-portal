@@ -1,12 +1,11 @@
 package cz.cvut.fel.integracniportal.service;
 
-import com.jcraft.jsch.SftpException;
 import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata;
 import cz.cvut.fel.integracniportal.cesnet.CesnetService;
 import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
-import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
+import cz.cvut.fel.integracniportal.exceptions.FileIOException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -41,7 +40,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     private UserDetailsService userDetailsService;
 
     @Override
-    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) throws FileNotFoundException {
+    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) {
         return fileMetadataDao.getByUUID(fileMetadataUuid);
     }
 
@@ -66,15 +65,13 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     }
 
     @Override
-    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class, NotFoundException.class})
-    public FileMetadata uploadFile(Long folderId, MultipartFile file) throws IOException, ServiceAccessException, NotFoundException {
-        Folder parent = archiveFolderService.getFolderById(folderId);
+    @Transactional
+    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
+        Folder parent = archiveFolderService.getFolderById(parentFolderId);
         return uploadFile(parent, file);
     }
 
-    @Override
-    @Transactional(rollbackFor = {ServiceAccessException.class, IOException.class})
-    public FileMetadata uploadFile(Folder folder, MultipartFile file) throws ServiceAccessException, IOException {
+    private FileMetadata uploadFile(Folder folder, MultipartFile file) {
         FileMetadata fileMetadata = new FileMetadata();
         setFileMetadata(fileMetadata, file);
         fileMetadata.setParent(folder);
@@ -87,60 +84,52 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
             cesnetService.uploadFile(file.getInputStream(), uuid);
             archiveFolderService.updateFolder(folder);
             return fileMetadata;
-        } catch (SftpException e) {
-            throw new ServiceAccessException("cesnet.service.unavailable");
+        } catch (IOException e) {
+            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
         }
     }
 
     @Override
-    public void updateFile(String fileuuid, MultipartFile file) throws ServiceAccessException, IOException {
+    public void updateFile(String fileuuid, MultipartFile file) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
         try {
             cesnetService.uploadFile(file.getInputStream(), fileuuid);
             setFileMetadata(fileMetadata, file);
             updateFileMetadata(fileMetadata);
-        } catch (SftpException e) {
-            throw new ServiceAccessException("cesnet.service.unavailable");
+        } catch (IOException e) {
+            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
         }
     }
 
     @Override
     @Transactional(rollbackFor = {ServiceAccessException.class, FileNotFoundException.class})
-    public void deleteFile(String uuid) throws ServiceAccessException, FileNotFoundException {
+    public void deleteFile(String uuid) {
         FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
         deleteFile(fileMetadata);
     }
 
     @Override
     @Transactional(rollbackFor = ServiceAccessException.class)
-    public void deleteFile(FileMetadata fileMetadata) throws ServiceAccessException {
-        try {
-            removeFileMetadata(fileMetadata);
-            cesnetService.deleteFile(fileMetadata.getUuid());
-        } catch (SftpException e) {
-            throw new ServiceAccessException("cesnet.service.unavailable");
-        }
+    public void deleteFile(FileMetadata fileMetadata) {
+        removeFileMetadata(fileMetadata);
+        cesnetService.deleteFile(fileMetadata.getUuid());
     }
 
     @Override
-    public CesnetFileMetadataRepresentation getFileMetadataResource(String fileMetadataUuid) throws ServiceAccessException, FileAccessException, FileNotFoundException {
+    public CesnetFileMetadataRepresentation getFileMetadataResource(String fileMetadataUuid) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileMetadataUuid);
         CesnetFileMetadata cesnetFileMetadata = cesnetService.getFileMetadata(fileMetadataUuid);
         return new CesnetFileMetadataRepresentation(fileMetadata, cesnetFileMetadata);
     }
 
     @Override
-    public List<CesnetFileMetadataRepresentation> getFileMetadataResources() throws ServiceAccessException, FileAccessException {
-        List<CesnetFileMetadata> cesnetFileMetadatas = cesnetService.getFileList();
-
-        return getFileMetadataResourcesFor(cesnetFileMetadatas);
+    public List<CesnetFileMetadataRepresentation> getFileMetadataResources() {
+        return getFileMetadataResourcesFor(cesnetService.getFileList());
     }
 
     @Override
-    public List<CesnetFileMetadataRepresentation> getFileMetadataResources(FileState fileState) throws ServiceAccessException, FileAccessException {
-        List<CesnetFileMetadata> cesnetFileMetadatas = cesnetService.getFileListByType(fileState);
-
-        return getFileMetadataResourcesFor(cesnetFileMetadatas);
+    public List<CesnetFileMetadataRepresentation> getFileMetadataResources(FileState fileState) {
+        return getFileMetadataResourcesFor(cesnetService.getFileListByType(fileState));
     }
 
     private List<CesnetFileMetadataRepresentation> getFileMetadataResourcesFor(List<CesnetFileMetadata> cesnetFileMetadatas) {
@@ -149,7 +138,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
             try {
                 FileMetadata fileMetadata = getFileMetadataByUuid(cesnetFileMetadata.getFilename());
                 fileMetadataResources.add(new CesnetFileMetadataRepresentation(fileMetadata, cesnetFileMetadata));
-            } catch (FileNotFoundException e) {
+            } catch (FileAccessException e) {
                 continue;
             }
         }

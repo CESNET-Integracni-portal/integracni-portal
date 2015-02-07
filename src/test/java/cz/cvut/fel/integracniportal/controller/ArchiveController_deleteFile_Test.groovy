@@ -1,11 +1,12 @@
 package cz.cvut.fel.integracniportal.controller
 
 import com.github.springtestdbunit.annotation.DatabaseSetup
-import com.jcraft.jsch.SftpException
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao
+import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException
 import org.junit.Test
 import org.kubek2k.springockito.annotations.ReplaceWithMock
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
@@ -52,7 +53,7 @@ public class ArchiveController_deleteFile_Test extends AbstractIntegrationTestCa
     @Test
     void "should return 503 Service Unavailable if FileAccessException thrown"() {
         when(cesnetService.deleteFile("2"))
-                .thenThrow(new SftpException(0, ""))
+                .thenThrow(new ServiceAccessException(""))
 
         apiDelete("archive/file/2")
                 .andExpect(status().isServiceUnavailable())

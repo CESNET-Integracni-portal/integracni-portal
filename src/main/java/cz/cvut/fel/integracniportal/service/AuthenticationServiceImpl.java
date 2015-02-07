@@ -36,11 +36,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) {
         UserDetails userEntity = userService.getUserByUsername(username);
         if (userEntity == null) {
             logger.info("Login credentials for user " + username + " not found.");
-            throw new UsernameNotFoundException("User not found.");
+            throw new UsernameNotFoundException("User not found");
         }
 
         // For security purposes, we should return new Spring User object, not an entity
