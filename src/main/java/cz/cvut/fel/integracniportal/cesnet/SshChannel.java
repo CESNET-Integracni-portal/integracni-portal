@@ -97,4 +97,5 @@ public class SshChannel {
     public void setSshDataSource(SshDataSource sshDataSource) {
         this.sshDataSource = sshDataSource;
     }
+
 }

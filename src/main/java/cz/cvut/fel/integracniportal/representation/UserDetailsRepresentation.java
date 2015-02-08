@@ -119,4 +119,5 @@ public class UserDetailsRepresentation {
     public void setDirectPermissions(List<String> directPermissions) {
         this.directPermissions = directPermissions;
     }
+
 }

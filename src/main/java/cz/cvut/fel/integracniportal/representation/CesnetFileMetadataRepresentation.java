@@ -52,4 +52,5 @@ public class CesnetFileMetadataRepresentation extends FileMetadataRepresentation
     public void setState(FileState state) {
         this.state = state;
     }
+
 }

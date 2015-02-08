@@ -61,4 +61,5 @@ public class CmisSessionFactory {
     public void setDefaultParameters(Map<String, String> defaultParameters) {
         this.defaultParameters = defaultParameters;
     }
+
 }

@@ -32,4 +32,5 @@ public class RegisterForm {
     public void setPasswordRepeat(String passwordRepeat) {
         this.passwordRepeat = passwordRepeat;
     }
+
 }

@@ -222,5 +222,6 @@ public class SshDataSource {
     public void setRetryTemplate(RetryTemplate retryTemplate) {
         this.retryTemplate = retryTemplate;
     }
+
 }
 

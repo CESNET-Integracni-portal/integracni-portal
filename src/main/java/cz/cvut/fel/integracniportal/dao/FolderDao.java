@@ -19,4 +19,5 @@ public interface FolderDao {
     List<Folder> getTopLevelFolders();
 
     void createFolder(Folder folder);
+
 }

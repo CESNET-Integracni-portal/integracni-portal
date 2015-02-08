@@ -30,4 +30,5 @@ public abstract class AbstractController {
     protected String resolveError(MessageSourceResolvable error) {
         return messageSource.getMessage(error, Locale.getDefault());
     }
+
 }

@@ -103,4 +103,5 @@ public class UserDetails extends AbstractEntity<Long> {
     public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }
+
 }

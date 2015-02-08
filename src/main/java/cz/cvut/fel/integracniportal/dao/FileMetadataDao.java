@@ -51,4 +51,5 @@ public interface FileMetadataDao {
      * @return List of files to be deleted.
      */
     public List<FileMetadata> getFilesForDeletion();
+
 }

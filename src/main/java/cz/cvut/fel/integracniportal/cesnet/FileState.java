@@ -21,4 +21,5 @@ public enum FileState {
     public String getState() {
         return state;
     }
+
 }

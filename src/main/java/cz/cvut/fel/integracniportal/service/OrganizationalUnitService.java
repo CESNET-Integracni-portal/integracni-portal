@@ -12,4 +12,5 @@ public interface OrganizationalUnitService {
     public OrganizationalUnit getOrganizationalUnitById(Long id);
 
     public void setAdmins(OrganizationalUnit unit, Set<String> admins);
+
 }

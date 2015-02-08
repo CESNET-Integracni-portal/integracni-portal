@@ -60,4 +60,5 @@ public class UserRoleRepresentation {
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
     }
+
 }

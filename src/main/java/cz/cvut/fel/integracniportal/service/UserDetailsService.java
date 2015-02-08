@@ -78,4 +78,5 @@ public interface UserDetailsService {
      * @param user UserDetails login credentials which are to be removed.
      */
     public void removeUser(UserDetails user);
+
 }

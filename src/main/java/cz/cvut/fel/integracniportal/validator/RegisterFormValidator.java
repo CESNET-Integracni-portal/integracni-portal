@@ -47,4 +47,5 @@ public class RegisterFormValidator implements Validator {
             errors.rejectValue("username", "username.taken");
         }
     }
+
 }

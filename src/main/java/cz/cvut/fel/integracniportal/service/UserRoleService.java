@@ -52,4 +52,5 @@ public interface UserRoleService {
      * @param role UserRole to be removed.
      */
     public void deleteRole(UserRole role);
+
 }

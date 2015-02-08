@@ -102,4 +102,5 @@ public interface ArchiveFileMetadataService {
      * @return List of full file metadata.
      */
     public List<CesnetFileMetadataRepresentation> getFileMetadataResources(FileState fileState);
+
 }

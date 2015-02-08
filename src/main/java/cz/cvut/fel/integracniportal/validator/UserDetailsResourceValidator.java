@@ -64,4 +64,5 @@ public class UserDetailsResourceValidator implements Validator {
             }
         }
     }
+
 }

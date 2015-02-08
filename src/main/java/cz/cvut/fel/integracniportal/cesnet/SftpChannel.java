@@ -90,4 +90,5 @@ public class SftpChannel {
     public void setSshDataSource(SshDataSource sshDataSource) {
         this.sshDataSource = sshDataSource;
     }
+
 }

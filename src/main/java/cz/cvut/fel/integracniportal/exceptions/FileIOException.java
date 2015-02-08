@@ -39,4 +39,5 @@ public class FileIOException extends BaseException {
     public FileIOException(String code, Object... args) {
         super(code, args);
     }
+
 }

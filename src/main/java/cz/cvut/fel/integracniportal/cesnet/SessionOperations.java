@@ -8,4 +8,5 @@ package cz.cvut.fel.integracniportal.cesnet;
 public interface SessionOperations {
 
     <T> T execute(SessionCallback<T> sessionCallback) throws Exception;
+
 }

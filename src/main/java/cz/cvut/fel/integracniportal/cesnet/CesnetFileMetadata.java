@@ -45,4 +45,5 @@ public class CesnetFileMetadata {
     public void setState(FileState state) {
         this.state = state;
     }
+
 }

@@ -107,4 +107,5 @@ public class Folder extends AbstractEntity<Long> {
     public void setOwner(UserDetails owner) {
         this.owner = owner;
     }
+
 }
