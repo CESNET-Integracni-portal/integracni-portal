@@ -20,6 +20,7 @@ import java.util.Set;
  * Service used by Spring to get access to user credentials during authentication.
  */
 @Service
+@Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final Logger logger = Logger.getLogger(AuthenticationServiceImpl.class);
@@ -69,4 +70,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Authentication getCurrentAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
+
 }

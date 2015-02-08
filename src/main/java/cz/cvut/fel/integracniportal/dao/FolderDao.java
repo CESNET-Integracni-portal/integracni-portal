@@ -1,7 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Folder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,7 +16,6 @@ public interface FolderDao {
 
     void delete(Folder folder);
 
-    @Transactional(readOnly = true)
     List<Folder> getTopLevelFolders();
 
     void createFolder(Folder folder);

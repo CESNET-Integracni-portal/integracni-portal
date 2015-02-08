@@ -9,7 +9,6 @@ import cz.cvut.fel.integracniportal.model.AbstractEntity;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -17,7 +16,6 @@ import java.io.Serializable;
 /**
  * @author Radek Jezdik
  */
-@Transactional
 public class GenericHibernateDao<ENTITY extends AbstractEntity> {
 
     private Class entityClass;

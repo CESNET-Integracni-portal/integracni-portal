@@ -17,6 +17,7 @@ import java.util.List;
  * Implementation of the {@link ArchiveFolderService}.
  */
 @Service
+@Transactional
 public class ArchiveFolderServiceImpl implements ArchiveFolderService {
 
     @Autowired
@@ -29,6 +30,7 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     private UserDetailsService userDetailsService;
 
     @Override
+    @Transactional(readOnly = true)
     public Folder getFolderById(long id) {
         Folder folder = folderDao.get(id);
         if (folder == null) {
@@ -45,12 +47,13 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Folder> getTopLevelFolders() {
         return folderDao.getTopLevelFolders();
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FolderRepresentation> getTopLevelFolderRepresentations() {
         List<Folder> folders = getTopLevelFolders();
         List<FolderRepresentation> folderResources = new ArrayList<FolderRepresentation>(folders.size());
@@ -62,7 +65,6 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional
     public Folder createFolder(Folder folder) {
         UserDetails currentUser = userDetailsService.getCurrentUser();
         folder.setOwner(currentUser);
@@ -79,7 +81,6 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional(rollbackFor = NotFoundException.class)
     public Folder createSubFolder(String folderName, Long parentId) {
         Folder parent = getFolderById(parentId);
         return createSubFolder(folderName, parent);
@@ -95,7 +96,6 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional
     public Folder updateFolder(Long folderId, FolderRepresentation folderRepresentation) {
         Folder folder = getFolderById(folderId);
         folder.setName(folderRepresentation.getName());
@@ -109,14 +109,12 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
     }
 
     @Override
-    @Transactional
     public void removeFolder(Long folderId) {
         Folder folder = getFolderById(folderId);
         removeFolder(folder);
     }
 
     @Override
-    @Transactional
     public void removeFolder(Folder folder) {
         for (FileMetadata fileMetadata : folder.getFiles()) {
             archiveFileMetadataService.deleteFile(fileMetadata);
@@ -126,4 +124,5 @@ public class ArchiveFolderServiceImpl implements ArchiveFolderService {
         }
         folderDao.delete(folder);
     }
+
 }

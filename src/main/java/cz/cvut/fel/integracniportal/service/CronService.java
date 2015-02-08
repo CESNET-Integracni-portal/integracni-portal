@@ -33,4 +33,5 @@ public class CronService {
             logger.error("Unable to delete old archived files: Cesnet service unavailable", e);
         }
     }
+
 }

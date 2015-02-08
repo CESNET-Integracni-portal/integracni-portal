@@ -3,7 +3,6 @@ package cz.cvut.fel.integracniportal.dao;
 import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -21,7 +20,6 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     }
 
     @Override
-    @Transactional(readOnly = true)
     public FileMetadata getByUUID(String fileMetadataUuid) {
         FileMetadata fileMetadata = get(fileMetadataUuid);
         if (fileMetadata == null) {
@@ -38,7 +36,6 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     }
 
     @Override
-    @Transactional
     public void createFileMetadata(FileMetadata fileMetadata) {
         Date currentDate = new Date();
         fileMetadata.setCreatedOn(currentDate);
@@ -59,4 +56,5 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
                 .where(fileMetadata.deleteOn.lt(new Date()))
                 .list(fileMetadata);
     }
+
 }

@@ -16,6 +16,7 @@ import java.util.List;
  * Implementation of the {@link cz.cvut.fel.integracniportal.service.UserRoleService}.
  */
 @Service
+@Transactional
 public class UserRoleServiceImpl implements UserRoleService {
 
     @Autowired
@@ -42,7 +43,6 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
     public void createRole(UserRole role) {
         // Check whether a different role with the same name exists
         UserRole existingRole = userRoleDao.getRoleByName(role.getName());
@@ -53,7 +53,6 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = PermissionNotAssignableToRoleException.class)
     public void saveRole(UserRole role) {
         for (Permission permission : role.getPermissions()) {
             if (!permission.isRoleAssignable()) {
@@ -67,4 +66,5 @@ public class UserRoleServiceImpl implements UserRoleService {
     public void deleteRole(UserRole role) {
         userRoleDao.delete(role);
     }
+
 }

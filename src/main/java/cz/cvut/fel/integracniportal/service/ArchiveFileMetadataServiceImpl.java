@@ -6,7 +6,6 @@ import cz.cvut.fel.integracniportal.cesnet.FileState;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.FileIOException;
-import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.List;
  * Implementation of the {@link ArchiveFileMetadataService}.
  */
 @Service
+@Transactional
 public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataService {
 
     @Autowired
@@ -40,6 +39,7 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     private UserDetailsService userDetailsService;
 
     @Override
+    @Transactional(readOnly = true)
     public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) {
         return fileMetadataDao.getByUUID(fileMetadataUuid);
     }
@@ -60,12 +60,12 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FileMetadata> getOldFilesForDeletion() {
         return fileMetadataDao.getFilesForDeletion();
     }
 
     @Override
-    @Transactional
     public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
         Folder parent = archiveFolderService.getFolderById(parentFolderId);
         return uploadFile(parent, file);
@@ -102,20 +102,19 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     }
 
     @Override
-    @Transactional(rollbackFor = {ServiceAccessException.class, FileNotFoundException.class})
     public void deleteFile(String uuid) {
         FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
         deleteFile(fileMetadata);
     }
 
     @Override
-    @Transactional(rollbackFor = ServiceAccessException.class)
     public void deleteFile(FileMetadata fileMetadata) {
         removeFileMetadata(fileMetadata);
         cesnetService.deleteFile(fileMetadata.getUuid());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CesnetFileMetadataRepresentation getFileMetadataResource(String fileMetadataUuid) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileMetadataUuid);
         CesnetFileMetadata cesnetFileMetadata = cesnetService.getFileMetadata(fileMetadataUuid);
@@ -123,11 +122,13 @@ public class ArchiveFileMetadataServiceImpl implements ArchiveFileMetadataServic
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CesnetFileMetadataRepresentation> getFileMetadataResources() {
         return getFileMetadataResourcesFor(cesnetService.getFileList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CesnetFileMetadataRepresentation> getFileMetadataResources(FileState fileState) {
         return getFileMetadataResourcesFor(cesnetService.getFileListByType(fileState));
     }

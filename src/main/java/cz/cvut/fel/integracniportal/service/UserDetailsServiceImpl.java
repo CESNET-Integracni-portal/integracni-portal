@@ -23,6 +23,7 @@ import java.util.List;
  * Implementation of the {@link cz.cvut.fel.integracniportal.service.UserDetailsService}.
  */
 @Service
+@Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -72,7 +73,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    @Transactional
     public UserDetails createUser(UserDetailsRepresentation userDetailsRepresentation) {
         if (getUserByUsername(userDetailsRepresentation.getUsername()) != null) {
             throw new AlreadyExistsException("user.alreadyExists");
@@ -85,7 +85,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    @Transactional(rollbackFor = {UserRoleNotFoundException.class, NotFoundException.class})
     public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) {
         UserDetails userDetails = getUserById(userId);
         updateUserFromRepresentation(userDetails, userDetailsRepresentation);
@@ -156,4 +155,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
+
 }

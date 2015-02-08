@@ -2,7 +2,6 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class UserRoleDaoImpl extends GenericHibernateDao<UserRole> implements Us
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserRole getRoleByName(String name) {
         return from(userRole)
                 .where(userRole.name.eq(name))
@@ -27,7 +25,6 @@ public class UserRoleDaoImpl extends GenericHibernateDao<UserRole> implements Us
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserRole> getAllRoles() {
         return from(userRole)
                 .list(userRole);

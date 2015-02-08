@@ -87,4 +87,5 @@ public class OrganizationalUnitServiceMock implements OrganizationalUnitService 
         newUnit.setMembers(new HashSet<String>(unit.getMembers()));
         return newUnit;
     }
+
 }
