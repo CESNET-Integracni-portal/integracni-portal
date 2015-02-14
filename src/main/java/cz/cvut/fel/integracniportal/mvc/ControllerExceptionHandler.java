@@ -32,11 +32,14 @@ public class ControllerExceptionHandler {
 
         if (resolvable != null && an != null) {
             String message = messageSource.getMessage(resolvable, Locale.getDefault());
-
             return new ResponseEntity(message, an.value());
+        } else {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            if (an != null) {
+                status = an.value();
+            }
+            return new ResponseEntity(e.getMessage(), status);
         }
-
-        throw e;
     }
 
     @ExceptionHandler(CmisContentAlreadyExistsException.class)
