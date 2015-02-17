@@ -3,9 +3,7 @@ package cz.cvut.fel.integracniportal.controller
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
-import cz.cvut.fel.integracniportal.cesnet.CesnetFileMetadata
 import cz.cvut.fel.integracniportal.cesnet.CesnetService
-import cz.cvut.fel.integracniportal.cesnet.FileState
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao
 import org.apache.commons.io.IOUtils
 import org.junit.Test
@@ -15,14 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
 import static org.junit.Assert.assertEquals
-import static org.mockito.Mockito.when
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * @author Radek Jezdik
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
-@DatabaseSetup("fileMetadata.xml")
+@DatabaseSetup("classpath:fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ArchiveController_updateFile_Test extends AbstractIntegrationTestCase {
 
@@ -35,9 +32,6 @@ public class ArchiveController_updateFile_Test extends AbstractIntegrationTestCa
 
     @Test
     void "should update the file's metadata"() {
-        when(cesnetService.getFileMetadata("2"))
-                .thenReturn(new CesnetFileMetadata(filename: "2", filesize: 100, state: FileState.REG))
-
         def body = IOUtils.toString(getClass().getResourceAsStream("putFileMetadata.json"))
 
         apiPut("archive/file/2", body)

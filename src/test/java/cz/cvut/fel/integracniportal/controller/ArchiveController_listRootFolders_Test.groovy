@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Radek Jezdik
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
-@DatabaseSetup("fileMetadata.xml")
+@DatabaseSetup("classpath:fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ArchiveController_listRootFolders_Test extends AbstractIntegrationTestCase {
 

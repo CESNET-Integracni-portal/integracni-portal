@@ -235,7 +235,8 @@ public class ArchiveController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.1/archive/folder/{folderid}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId, @RequestParam(value = "file", required = true) MultipartFile file) {
+    public ResponseEntity cesnetUploadFile(@PathVariable("folderid") Long folderId,
+                                           @RequestParam MultipartFile file) {
         FileMetadata fileMetadata = archiveFileMetadataService.uploadFileToFolder(folderId, file);
         return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }

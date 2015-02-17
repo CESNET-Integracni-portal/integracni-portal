@@ -7,15 +7,23 @@ import org.junit.runner.RunWith
 import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4SpringockitoContextTests
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpSession
+import org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
@@ -39,18 +47,26 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     @Autowired
 	protected WebApplicationContext wac
 
-    protected userPrincipal
+    @Autowired
+    protected MethodSecurityInterceptor securityInterceptor;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this)
-		this.mockMvc = webAppContextSetup(this.wac).build()
 
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("admin", "admin"))
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new User("admin", "admin", Collections.emptyList()), "admin", Collections.emptyList())
+
+        SecurityContext securityContext = SecurityContextHolder.getContext()
+        securityContext.setAuthentication(authentication)
+
+        MockHttpSession session = new MockHttpSession()
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext)
+
+        def builder = new MockHttpServletRequestBuilder(HttpMethod.GET, "forBuilder").session(session)
+        this.mockMvc = webAppContextSetup(this.wac).defaultRequest(builder).build()
 	}
 
-	public ResultActions apiGet(String urlTemplate) throws Exception {
+    public ResultActions apiGet(String urlTemplate) throws Exception {
 		return mockMvc.perform(
 				get(fromApi(urlTemplate))
 		)
@@ -78,6 +94,6 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 
 	public static String fromApi(String urlTemplate) {
 		return "/rest/v0.1/" + urlTemplate
-	}
+    }
 
 }

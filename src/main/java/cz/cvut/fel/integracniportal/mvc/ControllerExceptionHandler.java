@@ -4,11 +4,13 @@ import cz.cvut.fel.integracniportal.exceptions.BaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,6 +23,8 @@ import java.util.Locale;
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
+
+    private static final org.apache.log4j.Logger log = Logger.getLogger(ControllerExceptionHandler.class);
 
     @Autowired
     protected MessageSource messageSource;
@@ -60,6 +64,12 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity IOErrorHandler() {
         return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handle(HttpMessageNotReadableException e) {
+        log.warn("Returning HTTP 400 Bad Request", e);
     }
 
 }

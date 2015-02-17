@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertFalse
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * @author Radek Jezdik
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
-@DatabaseSetup("fileMetadata.xml")
+@DatabaseSetup("classpath:fileMetadata.xml")
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ArchiveController_updateFolder_Test extends AbstractIntegrationTestCase {
 
@@ -25,6 +26,8 @@ public class ArchiveController_updateFolder_Test extends AbstractIntegrationTest
 
     @Test
     void "should return the folder resource"() {
+        def origFolder = folderDao.get(2L)
+
         def content = '{"name": "renamed"}'
 
         apiPut("archive/folder/2", content)
@@ -32,6 +35,7 @@ public class ArchiveController_updateFolder_Test extends AbstractIntegrationTest
 
         def folder = folderDao.get(2L)
 
+        assertFalse origFolder.equals(folder)
         assertEquals "renamed", folder.name
     }
 
