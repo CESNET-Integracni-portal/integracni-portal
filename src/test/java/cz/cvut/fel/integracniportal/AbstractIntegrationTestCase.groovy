@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
 import com.github.springtestdbunit.annotation.DbUnitConfiguration
+import org.apache.commons.io.IOUtils
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4SpringockitoContextTests
@@ -54,7 +55,7 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 	public void setup() {
 		MockitoAnnotations.initMocks(this)
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(new User("admin", "admin", Collections.emptyList()), "admin", Collections.emptyList())
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new User("admin", "admin", []), "admin", [])
 
         SecurityContext securityContext = SecurityContextHolder.getContext()
         securityContext.setAuthentication(authentication)
@@ -78,6 +79,14 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         )
 	}
 
+    public ResultActions apiPost(String urlTemplate, String content) throws Exception {
+        return mockMvc.perform(
+                post(fromApi(urlTemplate))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+        )
+    }
+
     public ResultActions apiPut(String urlTemplate, String content) throws Exception {
         return mockMvc.perform(
                 put(fromApi(urlTemplate))
@@ -94,6 +103,14 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 
 	public static String fromApi(String urlTemplate) {
 		return "/rest/v0.1/" + urlTemplate
+    }
+
+    public InputStream getResource(String name) {
+        return getClass().getResourceAsStream(name)
+    }
+
+    public String getResourceAsString(String name) {
+        return IOUtils.toString(getResource(name));
     }
 
 }

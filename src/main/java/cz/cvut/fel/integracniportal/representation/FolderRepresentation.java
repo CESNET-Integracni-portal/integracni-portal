@@ -1,12 +1,8 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 
 import java.util.*;
 
@@ -35,36 +31,6 @@ public class FolderRepresentation {
     public FolderRepresentation() {
     }
 
-    public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder) {
-        this(folder, topFolder, true);
-    }
-
-    public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder, boolean deepCopy) {
-        id = AlfrescoUtils.parseId(folder);
-        name = folder.getName();
-        createdOn = folder.getCreationDate().getTime();
-        changedOn = folder.getLastModificationDate().getTime();
-
-        if (deepCopy) {
-            // Generate breadcrumbs
-            breadcrumbs = new ArrayList<Map<String, String>>();
-            if (!folder.equals(topFolder)) {
-                generateBreadcrumbs(breadcrumbs, folder.getFolderParent(), topFolder);
-                Collections.reverse(breadcrumbs);
-            }
-
-            folders = new ArrayList<FolderRepresentation>();
-            files = new ArrayList<FileMetadataRepresentation>();
-            for (CmisObject child : folder.getChildren()) {
-                if (child.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
-                    folders.add(new FolderRepresentation((org.apache.chemistry.opencmis.client.api.Folder) child, topFolder, false));
-                } else if (child.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
-                    files.add(new FileMetadataRepresentation((Document) child));
-                }
-            }
-        }
-    }
-
     public FolderRepresentation(Folder folder) {
         this(folder, true);
     }
@@ -86,28 +52,21 @@ public class FolderRepresentation {
             generateBreadcrumbs(breadcrumbs, folder.getParent());
             Collections.reverse(breadcrumbs);
 
-            folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
-            for (Folder subFolder : folder.getFolders()) {
-                FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
-                folders.add(folderResource);
+            if (folder.getFolders() != null) {
+                folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
+                for (Folder subFolder : folder.getFolders()) {
+                    FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
+                    folders.add(folderResource);
+                }
             }
 
-            files = new ArrayList<FileMetadataRepresentation>(folder.getFiles().size());
-            for (FileMetadata fileMetadata : folder.getFiles()) {
-                FileMetadataRepresentation fileMetadataResource = new FileMetadataRepresentation(fileMetadata);
-                files.add(fileMetadataResource);
+            if (folder.getFiles() != null) {
+                files = new ArrayList<FileMetadataRepresentation>(folder.getFiles().size());
+                for (FileMetadata fileMetadata : folder.getFiles()) {
+                    FileMetadataRepresentation fileMetadataResource = new FileMetadataRepresentation(fileMetadata);
+                    files.add(fileMetadataResource);
+                }
             }
-        }
-    }
-
-    public static void generateBreadcrumbs(List<Map<String, String>> breadcrumbs, org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder) {
-        org.apache.chemistry.opencmis.client.api.Folder current = folder;
-        while (current != null && !current.getId().equals(topFolder.getId())) {
-            Map<String, String> breadcrumbEntry = new HashMap<String, String>();
-            breadcrumbEntry.put("id", AlfrescoUtils.parseId(current));
-            breadcrumbEntry.put("name", current.getName());
-            breadcrumbs.add(breadcrumbEntry);
-            current = current.getFolderParent();
         }
     }
 

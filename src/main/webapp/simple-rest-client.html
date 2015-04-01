@@ -104,27 +104,6 @@
                 });
                 return false;
             });
-            $("form.js_uploadAlfresco").submit(function() {
-                var formElement = $(this);
-                var data = new FormData(formElement[0]);
-                var folderId = formElement.find(".js_alfrescoFolderId").val();
-                var url = getServerUrl()+formElement.attr("action");
-                if (folderId) {
-                    url += "folder/" + folderId;
-                }
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    data: data,
-                    headers: {
-                        Authorization: formElement.data("authorization")
-                    },
-                    cache: false,
-                    contentType: false,
-                    processData: false
-                });
-                return false;
-            });
         });
     </script>
 </head>
@@ -132,7 +111,7 @@
 Server URL
 <form>
     <select id="js_serverUrlSelect">
-        <option class="js_localhostOption" value="http://localhost:8089/">localhost:8089</option>
+        <option class="js_localhostOption" value="http://localhost:8080/integracni-portal/">localhost:8080</option>
         <option class="js_serverUrlOption" value="http://147.32.80.219:8080/integracni-portal/" selected="selected">URL</option>
     </select>
     <input type="text" id="js_serverUrl" value="http://147.32.80.219:8080/integracni-portal/" size="100" />
@@ -166,15 +145,8 @@ Request
 </form>
 <iframe name="rememberIframe" src="about:blank" style="display: none;"></iframe>
 
-Upload to home
-<form class="js_uploadAlfresco js_authReq" action="rest/v0.1/home/" data-method="POST" enctype="multipart/form-data">
-    <label for="alfrescoFolderId">Folder id to upload to: </label><input type="text" id="alfrescoFolderId" class="js_alfrescoFolderId" /><br/>
-    <input type="file" name="file" />
-    <button type="submit">Upload</button>
-</form>
-
-Upload to archive
-<form class="js_uploadCesnet js_authReq" action="rest/v0.1/archive/folder/" data-method="POST" enctype="multipart/form-data">
+Upload to cesnet
+<form class="js_uploadCesnet js_authReq" action="rest/v0.1/space/cesnet/folder/" data-method="POST" enctype="multipart/form-data">
     <label for="folderId">Folder id to upload to: </label><input type="text" id="folderId" class="js_folderId" /><br/>
     <input type="file" name="file" /><button type="submit">Upload</button>
 </form>

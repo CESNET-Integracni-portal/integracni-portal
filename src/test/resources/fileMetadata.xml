@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
+    <table name="user_details">
+        <column>user_id</column>
+        <column>username</column>
+        <column>password</column>
+        <row>
+            <value>0</value>
+            <value>admin</value>
+            <value>admin</value>
+        </row>
+    </table>
+
     <table name="resource_folder">
         <column>folder_id</column>
         <column>name</column>
         <column>created_on</column>
         <column>changed_on</column>
         <column>parent</column>
+        <column>owner</column>
+        <column>space</column>
+        <column>deleted</column>
+        <column>online</column>
         <row>
-            <value>1</value>
+            <value>1001</value>
             <value>root1</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
             <null/>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
         <row>
-            <value>2</value>
+            <value>1002</value>
             <value>root2</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
             <null/>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
         <row>
-            <value>3</value>
+            <value>1003</value>
             <value>child</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>2</value>
+            <value>1002</value>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
     </table>
 
@@ -37,41 +64,74 @@
         <column>created_on</column>
         <column>changed_on</column>
         <column>parent</column>
+        <column>owner</column>
+        <column>space</column>
+        <column>deleted</column>
+        <column>online</column>
         <row>
-            <value>1</value>
+            <value>1001</value>
             <value>a.txt</value>
             <value>100</value>
             <value>text/plain</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>1</value>
+            <value>1001</value>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
         <row>
-            <value>2</value>
+            <value>1002</value>
             <value>b.html</value>
             <value>100</value>
             <value>text/html</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>1</value>
+            <value>1001</value>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
         <row>
-            <value>3</value>
+            <value>1003</value>
             <value>c.json</value>
             <value>100</value>
             <value>application/json</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>3</value>
+            <value>1003</value>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
         <row>
-            <value>4</value>
+            <value>1004</value>
             <value>d.txt</value>
             <value>100</value>
             <value>text/plain</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>2</value>
+            <value>1002</value>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
+        </row>
+        <row>
+            <value>1005</value>
+            <value>root.txt</value>
+            <value>100</value>
+            <value>text/plain</value>
+            <value>2014-01-01</value>
+            <value>2014-01-01</value>
+            <null/>
+            <value>0</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
         </row>
     </table>
 </dataset>

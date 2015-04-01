@@ -20,11 +20,6 @@
             <id>mvnrepository</id>
             <url>http://repo1.maven.org/maven2</url>
         </repository>
-        <repository>
-            <id>maven.alfresco.com</id>
-            <name>Alfresco Maven Repository</name>
-            <url>http://maven.alfresco.com/nexus/content/groups/public/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -235,13 +230,6 @@
             <version>0.1.51</version>
         </dependency>
 
-        <!-- Alfresco -->
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-impl</artifactId>
-            <version>0.12.0</version>
-        </dependency>
-
         <!-- Apache Commons Upload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -316,6 +304,18 @@
             <version>1.4.182</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>cz.cvut.fel.integracni-portal</groupId>
+            <artifactId>integracni-portal-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.cvut.fel.integracni-portal</groupId>
+            <artifactId>cesnet-repository</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -336,6 +336,9 @@
                     <includes>
                         <include>**/*Test*.*</include>
                     </includes>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>cz.cvut.fel.integracni-portal:cesnet-repository</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
             <plugin>

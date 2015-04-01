@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -19,9 +20,22 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
     }
 
     @Override
-    public List<Folder> getTopLevelFolders() {
+    public List<Folder> getTopLevelFolders(UserDetails user) {
         return from(folder)
                 .where(folder.parent.isNull())
+                .where(folder.owner.eq(user))
+                .where(folder.deleted.isFalse())
+                .orderBy(folder.name.asc())
+                .list(folder);
+    }
+
+    @Override
+    public List<Folder> getSpaceTopLevelFolders(String spaceId, UserDetails user) {
+        return from(folder)
+                .where(folder.parent.isNull())
+                .where(folder.space.eq(spaceId))
+                .where(folder.owner.eq(user))
+                .where(folder.deleted.isFalse())
                 .orderBy(folder.name.asc())
                 .list(folder);
     }
@@ -33,5 +47,4 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
         folder.setChangedOn(currentDate);
         save(folder);
     }
-
 }

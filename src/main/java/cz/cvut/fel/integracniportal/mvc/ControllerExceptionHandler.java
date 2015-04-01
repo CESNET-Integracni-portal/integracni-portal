@@ -1,9 +1,6 @@
 package cz.cvut.fel.integracniportal.mvc;
 
 import cz.cvut.fel.integracniportal.exceptions.BaseException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -44,21 +41,6 @@ public class ControllerExceptionHandler {
             }
             return new ResponseEntity(e.getMessage(), status);
         }
-    }
-
-    @ExceptionHandler(CmisContentAlreadyExistsException.class)
-    public ResponseEntity cmisAlreayExistsHandler() {
-        return new ResponseEntity<String>(HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(CmisPermissionDeniedException.class)
-    public ResponseEntity cmisPermissionDeniedHandler() {
-        return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(CmisObjectNotFoundException.class)
-    public ResponseEntity cmisObjectNotFoundHandler() {
-        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IOException.class)

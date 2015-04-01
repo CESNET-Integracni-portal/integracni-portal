@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,7 +17,9 @@ public interface FolderDao {
 
     void delete(Folder folder);
 
-    List<Folder> getTopLevelFolders();
+    List<Folder> getTopLevelFolders(UserDetails user);
+
+    List<Folder> getSpaceTopLevelFolders(String spaceId, UserDetails user);
 
     void createFolder(Folder folder);
 

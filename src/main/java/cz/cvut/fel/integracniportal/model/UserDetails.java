@@ -25,12 +25,6 @@ public class UserDetails extends AbstractEntity<Long> {
     @Column(name = "org_unit_id", nullable = true)
     private Long organizationalUnitId;
 
-    @Column(nullable = true)
-    private String alfrescoUsername;
-
-    @Column(nullable = true)
-    private String alfrescoPassword;
-
     @ManyToMany
     private List<UserRole> userRoles;
 
@@ -70,22 +64,6 @@ public class UserDetails extends AbstractEntity<Long> {
 
     public void setOrganizationalUnitId(Long organizationalUnitId) {
         this.organizationalUnitId = organizationalUnitId;
-    }
-
-    public String getAlfrescoUsername() {
-        return alfrescoUsername;
-    }
-
-    public void setAlfrescoUsername(String alfrescoUsername) {
-        this.alfrescoUsername = alfrescoUsername;
-    }
-
-    public String getAlfrescoPassword() {
-        return alfrescoPassword;
-    }
-
-    public void setAlfrescoPassword(String alfrescoPassword) {
-        this.alfrescoPassword = alfrescoPassword;
     }
 
     public List<UserRole> getUserRoles() {

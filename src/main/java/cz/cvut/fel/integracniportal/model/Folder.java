@@ -18,6 +18,9 @@ public class Folder extends AbstractEntity<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long folderId;
 
+    @Column(name = "space")
+    private String space;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -42,6 +45,12 @@ public class Folder extends AbstractEntity<Long> {
     @JoinColumn(name = "owner", referencedColumnName = "user_id")
     private UserDetails owner;
 
+    @Column(name = "deleted")
+    private boolean deleted;
+
+    @Column(name = "online")
+    private boolean online = true;
+
     @Override
     public Long getId() {
         return folderId;
@@ -50,6 +59,14 @@ public class Folder extends AbstractEntity<Long> {
     @Override
     public void setId(Long folderId) {
         this.folderId = folderId;
+    }
+
+    public String getSpace() {
+        return space;
+    }
+
+    public void setSpace(String space) {
+        this.space = space;
     }
 
     public String getName() {
@@ -108,4 +125,19 @@ public class Folder extends AbstractEntity<Long> {
         this.owner = owner;
     }
 
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 }

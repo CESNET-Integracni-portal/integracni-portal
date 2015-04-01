@@ -15,7 +15,7 @@ public class CronService {
     private static final Logger logger = Logger.getLogger(CronService.class);
 
     @Autowired
-    private ArchiveFileMetadataService archiveFileMetadataService;
+    private FileMetadataService archiveFileMetadataService;
 
     @Scheduled(cron = "${cron.deleteOldArchivedFiles}")
     public void deleteOldArchivedFiles() {

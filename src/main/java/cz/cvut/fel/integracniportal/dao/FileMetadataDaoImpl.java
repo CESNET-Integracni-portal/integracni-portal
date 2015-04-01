@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -54,6 +55,16 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
         return from(fileMetadata)
                 .where(fileMetadata.deleteOn.isNotNull())
                 .where(fileMetadata.deleteOn.lt(new Date()))
+                .list(fileMetadata);
+    }
+
+    @Override
+    public List<FileMetadata> getAllTopLevelFiles(String spaceId, UserDetails owner) {
+        return from(fileMetadata)
+                .where(fileMetadata.owner.eq(owner))
+                .where(fileMetadata.parent.isNull())
+                .where(fileMetadata.space.eq(spaceId))
+                .orderBy(fileMetadata.filename.asc())
                 .list(fileMetadata);
     }
 

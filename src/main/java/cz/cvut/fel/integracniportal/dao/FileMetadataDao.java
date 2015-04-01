@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.List;
 
@@ -52,4 +53,5 @@ public interface FileMetadataDao {
      */
     public List<FileMetadata> getFilesForDeletion();
 
+    public List<FileMetadata> getAllTopLevelFiles(String spaceId, UserDetails owner);
 }
