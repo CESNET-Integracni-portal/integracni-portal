@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.Set;
 
@@ -19,14 +20,25 @@ public class OrganizationalUnitRepresentation {
 
     private Set<String> admins;
 
+    private Set<String> members;
+
     public OrganizationalUnitRepresentation() {
     }
 
     public OrganizationalUnitRepresentation(OrganizationalUnit organizationalUnit) {
-        this.id = organizationalUnit.getUnitId();
+        this.id = organizationalUnit.getId();
         this.name = organizationalUnit.getName();
         this.size = organizationalUnit.getSize();
-        this.admins = organizationalUnit.getAdmins();
+        if(organizationalUnit.getAdmins() != null){
+            for(UserDetails userDetails: organizationalUnit.getAdmins()){
+                admins.add(userDetails.getUsername());
+            }
+        }
+        if(organizationalUnit.getMembers() != null){
+            for(UserDetails userDetails: organizationalUnit.getMembers()){
+                members.add(userDetails.getUsername());
+            }
+        }
     }
 
     public Long getId() {
@@ -59,6 +71,14 @@ public class OrganizationalUnitRepresentation {
 
     public void setAdmins(Set<String> admins) {
         this.admins = admins;
+    }
+
+    public Set<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<String> members) {
+        this.members = members;
     }
 
 }

@@ -31,7 +31,7 @@ public class OrganizationalUnitsController extends AbstractController {
      * Get all organizational units.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.1/unit", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/unit", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getAllUnits() {
         List<OrganizationalUnit> units = organizationalUnitService.getAllOrganizationalUnits();
@@ -49,7 +49,7 @@ public class OrganizationalUnitsController extends AbstractController {
      * @return Organizational unit.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/unit/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getUnit(@PathVariable("id") Long id) {
         OrganizationalUnit unit = organizationalUnitService.getOrganizationalUnitById(id);
@@ -60,12 +60,36 @@ public class OrganizationalUnitsController extends AbstractController {
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/nameChange", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity changeNameUnit(@PathVariable("id") Long unitId,@RequestBody OrganizationalUnitRepresentation representation){
+        organizationalUnitService.updateUnit(unitId,representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/quotaChange", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity quotaChangeUnit(@PathVariable("id") Long unitId,@RequestBody OrganizationalUnitRepresentation representation){
+        organizationalUnitService.updateUnit(unitId, representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/adminsAssignment", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity assignAdmin(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation){
+        organizationalUnitService.setAdmins(unitId,representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
+    }
+
     /**
      * Update a organizational unit.
      *
      * @param id Id of the organizational unit.
      */
-    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+ /*   @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<Object> alfrescoUpdateFileMetadata(@PathVariable("id") Long id,
@@ -82,5 +106,5 @@ public class OrganizationalUnitsController extends AbstractController {
 
         return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
-
+*/
 }
