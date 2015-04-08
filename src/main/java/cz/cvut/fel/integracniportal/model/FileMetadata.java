@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Entity for file metadata.
@@ -47,6 +48,8 @@ public class FileMetadata extends AbstractEntity<String> {
     @Column(name = "delete_on", nullable = true)
     private Date deleteOn;
 
+    @OneToMany
+    private List<Label> labels;
     @Override
     public String getId() {
         return uuid;
@@ -137,4 +140,11 @@ public class FileMetadata extends AbstractEntity<String> {
         this.deleteOn = deleteOn;
     }
 
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }

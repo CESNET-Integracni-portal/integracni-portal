@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.Label;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
@@ -31,6 +32,8 @@ public class FolderRepresentation {
     private Date createdOn;
 
     private Date changedOn;
+
+    private List<LabelRepresentation> labels;
 
     public FolderRepresentation() {
     }
@@ -79,7 +82,13 @@ public class FolderRepresentation {
         }
         createdOn = folder.getCreatedOn();
         changedOn = folder.getChangedOn();
-
+        if (folder.getLabels() != null) {
+            labels = new ArrayList<LabelRepresentation>();
+            for (Label label : folder.getLabels()) {
+                LabelRepresentation labelResource = new LabelRepresentation(label);
+                labels.add(labelResource);
+            }
+        }
         if (deepCopy) {
             // Generate breadcrumbs
             breadcrumbs = new ArrayList<Map<String, String>>();
@@ -186,4 +195,11 @@ public class FolderRepresentation {
         this.changedOn = changedOn;
     }
 
+    public List<LabelRepresentation> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<LabelRepresentation> labels) {
+        this.labels = labels;
+    }
 }

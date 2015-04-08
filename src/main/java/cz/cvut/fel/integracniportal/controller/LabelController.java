@@ -1,9 +1,9 @@
 package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.representation.LabelMigrationRepresentation;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
 import cz.cvut.fel.integracniportal.service.LabelService;
-import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class LabelController extends AbstractController{
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label", method = RequestMethod.GET)
     @ResponseBody
-    public List<LabelRepresentation> getUserLabels(){
+    public List<LabelRepresentation> getLabels(){
         List<Label> labelList = labelService.getAllLabels();
         List<LabelRepresentation> result = new ArrayList<LabelRepresentation>(labelList.size());
         for (Label label: labelList){
@@ -37,7 +37,7 @@ public class LabelController extends AbstractController{
         return result;
     }
 
-    @PreAuthorize("hasRole('main_admin')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createLabel(@RequestBody LabelRepresentation labelRepresentation, BindingResult bindingResult){
@@ -49,15 +49,15 @@ public class LabelController extends AbstractController{
         return new ResponseEntity(new LabelRepresentation(label), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('main_admin')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> updateLabel(@PathVariable("labelid") Long labelId,@RequestBody LabelRepresentation labelRepresentation){
+    public ResponseEntity updateLabel(@PathVariable("labelid") Long labelId,@RequestBody LabelRepresentation labelRepresentation){
         labelService.updateLabel(labelId, labelRepresentation);
-        return new ResponseEntity(labelRepresentation, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole('main_admin')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getLabel(@PathVariable("labelid") Long labelId){
@@ -66,9 +66,43 @@ public class LabelController extends AbstractController{
         return new ResponseEntity(labelRepresentation, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('main_admin')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.DELETE)
-    public void deleteLabel(@PathVariable("labelid") Long labelId){
+    @ResponseBody
+    public ResponseEntity deleteLabel(@PathVariable("labelid") Long labelId){
         labelService.removeLabel(labelService.getLabelById(labelId));
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/addLabel", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity addLabelToFolder(@PathVariable("folderId") Long id, @RequestBody LabelMigrationRepresentation representation){
+        labelService.addLabelToFolder(id,representation);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/removeLabel", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity removeLabelFromFolder(@PathVariable("folderId") Long id, @RequestBody LabelMigrationRepresentation representation){
+        labelService.removeLabelFromFolder(id, representation);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/addLabel", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity addLabelToFile(@PathVariable("fileId") String id, @RequestBody LabelMigrationRepresentation representation){
+        labelService.addLabelToFile(id,representation);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/removeLabel", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity removeLabelFromFile(@PathVariable("fileId") String id, @RequestBody LabelMigrationRepresentation representation){
+        labelService.removeLabelFromFile(id, representation);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

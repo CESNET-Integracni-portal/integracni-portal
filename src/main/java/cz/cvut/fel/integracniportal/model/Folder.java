@@ -42,6 +42,9 @@ public class Folder extends AbstractEntity<Long> {
     @JoinColumn(name = "owner", referencedColumnName = "user_id")
     private UserDetails owner;
 
+    @OneToMany
+    private List<Label> labels;
+
     @Override
     public Long getId() {
         return folderId;
@@ -108,4 +111,11 @@ public class Folder extends AbstractEntity<Long> {
         this.owner = owner;
     }
 
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }
