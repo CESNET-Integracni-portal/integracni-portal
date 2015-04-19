@@ -51,6 +51,9 @@ public class Folder extends AbstractEntity<Long> {
     @Column(name = "online")
     private boolean online = true;
 
+    @OneToMany
+    private List<Label> labels;
+
     @Override
     public Long getId() {
         return folderId;
@@ -139,5 +142,13 @@ public class Folder extends AbstractEntity<Long> {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
     }
 }

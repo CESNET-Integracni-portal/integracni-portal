@@ -2,7 +2,9 @@ package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.Label;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +30,8 @@ public class FileMetadataRepresentation {
 
     private Date changedOn;
 
+    private List<LabelRepresentation> labels;
+
     public FileMetadataRepresentation() {
     }
 
@@ -40,6 +44,13 @@ public class FileMetadataRepresentation {
             owner = new UserDetailsRepresentation();
             owner.setId(fileMetadata.getOwner().getId());
             owner.setUsername(fileMetadata.getOwner().getUsername());
+        }
+        if (fileMetadata.getLabels() != null) {
+            labels = new ArrayList<LabelRepresentation>(fileMetadata.getLabels().size());
+            for (Label label: fileMetadata.getLabels()){
+                LabelRepresentation labelResource = new LabelRepresentation(label);
+                labels.add(labelResource);
+            }
         }
         createdOn = fileMetadata.getCreatedOn();
         changedOn = fileMetadata.getChangedOn();
@@ -109,4 +120,11 @@ public class FileMetadataRepresentation {
         this.changedOn = changedOn;
     }
 
+    public List<LabelRepresentation> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<LabelRepresentation> labels) {
+        this.labels = labels;
+    }
 }

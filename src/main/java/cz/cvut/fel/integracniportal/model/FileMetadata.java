@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Entity for file metadata.
@@ -55,6 +56,9 @@ public class FileMetadata extends AbstractEntity<String> {
 
     @Column(name = "online")
     private boolean online;
+
+    @OneToMany
+    private List<Label> labels;
 
     @Override
     public String getId() {
@@ -168,5 +172,13 @@ public class FileMetadata extends AbstractEntity<String> {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
     }
 }
