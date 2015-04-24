@@ -1,19 +1,29 @@
 package cz.cvut.fel.integracniportal.model;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+
 import javax.persistence.*;
+
+import static cz.cvut.fel.integracniportal.model.Label.USERS_LABELS_FILTER;
 
 /**
  * Created by Vavat on 1. 3. 2015.
  */
 @Entity
-@Table(name="label", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name","color","owner"})
+@Table(name = "label", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "color", "owner"})
 })
-public class Label extends AbstractEntity<Long>{
+@FilterDef(name = USERS_LABELS_FILTER, parameters = @ParamDef(name = "userId", type = "long"))
+@Filter(name = USERS_LABELS_FILTER, condition = "owner.userId = :userId")
+public class Label extends AbstractEntity<Long> {
+
+    public static final String USERS_LABELS_FILTER = "usersLabelFilter";
 
     @Id
     @GeneratedValue
-    @Column(name="label_id")
+    @Column(name = "label_id")
     private Long labelId;
 
     @Column(unique = true, nullable = false)
@@ -23,7 +33,7 @@ public class Label extends AbstractEntity<Long>{
     private String color;
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "user_id",nullable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "user_id", nullable = false)
     private UserDetails owner;
 
     @Override

@@ -33,7 +33,7 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("hasAnyRole('externists', 'main_admin')")
-    @RequestMapping(value = "/v0.1/user", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/user", method = RequestMethod.GET)
     @ResponseBody
     public List<UserDetailsRepresentation> getAllUsers() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
@@ -45,7 +45,7 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('externists')")
-    @RequestMapping(value = "/v0.1/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.2/user", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -57,7 +57,7 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("hasAnyRole('externists', 'main_admin')")
-    @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getUser(@PathVariable("userid") Long userId) {
         UserDetails userDetails = userDetailsService.getUserById(userId);
@@ -66,7 +66,7 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('externists')")
-    @RequestMapping(value = "/v0.1/user/{userid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.2/user/{userid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateUser(@PathVariable("userid") Long userId,
                                              @RequestBody UserDetailsRepresentation userDetailsResource) {
@@ -75,7 +75,7 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/user/current", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/user/current", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getCurrentUser() {
         UserDetails userDetails = userDetailsService.getCurrentUser();

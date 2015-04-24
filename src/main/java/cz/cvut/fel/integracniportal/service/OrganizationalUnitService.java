@@ -5,7 +5,6 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.OrganizationalUnitRepresentation;
 
 import java.util.List;
-import java.util.Set;
 
 public interface OrganizationalUnitService {
 

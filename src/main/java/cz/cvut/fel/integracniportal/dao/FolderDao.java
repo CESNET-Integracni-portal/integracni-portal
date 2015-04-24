@@ -13,6 +13,8 @@ public interface FolderDao {
 
     Folder get(Serializable id);
 
+    Folder getForUser(Long id, UserDetails currentUser);
+
     void update(Folder folder);
 
     void delete(Folder folder);
@@ -22,5 +24,4 @@ public interface FolderDao {
     List<Folder> getSpaceTopLevelFolders(String spaceId, UserDetails user);
 
     void createFolder(Folder folder);
-
 }

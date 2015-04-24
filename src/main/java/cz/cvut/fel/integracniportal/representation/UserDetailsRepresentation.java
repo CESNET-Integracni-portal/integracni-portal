@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.cvut.fel.integracniportal.model.Label;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
@@ -24,6 +25,8 @@ public class UserDetailsRepresentation {
 
     private Long unitId;
 
+    private List<LabelRepresentation> labels;
+
     private List<String> roles = new ArrayList<String>();
 
     private Map<String, Boolean> permissions = new HashMap<String, Boolean>();
@@ -44,6 +47,12 @@ public class UserDetailsRepresentation {
         if (withRoles) {
             for (Permission permission : Permission.values()) {
                 permissions.put(permission.toString(), false);
+            }
+
+            if (userDetails.getLabels() != null) {
+                for (Label label : userDetails.getLabels()) {
+                    labels.add(new LabelRepresentation(label));
+                }
             }
 
             if (userDetails.getPermissions() != null) {
@@ -120,4 +129,11 @@ public class UserDetailsRepresentation {
         this.directPermissions = directPermissions;
     }
 
+    public List<LabelRepresentation> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<LabelRepresentation> labels) {
+        this.labels = labels;
+    }
 }

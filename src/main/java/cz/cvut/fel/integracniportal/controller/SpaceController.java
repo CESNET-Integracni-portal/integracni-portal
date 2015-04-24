@@ -41,13 +41,13 @@ public class SpaceController extends AbstractController {
     private UserDetailsService userService;
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/space", method = GET)
+    @RequestMapping(value = "/v0.2/space", method = GET)
     public ResponseEntity<List<SpaceRepresentation>> getSpaces() {
         return new ResponseEntity<List<SpaceRepresentation>>(spaceService.getTypes(), HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/space/{spaceId}", method = GET)
+    @RequestMapping(value = "/v0.2/space/{spaceId}", method = GET)
     public ResponseEntity<TopLevelFolderRepresentation> getRoot(
             @PathVariable String spaceId,
             @RequestParam(required = false) List<String> labels) {
@@ -58,7 +58,7 @@ public class SpaceController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/space/{spaceId}/shared", method = GET)
+    @RequestMapping(value = "/v0.2/space/{spaceId}/shared", method = GET)
     public ResponseEntity<List<SpaceRepresentation>> getShared(
             @PathVariable String spaceId) {
 
@@ -66,7 +66,7 @@ public class SpaceController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/space/{spaceId}/folder", method = POST)
+    @RequestMapping(value = "/v0.2/space/{spaceId}/folder", method = POST)
     public ResponseEntity<FolderRepresentation> createFolder(
             @PathVariable String spaceId,
             @RequestBody NameRepresentation representation) {
@@ -77,7 +77,7 @@ public class SpaceController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.1/space/{spaceId}/file", method = POST)
+    @RequestMapping(value = "/v0.2/space/{spaceId}/file", method = POST)
     public ResponseEntity<FolderRepresentation> uploadFile(
             @PathVariable String spaceId,
             @RequestParam MultipartFile file) {

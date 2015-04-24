@@ -13,7 +13,6 @@
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>
     <import resource="cron.xml"/>
-    <import resource="dataMocks.xml"/>
 
     <!-- Load application.properties file -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

@@ -24,12 +24,16 @@ public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao
 
     @Override
     public List<Label> getUserLabels(long id) {
-        return from(label).where(label.owner.userId.eq(id)).list(label);
+        return from(label)
+                .where(label.owner.userId.eq(id))
+                .list(label);
     }
 
     @Override
     public Label getLabelByName(String name) {
-        return from(label).where(label.name.eq(name)).uniqueResult(label);
+        return from(label)
+                .where(label.name.eq(name))
+                .uniqueResult(label);
     }
 
     @Override

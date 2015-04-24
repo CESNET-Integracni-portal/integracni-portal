@@ -25,7 +25,7 @@ public class UserRolesController extends AbstractController {
     private UserRoleService userRoleService;
 
     @PreAuthorize("hasRole('main_admin')")
-    @RequestMapping(value = "/v0.1/role", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/role", method = RequestMethod.GET)
     @ResponseBody
     public List<UserRoleRepresentation> getAllRoles() {
         List<UserRole> userRoles = userRoleService.getAllRoles();
@@ -37,7 +37,7 @@ public class UserRolesController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('main_admin')")
-    @RequestMapping(value = "/v0.1/role", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.2/role", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createRole(@Validated @RequestBody UserRoleRepresentation userRoleRepresentation, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -53,7 +53,7 @@ public class UserRolesController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('main_admin')")
-    @RequestMapping(value = "/v0.1/role/{roleid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/role/{roleid}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getRole(@PathVariable("roleid") Long roleId) {
         UserRole userRole = userRoleService.getRoleById(roleId);
@@ -61,7 +61,7 @@ public class UserRolesController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('main_admin')")
-    @RequestMapping(value = "/v0.1/role/{roleid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.2/role/{roleid}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateRole(@PathVariable("roleid") Long roleId,
                                              @RequestBody UserRoleRepresentation userRoleRepresentation) {
@@ -80,7 +80,7 @@ public class UserRolesController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('main_admin')")
-    @RequestMapping(value = "/v0.1/permission", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/permission", method = RequestMethod.GET)
     @ResponseBody
     public Permission[] getAllPermissions() {
         return Permission.values();

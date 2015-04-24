@@ -51,7 +51,7 @@ public class Folder extends AbstractEntity<Long> {
     @Column(name = "online")
     private boolean online = true;
 
-    @OneToMany
+    @ManyToMany
     private List<Label> labels;
 
     @Override

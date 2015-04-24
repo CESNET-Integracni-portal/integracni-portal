@@ -25,9 +25,10 @@ public interface FolderService {
      * Finds a folder in database by its id and returns its representation.
      *
      * @param id Id of the folder.
+     * @param currentUser
      * @return The folder representation.
      */
-    public FolderRepresentation getFolderRepresentationById(long id);
+    public FolderRepresentation getFolderRepresentationById(long id, UserDetails currentUser);
 
     /**
      * Finds all top level folders.
@@ -116,24 +117,6 @@ public interface FolderService {
      * @param folderId
      */
     public void moveFolderOffline(Long folderId);
-
-    /**
-     * Adds a label to folder.
-     *
-     * @param folderId    the ID of folder to add the label to
-     * @param labelId     the ID of label to add
-     * @param currentUser the user to add the label for
-     */
-    public void addLabel(Long folderId, Long labelId, UserDetails currentUser);
-
-    /**
-     * Removes a label from folder.
-     *
-     * @param folderId    the ID of folder to remove the label from.
-     * @param labelId     the ID of label to remove
-     * @param currentUser the user to remove the label for
-     */
-    public void removeLabel(Long folderId, Long labelId, UserDetails currentUser);
 
     /**
      * Marks the folder as favorite for the given user.

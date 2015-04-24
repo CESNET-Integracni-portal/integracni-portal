@@ -21,6 +21,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml",
         "classpath:config/test-applicationContext.xml"
 ])
-@TestExecutionListeners(TransactionDbUnitTestExecutionListener)
+@TestExecutionListeners([TransactionDbUnitTestExecutionListener, TransactionalTestExecutionListener])
 @DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
 public abstract class AbstractIntegrationTestCase extends AbstractJUnit4SpringockitoContextTests {
 
@@ -102,7 +103,7 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     }
 
 	public static String fromApi(String urlTemplate) {
-		return "/rest/v0.1/" + urlTemplate
+		return "/rest/v0.2/" + urlTemplate
     }
 
     public InputStream getResource(String name) {

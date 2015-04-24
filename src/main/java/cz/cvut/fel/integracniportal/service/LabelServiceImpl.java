@@ -6,9 +6,7 @@ import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.Label;
-import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
-import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
-import cz.cvut.fel.integracniportal.representation.LabelMigrationRepresentation;
+import cz.cvut.fel.integracniportal.representation.LabelIdRepresentation;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,10 +29,10 @@ public class LabelServiceImpl implements LabelService {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private ArchiveFolderService archiveFolderService;
+    private FolderService folderService;
 
     @Autowired
-    private ArchiveFileMetadataService archiveFileMetadataService;
+    private FileMetadataService fileMetadataService;
 
     @Override
     public List<Label> getAllLabels() {
@@ -44,7 +42,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public List<Label> getUserLabels(long userId) {
         List<Label> result = labelDao.getUserLabels(userId);
-        if(result == null){
+        if (result == null) {
             throw new NotFoundException("labels.notFound.user.id", userId);
         }
         return result;
@@ -58,7 +56,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public Label getLabelById(long labelId) {
         Label label = labelDao.getLabelById(labelId);
-        if(label == null){
+        if (label == null) {
             throw new NotFoundException("label.notFound.id", labelId);
         }
         return label;
@@ -66,7 +64,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Label createLabel(LabelRepresentation labelRepresentation) {
-        if(getLabelByName(labelRepresentation.getName()) != null){
+        if (getLabelByName(labelRepresentation.getName()) != null) {
             throw new AlreadyExistsException("label.alreadyExists");
         }
         Label label = new Label();
@@ -83,17 +81,17 @@ public class LabelServiceImpl implements LabelService {
         return label;
     }
 
-    private void updateLabelFromRepresentation(Label label, LabelRepresentation labelRepresentation){
-        if(labelRepresentation.getId() != null){
+    private void updateLabelFromRepresentation(Label label, LabelRepresentation labelRepresentation) {
+        if (labelRepresentation.getId() != null) {
             label.setId(labelRepresentation.getId());
         }
-        if(labelRepresentation.getName() != null){
+        if (labelRepresentation.getName() != null) {
             label.setName(labelRepresentation.getName());
         }
-        if(labelRepresentation.getColor() != null){
+        if (labelRepresentation.getColor() != null) {
             label.setColor(labelRepresentation.getColor());
         }
-        if(labelRepresentation.getOwner() != null){
+        if (labelRepresentation.getOwner() != null) {
             label.setOwner(userDetailsService.getUserById(labelRepresentation.getOwner()));
         }
     }
@@ -109,93 +107,75 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFile(String fileUuid, LabelMigrationRepresentation representation) {
-        FileMetadata file = archiveFileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation) {
+        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
         Label label = getLabelById(representation.getLabelId());
-        if (file.getLabels() == null){
+        if (file.getLabels() == null) {
             file.setLabels(new ArrayList<Label>());
         }
-        if(containLabel(label,file.getLabels())){
-            throw new AlreadyExistsException("label.alreadyExists.onFile.id",file.getId());
-        }else{
+        if (containsLabel(label, file.getLabels())) {
+            throw new AlreadyExistsException("label.alreadyExists.onFile.id", file.getId());
+        } else {
             file.getLabels().add(label);
         }
-        archiveFileMetadataService.updateFileMetadata(file);
+        fileMetadataService.updateFileMetadata(file);
     }
 
     @Override
-    public void removeLabelFromFile(String fileUuid, LabelMigrationRepresentation representation) {
-        FileMetadata file = archiveFileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation) {
+        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
         List<Label> labels = file.getLabels();
-        if (labels == null){
+        if (labels == null) {
             throw new NotFoundException("label.onFile.notFound.id", representation.getLabelId());
         }
-        for (Label tmp: labels){
-            if(tmp.getLabelId() == representation.getLabelId()){
+        for (Label tmp : labels) {
+            if (tmp.getLabelId().equals(representation.getLabelId())) {
                 labels.remove(tmp);
                 break;
             }
         }
         file.setLabels(labels);
-        archiveFileMetadataService.updateFileMetadata(file);
+        fileMetadataService.updateFileMetadata(file);
     }
 
     @Override
-    public void addLabelToFolder(Long folderId, LabelMigrationRepresentation representation) {
-        Folder folder = archiveFolderService.getFolderById(folderId);
+    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation) {
+        Folder folder = folderService.getFolderById(folderId);
         Label label = getLabelById(representation.getLabelId());
-        if(folder.getLabels() == null){
+        if (folder.getLabels() == null) {
             folder.setLabels(new ArrayList<Label>());
         }
-        if(containLabel(label,folder.getLabels())){
-            throw new AlreadyExistsException("label.alreadyExists.onFolder.id",folder.getId());
-        }else{
+        if (folder.getLabels().contains(label)) {
+            throw new AlreadyExistsException("label.alreadyExists.onFolder.id", folder.getId());
+        } else {
             folder.getLabels().add(label);
         }
-        archiveFolderService.updateFolder(folder);
+        folderService.updateFolder(folder);
     }
 
     @Override
-    public void removeLabelFromFolder(Long folderId, LabelMigrationRepresentation representation) {
-        Folder folder = archiveFolderService.getFolderById(folderId);
+    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation) {
+        Folder folder = folderService.getFolderById(folderId);
         List<Label> labels = folder.getLabels();
-        if(labels == null){
+        if (labels == null) {
             throw new NotFoundException("label.onFolder.notFound.id", representation.getLabelId());
         }
-        for (Label tmp: labels){
-            if(tmp.getLabelId() == representation.getLabelId()){
+        for (Label tmp : labels) {
+            if (tmp.getLabelId() == representation.getLabelId()) {
                 labels.remove(tmp);
                 break;
             }
         }
         folder.setLabels(labels);
-        archiveFolderService.updateFolder(folder);
+        folderService.updateFolder(folder);
     }
 
-    private boolean containLabel(Label label, List<Label> list){
-        boolean res = false;
-        for (Label tmp: list){
-            if(tmp.getLabelId() == label.getLabelId()){
-                res = true;
-                break;
+    private boolean containsLabel(Label label, List<Label> list) {
+        for (Label tmp : list) {
+            if (tmp.getLabelId() == label.getLabelId()) {
+                return true;
             }
         }
-        return res;
-    }
-
-    public void setLabelDao(LabelDao labelDao) {
-        this.labelDao = labelDao;
-    }
-
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    public void setArchiveFolderService(ArchiveFolderService archiveFolderService) {
-        this.archiveFolderService = archiveFolderService;
-    }
-
-    public void setArchiveFileMetadataService(ArchiveFileMetadataService archiveFileMetadataService) {
-        this.archiveFileMetadataService = archiveFileMetadataService;
+        return false;
     }
 }

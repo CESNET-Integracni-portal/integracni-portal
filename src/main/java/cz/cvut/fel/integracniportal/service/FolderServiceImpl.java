@@ -45,8 +45,11 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public FolderRepresentation getFolderRepresentationById(long id) {
-        Folder folder = getFolderById(id);
+    public FolderRepresentation getFolderRepresentationById(long id, UserDetails currentUser) {
+        Folder folder = folderDao.getForUser(id, currentUser);
+        if (folder == null) {
+            throw new NotFoundException("cesnet.folder.notFound", id);
+        }
         return new FolderRepresentation(folder);
     }
 
@@ -176,19 +179,6 @@ public class FolderServiceImpl implements FolderService {
         getFileApi(folder.getSpace()).moveFolderOffline(folder);
     }
 
-    @Override
-    public void addLabel(Long folderId, Long labelId, UserDetails currentUser) {
-        Folder folder = getFolderById(folderId);
-        // TODO
-        // TODO user-label check
-    }
-
-    @Override
-    public void removeLabel(Long folderId, Long labelId, UserDetails currentUser) {
-        Folder folder = getFolderById(folderId);
-        // TODO
-        // TODO user-label check
-    }
 
     @Override
     public void favoriteFolder(Long folderId, UserDetails currentUser) {

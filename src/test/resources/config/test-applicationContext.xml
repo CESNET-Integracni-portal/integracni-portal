@@ -12,7 +12,6 @@
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>
     <import resource="cron.xml"/>
-    <import resource="dataMocks.xml"/>
 
     <bean class="cz.cvut.fel.integracniportal.mock.MockFileRepository" />
 

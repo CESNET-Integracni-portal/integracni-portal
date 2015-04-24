@@ -131,24 +131,6 @@ public interface FileMetadataService {
     public void moveFileOffline(String fileId);
 
     /**
-     * Adds a label to file.
-     *
-     * @param fileId      the ID of file to add the label to
-     * @param labelId     the ID of label to add
-     * @param currentUser the user to add the label for
-     */
-    public void addLabel(String fileId, Long labelId, UserDetails currentUser);
-
-    /**
-     * Removes a label from file.
-     *
-     * @param fileId      the ID of file to remove the label from.
-     * @param labelId     the ID of label to remove
-     * @param currentUser the user to remove the label for
-     */
-    public void removeLabel(String fileId, Long labelId, UserDetails currentUser);
-
-    /**
      * Marks the file as favorite for the given user.
      *
      * @param fileId      the ID of file to make favorite

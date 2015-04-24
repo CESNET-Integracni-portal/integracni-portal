@@ -32,6 +32,9 @@ public class UserDetails extends AbstractEntity<Long> {
     @Enumerated(EnumType.STRING)
     private Set<Permission> permissions;
 
+    @OneToMany
+    private List<Label> labels;
+
     @Override
     public Long getId() {
         return userId;
@@ -82,4 +85,11 @@ public class UserDetails extends AbstractEntity<Long> {
         this.permissions = permissions;
     }
 
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }

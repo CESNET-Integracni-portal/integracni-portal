@@ -184,20 +184,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void addLabel(String fileId, Long labelId, UserDetails currentUser) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
-        // TODO
-        // TODO user-label check
-    }
-
-    @Override
-    public void removeLabel(String fileId, Long labelId, UserDetails currentUser) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
-        // TODO
-        // TODO user-label check
-    }
-
-    @Override
     public void favoriteFile(String fileId, UserDetails currentUser) {
         FileMetadata file = getFileMetadataByUuid(fileId);
         // TODO
