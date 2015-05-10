@@ -131,6 +131,7 @@ public class FileApiAdapter {
 
         user.setId(owner.getId());
         user.setUsername(owner.getUsername());
+        user.setOrganizationalUnitId(owner.getOrganizationalUnitId());
 
         return user;
     }
