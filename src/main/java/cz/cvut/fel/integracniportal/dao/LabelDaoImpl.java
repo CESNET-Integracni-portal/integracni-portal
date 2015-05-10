@@ -11,7 +11,7 @@ import static cz.cvut.fel.integracniportal.model.QLabel.label;
  * Created by Vavat on 7. 3. 2015.
  */
 @Repository
-public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao{
+public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao {
 
     public LabelDaoImpl() {
         super(Label.class);
@@ -36,8 +36,4 @@ public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao
                 .uniqueResult(label);
     }
 
-    @Override
-    public Label getLabelById(long id) {
-        return get(id);
-    }
 }

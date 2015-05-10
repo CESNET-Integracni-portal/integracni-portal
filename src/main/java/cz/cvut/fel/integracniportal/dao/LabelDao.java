@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Label;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public interface LabelDao {
 
     public Label getLabelByName(String name);
 
-    public Label getLabelById(long id);
+    public Label get(Serializable id);
 
     public void save(Label label);
 

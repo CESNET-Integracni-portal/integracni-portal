@@ -55,7 +55,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Label getLabelById(long labelId) {
-        Label label = labelDao.getLabelById(labelId);
+        Label label = labelDao.get(labelId);
         if (label == null) {
             throw new NotFoundException("label.notFound.id", labelId);
         }
