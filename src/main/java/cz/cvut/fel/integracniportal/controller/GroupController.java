@@ -42,7 +42,7 @@ public class GroupController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/group", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/group", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<Object> create(GroupRepresentation representation) {
         Group userGroup = groupService.createUserGroup(userService.getCurrentUser(), representation);

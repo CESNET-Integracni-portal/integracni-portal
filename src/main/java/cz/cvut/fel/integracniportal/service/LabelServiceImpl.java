@@ -2,10 +2,12 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.LabelDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.InvalidStateException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.LabelIdRepresentation;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,9 +109,12 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation) {
+    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
         FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
         Label label = getLabelById(representation.getLabelId());
+        if (label.getOwner().getId().equals(currentUser.getId()) == false) {
+            throw new InvalidStateException("Could not add label of other user");
+        }
         if (file.getLabels() == null) {
             file.setLabels(new ArrayList<Label>());
         }
@@ -122,15 +127,18 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation) {
+    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
         FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
         List<Label> labels = file.getLabels();
         if (labels == null) {
             throw new NotFoundException("label.onFile.notFound.id", representation.getLabelId());
         }
-        for (Label tmp : labels) {
-            if (tmp.getLabelId().equals(representation.getLabelId())) {
-                labels.remove(tmp);
+        for (Label label : labels) {
+            if (label.getLabelId().equals(representation.getLabelId())) {
+                if (label.getOwner().getId().equals(currentUser.getId()) == false) {
+                    throw new InvalidStateException("Could not add label of other user");
+                }
+                labels.remove(label);
                 break;
             }
         }
@@ -139,9 +147,12 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation) {
+    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         Label label = getLabelById(representation.getLabelId());
+        if (label.getOwner().getId().equals(currentUser.getId()) == false) {
+            throw new InvalidStateException("Could not add label of other user");
+        }
         if (folder.getLabels() == null) {
             folder.setLabels(new ArrayList<Label>());
         }
@@ -154,15 +165,18 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation) {
+    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         List<Label> labels = folder.getLabels();
         if (labels == null) {
             throw new NotFoundException("label.onFolder.notFound.id", representation.getLabelId());
         }
-        for (Label tmp : labels) {
-            if (tmp.getLabelId() == representation.getLabelId()) {
-                labels.remove(tmp);
+        for (Label label : labels) {
+            if (label.getLabelId().equals(representation.getLabelId())) {
+                if (label.getOwner().getId().equals(currentUser.getId()) == false) {
+                    throw new InvalidStateException("Could not add label of other user");
+                }
+                labels.remove(label);
                 break;
             }
         }
@@ -172,7 +186,7 @@ public class LabelServiceImpl implements LabelService {
 
     private boolean containsLabel(Label label, List<Label> list) {
         for (Label tmp : list) {
-            if (tmp.getLabelId() == label.getLabelId()) {
+            if (tmp.getLabelId().equals(label.getLabelId())) {
                 return true;
             }
         }

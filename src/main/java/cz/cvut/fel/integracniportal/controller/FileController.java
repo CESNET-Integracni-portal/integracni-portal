@@ -144,7 +144,7 @@ public class FileController extends AbstractController {
                                    @PathVariable String fileId,
                                    @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.addLabelToFile(fileId, representation);
+        labelService.addLabelToFile(fileId, representation, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -159,7 +159,7 @@ public class FileController extends AbstractController {
                                       @PathVariable String fileId,
                                       @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.removeLabelFromFile(fileId, representation);
+        labelService.removeLabelFromFile(fileId, representation, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

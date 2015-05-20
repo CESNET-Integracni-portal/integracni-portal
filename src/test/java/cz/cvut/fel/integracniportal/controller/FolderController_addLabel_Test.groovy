@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 
+import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize
 import static junit.framework.Assert.assertEquals
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
@@ -62,13 +64,13 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
         def label1 = labelService.createLabel(new LabelRepresentation(name: "work", owner: 0, color: "red"))
         def label2 = labelService.createLabel(new LabelRepresentation(name: "cesnet", owner: user.getId(), color: "blue"))
 
-        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label1.getId()))
-        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label2.getId()))
+        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label1.getId()), userService.getCurrentUser())
+        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label2.getId()), user)
 
-        def folder = folderService.getFolderRepresentationById(1001, userService.getCurrentUser())
-        def labels = folder.getLabels()
+        apiGet("space/cesnet/folder/1001")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('$.labels', hasSize(1)))
 
-        assertEquals 1, labels.size()
     }
 
     @Test
@@ -78,7 +80,7 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
     }
 
     @Test
-    void "should return 404 error for label thats not users"() {
+    void "should return 400 error for label thats not users"() {
         def user = userService.createUser(new UserDetailsRepresentation(username: "user", password: "xyz"))
 
         def label = labelService.createLabel(new LabelRepresentation(name: "work", owner: user.getId(), color: "red"))

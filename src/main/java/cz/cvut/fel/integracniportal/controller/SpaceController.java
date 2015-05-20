@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import cz.cvut.fel.integracniportal.representation.NameRepresentation;
 import cz.cvut.fel.integracniportal.representation.SpaceRepresentation;
@@ -71,8 +72,9 @@ public class SpaceController extends AbstractController {
             @PathVariable String spaceId,
             @RequestBody NameRepresentation representation) {
 
-        Folder folder = folderService.createTopLevelFolder(representation.getName(), spaceId, userService.getCurrentUser());
-        FolderRepresentation folderRepresentation = new FolderRepresentation(folder);
+        UserDetails currentUser = userService.getCurrentUser();
+        Folder folder = folderService.createTopLevelFolder(representation.getName(), spaceId, currentUser);
+        FolderRepresentation folderRepresentation = new FolderRepresentation(folder, currentUser);
         return new ResponseEntity<FolderRepresentation>(folderRepresentation, HttpStatus.OK);
     }
 

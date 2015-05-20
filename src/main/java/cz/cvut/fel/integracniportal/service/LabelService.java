@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.LabelIdRepresentation;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
 
@@ -30,11 +31,11 @@ public interface LabelService {
 
     public void removeLabel(Label label);
 
-    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation);
+    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser);
 
-    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation);
+    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser);
 
-    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation);
+    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser);
 
-    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation);
+    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser);
 }

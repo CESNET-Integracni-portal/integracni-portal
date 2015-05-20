@@ -50,7 +50,7 @@ public class FolderServiceImpl implements FolderService {
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
         }
-        return new FolderRepresentation(folder);
+        return new FolderRepresentation(folder, currentUser);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class FolderServiceImpl implements FolderService {
     public TopLevelFolderRepresentation getTopLevelFolder(String spaceId, UserDetails owner) {
         List<Folder> topLevelFolders = getTopLevelFolders(spaceId, owner);
         List<FileMetadata> topLevelFiles = fileMetadataService.getTopLevelFiles(spaceId, owner);
-        TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(topLevelFolders, topLevelFiles);
+        TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(topLevelFolders, topLevelFiles, owner);
         return representation;
     }
 

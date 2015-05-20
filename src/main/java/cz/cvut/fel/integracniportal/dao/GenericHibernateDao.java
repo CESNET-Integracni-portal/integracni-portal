@@ -6,7 +6,6 @@ import com.mysema.query.jpa.hibernate.HibernateSubQuery;
 import com.mysema.query.jpa.hibernate.HibernateUpdateClause;
 import com.mysema.query.types.EntityPath;
 import cz.cvut.fel.integracniportal.model.AbstractEntity;
-import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,11 +74,6 @@ public class GenericHibernateDao<ENTITY extends AbstractEntity> {
 
     protected Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
-    }
-
-
-    protected Filter enableFilter(String filterName) {
-        return getCurrentSession().enableFilter(filterName);
     }
 
 }

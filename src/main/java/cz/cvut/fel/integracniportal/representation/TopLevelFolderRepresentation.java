@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.representation;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,10 @@ public class TopLevelFolderRepresentation {
 
     private List<FileMetadataRepresentation> files;
 
-    public TopLevelFolderRepresentation(List<Folder> topLevelFolders, List<FileMetadata> topLevelFiles) {
+    public TopLevelFolderRepresentation(List<Folder> topLevelFolders, List<FileMetadata> topLevelFiles, UserDetails viewer) {
         folders = new ArrayList<FolderRepresentation>(topLevelFolders.size());
         for (Folder subFolder : topLevelFolders) {
-            FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
+            FolderRepresentation folderResource = new FolderRepresentation(subFolder, viewer, false);
             folders.add(folderResource);
         }
 

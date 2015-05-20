@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.*;
 
@@ -34,11 +35,11 @@ public class FolderRepresentation {
     public FolderRepresentation() {
     }
 
-    public FolderRepresentation(Folder folder) {
-        this(folder, true);
+    public FolderRepresentation(Folder folder, UserDetails viewer) {
+        this(folder, viewer, true);
     }
 
-    public FolderRepresentation(Folder folder, boolean deepCopy) {
+    public FolderRepresentation(Folder folder, UserDetails viewer, boolean deepCopy) {
         id = folder.getId().toString();
         name = folder.getName();
         if (folder.getOwner() != null) {
@@ -51,8 +52,10 @@ public class FolderRepresentation {
         if (folder.getLabels() != null) {
             labels = new ArrayList<LabelRepresentation>();
             for (Label label : folder.getLabels()) {
-                LabelRepresentation labelResource = new LabelRepresentation(label);
-                labels.add(labelResource);
+                if (label.getOwner().getId().equals(viewer.getId())) {
+                    LabelRepresentation labelResource = new LabelRepresentation(label);
+                    labels.add(labelResource);
+                }
             }
         }
         if (deepCopy) {
@@ -64,7 +67,7 @@ public class FolderRepresentation {
             if (folder.getFolders() != null) {
                 folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
                 for (Folder subFolder : folder.getFolders()) {
-                    FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
+                    FolderRepresentation folderResource = new FolderRepresentation(subFolder, viewer, false);
                     folders.add(folderResource);
                 }
             }

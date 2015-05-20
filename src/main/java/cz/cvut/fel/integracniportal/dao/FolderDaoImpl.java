@@ -1,7 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.Folder;
-import cz.cvut.fel.integracniportal.model.Label;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.springframework.stereotype.Repository;
 
@@ -22,9 +21,6 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
 
     @Override
     public Folder getForUser(Long id, UserDetails currentUser) {
-//        enableFilter(Label.USERS_LABELS_FILTER)
-//                .setParameter("userId", currentUser.getId());
-
         return from(folder)
                 .where(folder.folderId.eq(id))
                 .singleResult(folder);
@@ -33,9 +29,6 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
 
     @Override
     public List<Folder> getTopLevelFolders(UserDetails user) {
-        enableFilter(Label.USERS_LABELS_FILTER)
-                .setParameter("userId", user.getId());
-
         return from(folder)
                 .where(folder.parent.isNull())
                 .where(folder.owner.eq(user))

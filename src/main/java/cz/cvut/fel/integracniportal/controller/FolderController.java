@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +67,9 @@ public class FolderController extends AbstractController {
                                           @PathVariable Long parentFolderId,
                                           @RequestBody NameRepresentation folderRepresentation) {
         ensureSpace(spaceId);
-        Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId, userService.getCurrentUser());
-        return new ResponseEntity(new FolderRepresentation(newFolder, true), HttpStatus.CREATED);
+        UserDetails currentUser = userService.getCurrentUser();
+        Folder newFolder = folderService.createSubFolder(folderRepresentation.getName(), parentFolderId, currentUser);
+        return new ResponseEntity(new FolderRepresentation(newFolder, currentUser, true), HttpStatus.CREATED);
     }
 
     /**
@@ -174,7 +176,7 @@ public class FolderController extends AbstractController {
                                    @PathVariable Long folderId,
                                    @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.addLabelToFolder(folderId, representation);
+        labelService.addLabelToFolder(folderId, representation, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -189,7 +191,7 @@ public class FolderController extends AbstractController {
                                       @PathVariable Long folderId,
                                       @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.removeLabelFromFolder(folderId, representation);
+        labelService.removeLabelFromFolder(folderId, representation, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
