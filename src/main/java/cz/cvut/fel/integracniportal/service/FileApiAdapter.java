@@ -1,10 +1,10 @@
 package cz.cvut.fel.integracniportal.service;
 
-import com.sun.deploy.util.StringUtils;
 import cz.cvut.fel.integracniportal.api.*;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
