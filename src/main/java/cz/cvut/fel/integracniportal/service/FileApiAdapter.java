@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
+import com.sun.deploy.util.StringUtils;
 import cz.cvut.fel.integracniportal.api.*;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -123,7 +124,7 @@ public class FileApiAdapter {
             folder = folder.getParent();
         }
 
-        return String.join("/", path);
+        return StringUtils.join(path, "/");
     }
 
     private User mapUser(UserDetails owner) {

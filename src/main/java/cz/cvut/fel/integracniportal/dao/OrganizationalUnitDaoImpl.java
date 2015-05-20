@@ -19,7 +19,8 @@ public class OrganizationalUnitDaoImpl extends GenericHibernateDao<Organizationa
 
     @Override
     public List<OrganizationalUnit> getAllUnits() {
-        return from(organizationalUnit).list(organizationalUnit);
+        return from(organizationalUnit)
+                .list(organizationalUnit);
     }
 
     @Override
@@ -29,6 +30,8 @@ public class OrganizationalUnitDaoImpl extends GenericHibernateDao<Organizationa
 
     @Override
     public OrganizationalUnit getOrgUnitByName(String name) {
-        return from(organizationalUnit).where(organizationalUnit.name.eq(name)).uniqueResult(organizationalUnit);
+        return from(organizationalUnit)
+                .where(organizationalUnit.name.eq(name))
+                .uniqueResult(organizationalUnit);
     }
 }

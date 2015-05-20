@@ -19,7 +19,8 @@ public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao
 
     @Override
     public List<Label> getAllLabels() {
-        return from(label).list(label);
+        return from(label)
+                .list(label);
     }
 
     @Override
