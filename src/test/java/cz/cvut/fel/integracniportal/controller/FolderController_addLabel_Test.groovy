@@ -86,7 +86,7 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
         def label = labelService.createLabel(new LabelRepresentation(name: "work", owner: user.getId(), color: "red"))
 
         apiPost("space/cesnet/file/1002/addLabel", '{"labelId": ' + label.getId() + '}')
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
     }
 
 }
