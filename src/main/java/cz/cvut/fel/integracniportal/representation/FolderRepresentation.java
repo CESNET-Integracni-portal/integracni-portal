@@ -14,6 +14,8 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {
 
+    private String type = "folder";
+
     private String id;
 
     private String name;
@@ -163,5 +165,9 @@ public class FolderRepresentation {
 
     public void setLabels(List<LabelRepresentation> labels) {
         this.labels = labels;
+    }
+
+    public String getType() {
+        return type;
     }
 }

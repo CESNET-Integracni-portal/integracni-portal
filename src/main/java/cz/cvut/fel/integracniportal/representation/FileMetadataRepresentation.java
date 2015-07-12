@@ -14,6 +14,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileMetadataRepresentation {
 
+    private String type = "file";
+
     private String uuid;
 
     private String filename;
@@ -126,5 +128,9 @@ public class FileMetadataRepresentation {
 
     public void setLabels(List<LabelRepresentation> labels) {
         this.labels = labels;
+    }
+
+    public String getType() {
+        return type;
     }
 }
