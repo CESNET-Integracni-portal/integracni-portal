@@ -63,6 +63,15 @@ public interface FileMetadataService {
     public List<FileMetadata> getOldFilesForDeletion();
 
     /**
+     * Uploads a file into root space folder and stores its metadata in database.
+     *
+     * @param space space name to upload the file to
+     * @param file  The file to be uploaded.
+     * @return Uuid identifier of the created file.
+     */
+    public FileMetadata uploadFileToRoot(String space, MultipartFile file);
+
+    /**
      * Uploads a file and stores its metadata in database.
      *
      * @param parentFolderId Id of the folder to which the file should be uploaded.

@@ -1,11 +1,10 @@
 package cz.cvut.fel.integracniportal.controller;
 
+import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
-import cz.cvut.fel.integracniportal.representation.NameRepresentation;
-import cz.cvut.fel.integracniportal.representation.SpaceRepresentation;
-import cz.cvut.fel.integracniportal.representation.TopLevelFolderRepresentation;
+import cz.cvut.fel.integracniportal.representation.*;
+import cz.cvut.fel.integracniportal.service.FileMetadataService;
 import cz.cvut.fel.integracniportal.service.FolderService;
 import cz.cvut.fel.integracniportal.service.SpaceService;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
@@ -40,6 +39,9 @@ public class SpaceController extends AbstractController {
 
     @Autowired
     private UserDetailsService userService;
+
+    @Autowired
+    private FileMetadataService fileMetadataService;
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space", method = GET)
@@ -84,8 +86,8 @@ public class SpaceController extends AbstractController {
             @PathVariable String spaceId,
             @RequestParam MultipartFile file) {
 
-        // TODO
-        return null;
+        FileMetadata fileMetadata = fileMetadataService.uploadFileToRoot(spaceId, file);
+        return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
 }

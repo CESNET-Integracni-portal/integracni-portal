@@ -75,6 +75,29 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
+    public FileMetadata uploadFileToRoot(String space, MultipartFile file) {
+        FileMetadata fileMetadata = new FileMetadata();
+
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+
+        setFileMetadata(fileMetadata, file);
+
+        fileMetadata.setParent(null);
+        fileMetadata.setOwner(currentUser);
+        fileMetadata.setSpace(space);
+
+        createFileMetadata(fileMetadata);
+
+        try {
+            getFileApi(space).putFile(fileMetadata, file.getInputStream());
+
+            return fileMetadata;
+        } catch (IOException e) {
+            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
+        }
+    }
+
+    @Override
     public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
         FileMetadata fileMetadata = new FileMetadata();
 
