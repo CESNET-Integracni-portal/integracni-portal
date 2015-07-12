@@ -29,7 +29,7 @@ public class FileApiAdapter {
     }
 
     public void createFolder(Folder folder) {
-        fileRepository.createFolder(mapFolder(folder));
+        fileRepository.createFolder(mapFolder(folder, null));
     }
 
 
@@ -45,7 +45,7 @@ public class FileApiAdapter {
         if ((fileRepository instanceof BinFileRepository) == false) {
             throw new IllegalStateException("Repository doesn't support bin");
         }
-        FolderDefinition folderDef = mapFolder(folder);
+        FolderDefinition folderDef = mapFolder(folder, null);
         ((BinFileRepository) fileRepository).moveFolderToBin(folderDef);
     }
 
@@ -58,11 +58,11 @@ public class FileApiAdapter {
     }
 
     public void renameFolder(Folder folder, String newName) {
-        fileRepository.renameFolder(newName, mapFolder(folder));
+        fileRepository.renameFolder(newName, mapFolder(folder, null));
     }
 
     public void moveFolder(Folder folder, Folder parent) {
-        fileRepository.moveFolder(mapFolder(folder), mapFolder(parent));
+        fileRepository.moveFolder(mapFolder(folder, null), mapFolder(parent, null));
     }
 
     public void moveFolderOnline(Folder folder) {
@@ -84,7 +84,7 @@ public class FileApiAdapter {
     }
 
     public void moveFile(FileMetadata fileMetadata, Folder parent) {
-        fileRepository.moveFile(mapFile(fileMetadata), mapFolder(parent));
+        fileRepository.moveFile(mapFile(fileMetadata), mapFolder(parent, fileMetadata.getOwner()));
     }
 
     public void moveFileOnline(FileMetadata fileMetadata) {
@@ -101,17 +101,19 @@ public class FileApiAdapter {
         }
     }
 
-    private FolderDefinition mapFolder(Folder folder) {
-        if (folder == null) {
-            return FolderDefinition.ROOT_FOLDER;
-        }
-
+    private FolderDefinition mapFolder(Folder folder, UserDetails user) {
         FolderDefinition folderDefinition = new FolderDefinition();
 
-        folderDefinition.setId(folder.getId());
-        folderDefinition.setName(folder.getName());
-        folderDefinition.setOwner(mapUser(folder.getOwner()));
-        folderDefinition.setPath(createFolderPath(folder));
+        if (folder == null) {
+            folderDefinition.setOwner(mapUser(user));
+            folderDefinition.setPath("");
+
+        } else {
+            folderDefinition.setId(folder.getId());
+            folderDefinition.setName(folder.getName());
+            folderDefinition.setOwner(mapUser(folder.getOwner()));
+            folderDefinition.setPath(createFolderPath(folder));
+        }
 
         return folderDefinition;
     }
@@ -145,7 +147,7 @@ public class FileApiAdapter {
         fileDefinition.setSize(fileMetadata.getFilesize());
         fileDefinition.setMimeType(fileMetadata.getMimetype());
         fileDefinition.setDateCreated(fileMetadata.getCreatedOn());
-        fileDefinition.setFolder(mapFolder(fileMetadata.getParent()));
+        fileDefinition.setFolder(mapFolder(fileMetadata.getParent(), fileMetadata.getOwner()));
 
         return fileDefinition;
     }
