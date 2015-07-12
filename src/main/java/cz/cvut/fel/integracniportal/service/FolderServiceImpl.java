@@ -125,13 +125,19 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void removeFolder(Long folderId) {
         Folder folder = getFolderById(folderId);
+        removeFolder(folder);
+    }
 
-        folder.setDeleted(true);
-        updateFolder(folder);
-
+    private void removeFolder(Folder folder) {
         getFileApi(folder.getSpace()).moveFolderToBin(folder);
 
-        // TODO set deleted to all child files and subfolders
+        for(Folder subFolder : folder.getFolders()) {
+            removeFolder(subFolder);
+        }
+        for (FileMetadata fileMetadata : folder.getFiles()) {
+            fileMetadataService.deleteFile(fileMetadata);
+        }
+        folderDao.delete(folder);
     }
 
     @Override

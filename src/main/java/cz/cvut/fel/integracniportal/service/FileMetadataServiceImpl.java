@@ -160,16 +160,14 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void deleteFile(String uuid) {
-        // TODO
-//        FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
-//        deleteFile(fileMetadata);
+        FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
+        deleteFile(fileMetadata);
     }
 
     @Override
     public void deleteFile(FileMetadata fileMetadata) {
-        // TODO
-//        removeFileMetadata(fileMetadata);
-//        getFileApi().moveFileToBin(fileMetadata);
+        removeFileMetadata(fileMetadata);
+        getFileApi(fileMetadata.getSpace()).moveFileToBin(fileMetadata);
     }
 
     @Override
