@@ -148,6 +148,7 @@ public class FileApiAdapter {
         fileDefinition.setMimeType(fileMetadata.getMimetype());
         fileDefinition.setDateCreated(fileMetadata.getCreatedOn());
         fileDefinition.setFolder(mapFolder(fileMetadata.getParent(), fileMetadata.getOwner()));
+        fileDefinition.setOwner(mapUser(fileMetadata.getOwner()));
 
         return fileDefinition;
     }
