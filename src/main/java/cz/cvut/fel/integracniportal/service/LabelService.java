@@ -23,7 +23,7 @@ public interface LabelService {
 
     public Label getLabelByName(String name);
 
-    public Label createLabel(LabelRepresentation labelRepresentation);
+    public Label createLabel(LabelRepresentation labelRepresentation, UserDetails owner);
 
     public Label updateLabel(Long labelId, LabelRepresentation labelRepresentation);
 

@@ -135,9 +135,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             String encodedPassword = passwordEncoder.encode(userDetailsRepresentation.getPassword());
             userDetails.setPassword(encodedPassword);
         }
-        if (userDetailsRepresentation.getUnitId() != null) {
-            userDetails.setOrganizationalUnitId(userDetailsRepresentation.getUnitId());
-        }
         if (userDetailsRepresentation.getDirectPermissions() != null) {
             if (userDetails.getPermissions() == null) {
                 userDetails.setPermissions(new HashSet<Permission>());

@@ -52,6 +52,9 @@ public class Folder extends AbstractEntity<Long> {
     private boolean online = true;
 
     @ManyToMany
+    @JoinTable(name = "resource_folder_label", joinColumns = {@JoinColumn(name = "folder_id")},
+            inverseJoinColumns = {@JoinColumn(name = "label_id")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "folder_id"})})
     private List<Label> labels;
 
     @Override

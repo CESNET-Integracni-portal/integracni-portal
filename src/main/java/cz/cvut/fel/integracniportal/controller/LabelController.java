@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.controller;
 import cz.cvut.fel.integracniportal.model.Label;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
 import cz.cvut.fel.integracniportal.service.LabelService;
+import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,9 @@ public class LabelController extends AbstractController {
     @Autowired
     private LabelService labelService;
 
+    @Autowired
+    private UserDetailsService userService;
+
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/label", method = RequestMethod.GET)
     @ResponseBody
@@ -44,7 +48,7 @@ public class LabelController extends AbstractController {
             return new ResponseEntity(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
 
-        Label label = labelService.createLabel(labelRepresentation);
+        Label label = labelService.createLabel(labelRepresentation, userService.getCurrentUser());
         return new ResponseEntity(new LabelRepresentation(label), HttpStatus.OK);
     }
 

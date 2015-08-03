@@ -19,9 +19,9 @@ public interface FolderDao {
 
     void delete(Folder folder);
 
-    List<Folder> getTopLevelFolders(UserDetails user);
-
     List<Folder> getSpaceTopLevelFolders(String spaceId, UserDetails user);
+
+    List<Folder> getFoldersByLabels(String spaceId, List<Long> labelIds, UserDetails owner);
 
     void createFolder(Folder folder);
 }

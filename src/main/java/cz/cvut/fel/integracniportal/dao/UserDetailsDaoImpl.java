@@ -38,7 +38,7 @@ public class UserDetailsDaoImpl extends GenericHibernateDao<UserDetails> impleme
     @Override
     public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId) {
         return from(userDetails)
-                .where(userDetails.organizationalUnitId.eq(organizationalUnitId))
+                .where(userDetails.organizationalUnit.unitId.eq(organizationalUnitId))
                 .list(userDetails);
     }
 

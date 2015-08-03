@@ -18,6 +18,9 @@ public interface FileMetadataService {
     @Transactional(readOnly = true)
     List<FileMetadata> getTopLevelFiles(String spaceId, UserDetails owner);
 
+    @Transactional(readOnly = true)
+    List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labels, UserDetails owner);
+
     /**
      * Finds a file metadata in database by its uuid.
      *
@@ -115,8 +118,9 @@ public interface FileMetadataService {
      * Deletes a file and removes its metadata from database
      *
      * @param fileMetadata File to be deleted.
+     * @param removeFromRepository true if file is to be removed from file repository
      */
-    public void deleteFile(FileMetadata fileMetadata);
+    void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository);
 
     /**
      * Returns the file contents as input stream.

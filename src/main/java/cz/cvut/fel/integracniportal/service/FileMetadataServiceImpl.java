@@ -42,6 +42,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labels, UserDetails owner) {
+        return fileMetadataDao.getFilesByLabels(spaceId, labels, owner);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) {
         return fileMetadataDao.getByUUID(fileMetadataUuid);
@@ -161,13 +166,15 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void deleteFile(String uuid) {
         FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
-        deleteFile(fileMetadata);
+        deleteFile(fileMetadata, true);
     }
 
     @Override
-    public void deleteFile(FileMetadata fileMetadata) {
+    public void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository) {
         removeFileMetadata(fileMetadata);
-        getFileApi(fileMetadata.getSpace()).moveFileToBin(fileMetadata);
+        if (removeFromRepository) {
+            getFileApi(fileMetadata.getSpace()).moveFileToBin(fileMetadata);
+        }
     }
 
     @Override

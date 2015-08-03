@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.representation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.Group;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * @author Radek Jezdik
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GroupRepresentation {
 
     private Long id;
@@ -16,6 +18,9 @@ public class GroupRepresentation {
     private String name;
 
     private List<UserDetailsRepresentation> members;
+
+    public GroupRepresentation() {
+    }
 
     public GroupRepresentation(Group group) {
         this.id = group.getId();

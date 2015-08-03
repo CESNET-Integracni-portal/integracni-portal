@@ -57,7 +57,10 @@ public class FileMetadata extends AbstractEntity<String> {
     @Column(name = "online")
     private boolean online;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(name = "resource_file_label", joinColumns = {@JoinColumn(name = "uuid")},
+            inverseJoinColumns = {@JoinColumn(name = "label_id")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "uuid"})})
     private List<Label> labels;
 
     @Override

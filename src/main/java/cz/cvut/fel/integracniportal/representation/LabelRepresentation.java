@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.Label;
 
 /**
- * Created by Vavat on 7. 3. 2015.
+ *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LabelRepresentation {
@@ -15,8 +15,6 @@ public class LabelRepresentation {
 
     private String color;
 
-    private Long owner;
-
     public LabelRepresentation() {
     }
 
@@ -24,7 +22,6 @@ public class LabelRepresentation {
         this.id = label.getId();
         this.name = label.getName();
         this.color = label.getColor();
-        this.owner = label.getOwner().getId();
     }
 
     public String getColor() {
@@ -51,11 +48,4 @@ public class LabelRepresentation {
         this.name = name;
     }
 
-    public Long getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Long owner) {
-        this.owner = owner;
-    }
 }

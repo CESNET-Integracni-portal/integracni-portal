@@ -45,6 +45,11 @@ public interface FolderService {
     public TopLevelFolderRepresentation getTopLevelFolder(String spaceId, UserDetails owner);
 
     /**
+     * Returns all files and folders that have the given labels assigned.
+     */
+    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<Long> labels, UserDetails owner);
+
+    /**
      * Creates new folder in database.
      *
      * @param folder Folder which is to be created in the database.
@@ -143,4 +148,11 @@ public interface FolderService {
      */
     public void shareFolder(Long folderId, List<Long> userIds, UserDetails currentUser);
 
+    /**
+     * Returns the list of user favorite folders.
+     * @param spaceId
+     * @param currentUser
+     * @return
+     */
+    public List<Folder> getFavorites(String spaceId, UserDetails currentUser);
 }

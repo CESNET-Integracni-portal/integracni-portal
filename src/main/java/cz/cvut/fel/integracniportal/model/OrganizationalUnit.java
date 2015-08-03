@@ -19,9 +19,14 @@ public class OrganizationalUnit extends AbstractEntity<Long>{
     private Long size;
 
     @ManyToMany
+    @JoinTable(
+            name = "organization_unit_admins",
+            joinColumns = @JoinColumn(name = "unit_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<UserDetails> admins;
 
-    @ManyToMany
+    @OneToMany(mappedBy = "organizationalUnit")
     private Set<UserDetails> members;
 
     @Override

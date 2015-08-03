@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -53,10 +54,14 @@ public class SpaceController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}", method = GET)
     public ResponseEntity<TopLevelFolderRepresentation> getRoot(
             @PathVariable String spaceId,
-            @RequestParam(required = false) List<String> labels) {
+            @RequestParam(required = false) List<Long> labels) {
 
-        // TODO labels
-        TopLevelFolderRepresentation topLevelFolder = folderService.getTopLevelFolder(spaceId, userService.getCurrentUser());
+        TopLevelFolderRepresentation topLevelFolder;
+        if (labels != null && labels.isEmpty() == false) {
+            topLevelFolder = folderService.getTopLevelFolderByLabels(spaceId, labels, userService.getCurrentUser());
+        } else {
+            topLevelFolder = folderService.getTopLevelFolder(spaceId, userService.getCurrentUser());
+        }
         return new ResponseEntity<TopLevelFolderRepresentation>(topLevelFolder, HttpStatus.OK);
     }
 
@@ -88,6 +93,16 @@ public class SpaceController extends AbstractController {
 
         FileMetadata fileMetadata = fileMetadataService.uploadFileToRoot(spaceId, file);
         return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/favorites", method = GET)
+    public ResponseEntity<TopLevelFolderRepresentation> getFavorites(
+            @PathVariable String spaceId) {
+
+//        List<Folder> folders = folderService.getFavorites(spaceId, userService.getCurrentUser());
+//        List<FileMetadata> fileMetadata = fileMetadataService.getFavorites(spaceId, userService.getCurrentUser());
+        return new ResponseEntity(new TopLevelFolderRepresentation(Collections.<Folder>emptyList(), Collections.<FileMetadata>emptyList(), userService.getCurrentUser()), HttpStatus.OK);
     }
 
 }

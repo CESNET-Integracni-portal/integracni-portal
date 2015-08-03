@@ -68,6 +68,14 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<Long> labels, UserDetails owner) {
+        List<Folder> folders = folderDao.getFoldersByLabels(spaceId, labels, owner);
+        List<FileMetadata> files = fileMetadataService.getFilesByLabels(spaceId, labels, owner);
+        TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(folders, files, owner);
+        return representation;
+    }
+
+    @Override
     public Folder createFolder(Folder folder, UserDetails owner) {
         FileApiAdapter fileApi = getFileApi(folder.getSpace());
 
@@ -112,12 +120,11 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public Folder renameFolder(Long folderId, String newName) {
         Folder folder = getFolderById(folderId);
-        folder.setName(newName);
 
-        folderDao.update(folder);
-
-        // TODO: bug #6 (calling api with already renamed file metadata)
         getFileApi(folder.getSpace()).renameFolder(folder, newName);
+
+        folder.setName(newName);
+        folderDao.update(folder);
 
         return folder;
     }
@@ -125,17 +132,19 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void removeFolder(Long folderId) {
         Folder folder = getFolderById(folderId);
-        removeFolder(folder);
+        removeFolder(folder, true);
     }
 
-    private void removeFolder(Folder folder) {
-        getFileApi(folder.getSpace()).moveFolderToBin(folder);
+    private void removeFolder(Folder folder, boolean removeFromRepository) {
 
         for(Folder subFolder : folder.getFolders()) {
-            removeFolder(subFolder);
+            removeFolder(subFolder, false);
         }
         for (FileMetadata fileMetadata : folder.getFiles()) {
-            fileMetadataService.deleteFile(fileMetadata);
+            fileMetadataService.deleteFile(fileMetadata, false);
+        }
+        if (removeFromRepository) {
+            getFileApi(folder.getSpace()).moveFolderToBin(folder);
         }
         folderDao.delete(folder);
     }
@@ -202,6 +211,11 @@ public class FolderServiceImpl implements FolderService {
     public void shareFolder(Long folderId, List<Long> userIds, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
+    }
+
+    @Override
+    public List<Folder> getFavorites(String spaceId, UserDetails currentUser) {
+        return null;
     }
 
     private FileApiAdapter getFileApi(String type) {

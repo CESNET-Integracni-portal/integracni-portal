@@ -32,7 +32,7 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getUserGroups() {
+    public ResponseEntity getUserGroups() {
         List<Group> groups = groupService.getUserGroups(userService.getCurrentUser());
         List<GroupRepresentation> representations = new ArrayList<GroupRepresentation>();
         for (Group group : groups) {
@@ -44,9 +44,9 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> create(GroupRepresentation representation) {
+    public ResponseEntity create(@RequestBody GroupRepresentation representation) {
         Group userGroup = groupService.createUserGroup(userService.getCurrentUser(), representation);
-        return new ResponseEntity<Object>(new GroupRepresentation(userGroup), HttpStatus.CREATED);
+        return new ResponseEntity(new GroupRepresentation(userGroup), HttpStatus.CREATED);
     }
 
     @PreAuthorize("isAuthenticated()")

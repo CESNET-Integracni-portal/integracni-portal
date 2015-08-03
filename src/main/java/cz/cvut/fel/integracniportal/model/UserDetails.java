@@ -22,8 +22,8 @@ public class UserDetails extends AbstractEntity<Long> {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "org_unit_id", nullable = true)
-    private Long organizationalUnitId;
+    @ManyToOne
+    private OrganizationalUnit organizationalUnit;
 
     @ManyToMany
     private List<UserRole> userRoles;
@@ -61,12 +61,12 @@ public class UserDetails extends AbstractEntity<Long> {
         this.password = password;
     }
 
-    public Long getOrganizationalUnitId() {
-        return organizationalUnitId;
+    public OrganizationalUnit getOrganizationalUnit() {
+        return organizationalUnit;
     }
 
-    public void setOrganizationalUnitId(Long organizationalUnitId) {
-        this.organizationalUnitId = organizationalUnitId;
+    public void setOrganizationalUnit(OrganizationalUnit organizationalUnit) {
+        this.organizationalUnit = organizationalUnit;
     }
 
     public List<UserRole> getUserRoles() {

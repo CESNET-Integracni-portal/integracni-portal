@@ -43,7 +43,7 @@ public class UserDetailsRepresentation {
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getId();
         this.username = userDetails.getUsername();
-        this.unitId = userDetails.getOrganizationalUnitId();
+        this.unitId = userDetails.getOrganizationalUnit().getId();
         if (withRoles) {
             for (Permission permission : Permission.values()) {
                 permissions.put(permission.toString(), false);

@@ -65,12 +65,13 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public Label createLabel(LabelRepresentation labelRepresentation) {
+    public Label createLabel(LabelRepresentation labelRepresentation, UserDetails owner) {
         if (getLabelByName(labelRepresentation.getName()) != null) {
             throw new AlreadyExistsException("label.alreadyExists");
         }
         Label label = new Label();
         updateLabelFromRepresentation(label, labelRepresentation);
+        label.setOwner(owner);
         labelDao.save(label);
         return label;
     }
@@ -84,17 +85,11 @@ public class LabelServiceImpl implements LabelService {
     }
 
     private void updateLabelFromRepresentation(Label label, LabelRepresentation labelRepresentation) {
-        if (labelRepresentation.getId() != null) {
-            label.setId(labelRepresentation.getId());
-        }
         if (labelRepresentation.getName() != null) {
             label.setName(labelRepresentation.getName());
         }
         if (labelRepresentation.getColor() != null) {
             label.setColor(labelRepresentation.getColor());
-        }
-        if (labelRepresentation.getOwner() != null) {
-            label.setOwner(userDetailsService.getUserById(labelRepresentation.getOwner()));
         }
     }
 

@@ -7,7 +7,7 @@ import java.util.Set;
  * @author Radek Jezdik
  */
 @Entity
-@Table(name = "group", uniqueConstraints = {
+@Table(name = "user_group", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "owner"})
 })
 public class Group extends AbstractEntity<Long> {
@@ -25,6 +25,9 @@ public class Group extends AbstractEntity<Long> {
     private UserDetails owner;
 
     @ManyToMany
+    @JoinTable(name = "user_group_members",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<UserDetails> members;
 
 

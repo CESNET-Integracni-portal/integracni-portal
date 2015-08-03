@@ -54,4 +54,6 @@ public interface FileMetadataDao {
     public List<FileMetadata> getFilesForDeletion();
 
     public List<FileMetadata> getAllTopLevelFiles(String spaceId, UserDetails owner);
+
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labelIds, UserDetails user);
 }

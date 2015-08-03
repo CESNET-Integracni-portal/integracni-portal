@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.QFileMetadata;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import static cz.cvut.fel.integracniportal.model.QFileMetadata.fileMetadata;
+import static cz.cvut.fel.integracniportal.model.QLabel.label;
 
 /**
  * Hibernate implementation of the FileMetadataDao interface.
@@ -65,6 +67,22 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
                 .where(fileMetadata.parent.isNull())
                 .where(fileMetadata.space.eq(spaceId))
                 .orderBy(fileMetadata.filename.asc())
+                .list(fileMetadata);
+    }
+
+    @Override
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labelIds, UserDetails owner) {
+        QFileMetadata file2 = new QFileMetadata("file2");
+        return from(fileMetadata)
+                .where(fileMetadata.owner.eq(owner))
+                .where(fileMetadata.space.eq(spaceId))
+                .where(fileMetadata.notIn(subQuery()
+                        .from(file2)
+                        .leftJoin(file2.labels, label)
+                        .where(label.labelId.notIn(labelIds).or(file2.labels.isEmpty()))
+                        .list(file2)))
+                .orderBy(fileMetadata.filename.asc())
+                .distinct()
                 .list(fileMetadata);
     }
 
