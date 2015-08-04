@@ -9,15 +9,15 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of the {@link cz.cvut.fel.integracniportal.service.UserDetailsService}.
@@ -38,6 +38,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    @Qualifier("adminUserService")
+    private org.springframework.security.core.userdetails.UserDetailsService adminUserService;
+
     @Override
     public UserDetails getUserById(long userId) {
         UserDetails userDetails = userDao.getUserById(userId);
@@ -52,6 +56,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userDao.getUserByUsername(username);
     }
 
+    /**
+     * TODO admin není v db
+     * FIXME admin není v db
+     * @return
+     */
     @Override
     public UserDetails getCurrentUser() {
         Authentication authentication = authenticationService.getCurrentAuthentication();
@@ -59,7 +68,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (loggedUser == null) {
             return null;
         }
-        return getUserByUsername(loggedUser.getUsername());
+
+        UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
+
+        if(specialUserDetails != null) {
+            return specialUserDetails;
+        } else {
+            return getUserByUsername(loggedUser.getUsername());
+        }
+    }
+
+    private UserDetails resolveSpecialUser(User loggedUser) {
+        try {
+            org.springframework.security.core.userdetails.UserDetails adminDetails = adminUserService.loadUserByUsername(loggedUser.getUsername());
+
+            UserDetails userDetails = new UserDetails();
+            userDetails.setId(0L);
+            userDetails.setUsername(adminDetails.getUsername());
+
+            Set<Permission> permissions = new HashSet<Permission>();
+            permissions.addAll(Arrays.asList(Permission.values()));
+            userDetails.setPermissions(permissions);
+
+            return userDetails;
+
+        } catch (UsernameNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
@@ -99,9 +134,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userDetailsRepresentation.getPassword() != null) {
             String encodedPassword = passwordEncoder.encode(userDetailsRepresentation.getPassword());
             userDetails.setPassword(encodedPassword);
-        }
-        if (userDetailsRepresentation.getUnitId() != null) {
-            userDetails.setOrganizationalUnitId(userDetailsRepresentation.getUnitId());
         }
         if (userDetailsRepresentation.getDirectPermissions() != null) {
             if (userDetails.getPermissions() == null) {

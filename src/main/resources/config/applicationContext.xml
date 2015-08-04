@@ -6,21 +6,23 @@
                "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!--<import resource="classpath*:/META-INF/spring/applicationContext*.xml" />-->
     <import resource="databaseConfig.xml"/>
     <import resource="springSecurity.xml"/>
     <import resource="client-details.xml"/>
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>
-    <import resource="cesnet.xml"/>
-    <import resource="alfresco.xml"/>
     <import resource="cron.xml"/>
-    <import resource="dataMocks.xml"/>
+
+    <import resource="cesnet.xml"/>
 
     <!-- Load application.properties file -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath*:application.properties</value>
+                <value>classpath:application.properties</value>
+                <value>${portal.config.location}portal.properties</value>
+                <value>${portal.config.location}cesnet.properties</value>
             </list>
         </property>
     </bean>

@@ -1,9 +1,10 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.Label;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileMetadataRepresentation {
+
+    private String type = "file";
 
     private String uuid;
 
@@ -29,16 +32,9 @@ public class FileMetadataRepresentation {
 
     private Date changedOn;
 
-    public FileMetadataRepresentation() {
-    }
+    private List<LabelRepresentation> labels;
 
-    public FileMetadataRepresentation(org.apache.chemistry.opencmis.client.api.Document document) {
-        uuid = AlfrescoUtils.parseId(document);
-        filename = document.getName();
-        mimetype = document.getContentStreamMimeType();
-        filesize = document.getContentStreamLength();
-        createdOn = document.getCreationDate().getTime();
-        changedOn = document.getLastModificationDate().getTime();
+    public FileMetadataRepresentation() {
     }
 
     public FileMetadataRepresentation(FileMetadata fileMetadata) {
@@ -50,6 +46,13 @@ public class FileMetadataRepresentation {
             owner = new UserDetailsRepresentation();
             owner.setId(fileMetadata.getOwner().getId());
             owner.setUsername(fileMetadata.getOwner().getUsername());
+        }
+        if (fileMetadata.getLabels() != null) {
+            labels = new ArrayList<LabelRepresentation>(fileMetadata.getLabels().size());
+            for (Label label: fileMetadata.getLabels()){
+                LabelRepresentation labelResource = new LabelRepresentation(label);
+                labels.add(labelResource);
+            }
         }
         createdOn = fileMetadata.getCreatedOn();
         changedOn = fileMetadata.getChangedOn();
@@ -119,4 +122,15 @@ public class FileMetadataRepresentation {
         this.changedOn = changedOn;
     }
 
+    public List<LabelRepresentation> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<LabelRepresentation> labels) {
+        this.labels = labels;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

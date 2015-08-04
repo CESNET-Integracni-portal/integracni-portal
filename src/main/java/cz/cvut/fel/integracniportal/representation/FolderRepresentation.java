@@ -1,12 +1,10 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import cz.cvut.fel.integracniportal.cmis.AlfrescoUtils;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.*;
 
@@ -15,6 +13,8 @@ import java.util.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderRepresentation {
+
+    private String type = "folder";
 
     private String id;
 
@@ -32,44 +32,16 @@ public class FolderRepresentation {
 
     private Date changedOn;
 
+    private List<LabelRepresentation> labels;
+
     public FolderRepresentation() {
     }
 
-    public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder) {
-        this(folder, topFolder, true);
+    public FolderRepresentation(Folder folder, UserDetails viewer) {
+        this(folder, viewer, true);
     }
 
-    public FolderRepresentation(org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder, boolean deepCopy) {
-        id = AlfrescoUtils.parseId(folder);
-        name = folder.getName();
-        createdOn = folder.getCreationDate().getTime();
-        changedOn = folder.getLastModificationDate().getTime();
-
-        if (deepCopy) {
-            // Generate breadcrumbs
-            breadcrumbs = new ArrayList<Map<String, String>>();
-            if (!folder.equals(topFolder)) {
-                generateBreadcrumbs(breadcrumbs, folder.getFolderParent(), topFolder);
-                Collections.reverse(breadcrumbs);
-            }
-
-            folders = new ArrayList<FolderRepresentation>();
-            files = new ArrayList<FileMetadataRepresentation>();
-            for (CmisObject child : folder.getChildren()) {
-                if (child.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER)) {
-                    folders.add(new FolderRepresentation((org.apache.chemistry.opencmis.client.api.Folder) child, topFolder, false));
-                } else if (child.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
-                    files.add(new FileMetadataRepresentation((Document) child));
-                }
-            }
-        }
-    }
-
-    public FolderRepresentation(Folder folder) {
-        this(folder, true);
-    }
-
-    public FolderRepresentation(Folder folder, boolean deepCopy) {
+    public FolderRepresentation(Folder folder, UserDetails viewer, boolean deepCopy) {
         id = folder.getId().toString();
         name = folder.getName();
         if (folder.getOwner() != null) {
@@ -79,35 +51,36 @@ public class FolderRepresentation {
         }
         createdOn = folder.getCreatedOn();
         changedOn = folder.getChangedOn();
-
+        if (folder.getLabels() != null) {
+            labels = new ArrayList<LabelRepresentation>();
+            for (Label label : folder.getLabels()) {
+                if (label.getOwner().getId().equals(viewer.getId())) {
+                    LabelRepresentation labelResource = new LabelRepresentation(label);
+                    labels.add(labelResource);
+                }
+            }
+        }
         if (deepCopy) {
             // Generate breadcrumbs
             breadcrumbs = new ArrayList<Map<String, String>>();
             generateBreadcrumbs(breadcrumbs, folder.getParent());
             Collections.reverse(breadcrumbs);
 
-            folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
-            for (Folder subFolder : folder.getFolders()) {
-                FolderRepresentation folderResource = new FolderRepresentation(subFolder, false);
-                folders.add(folderResource);
+            if (folder.getFolders() != null) {
+                folders = new ArrayList<FolderRepresentation>(folder.getFolders().size());
+                for (Folder subFolder : folder.getFolders()) {
+                    FolderRepresentation folderResource = new FolderRepresentation(subFolder, viewer, false);
+                    folders.add(folderResource);
+                }
             }
 
-            files = new ArrayList<FileMetadataRepresentation>(folder.getFiles().size());
-            for (FileMetadata fileMetadata : folder.getFiles()) {
-                FileMetadataRepresentation fileMetadataResource = new FileMetadataRepresentation(fileMetadata);
-                files.add(fileMetadataResource);
+            if (folder.getFiles() != null) {
+                files = new ArrayList<FileMetadataRepresentation>(folder.getFiles().size());
+                for (FileMetadata fileMetadata : folder.getFiles()) {
+                    FileMetadataRepresentation fileMetadataResource = new FileMetadataRepresentation(fileMetadata);
+                    files.add(fileMetadataResource);
+                }
             }
-        }
-    }
-
-    public static void generateBreadcrumbs(List<Map<String, String>> breadcrumbs, org.apache.chemistry.opencmis.client.api.Folder folder, org.apache.chemistry.opencmis.client.api.Folder topFolder) {
-        org.apache.chemistry.opencmis.client.api.Folder current = folder;
-        while (current != null && !current.getId().equals(topFolder.getId())) {
-            Map<String, String> breadcrumbEntry = new HashMap<String, String>();
-            breadcrumbEntry.put("id", AlfrescoUtils.parseId(current));
-            breadcrumbEntry.put("name", current.getName());
-            breadcrumbs.add(breadcrumbEntry);
-            current = current.getFolderParent();
         }
     }
 
@@ -186,4 +159,15 @@ public class FolderRepresentation {
         this.changedOn = changedOn;
     }
 
+    public List<LabelRepresentation> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<LabelRepresentation> labels) {
+        this.labels = labels;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

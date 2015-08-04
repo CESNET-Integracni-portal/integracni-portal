@@ -10,8 +10,8 @@ public class ServiceAccessException extends BaseException {
         super(code);
     }
 
-    public ServiceAccessException(String code, Object... args) {
-        super(code, args);
+    public ServiceAccessException(String code, Throwable e) {
+        super(code, e);
     }
 
 }

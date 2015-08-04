@@ -1,25 +1,42 @@
 package cz.cvut.fel.integracniportal.model;
 
+import javax.persistence.*;
 import java.util.Set;
 
-public class OrganizationalUnit {
+@Entity
+@Table(name = "organization_unit")
+public class OrganizationalUnit extends AbstractEntity<Long>{
 
+    @Id
+    @GeneratedValue
+    @Column(name="unit_id")
     private Long unitId;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private Long size;
 
-    private Set<String> admins;
+    @ManyToMany
+    @JoinTable(
+            name = "organization_unit_admins",
+            joinColumns = @JoinColumn(name = "unit_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<UserDetails> admins;
 
-    private Set<String> members;
+    @OneToMany(mappedBy = "organizationalUnit")
+    private Set<UserDetails> members;
 
-    public Long getUnitId() {
+    @Override
+    public Long getId() {
         return unitId;
     }
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
+    @Override
+    public void setId(Long id) {
+        this.unitId = id;
     }
 
     public String getName() {
@@ -38,20 +55,19 @@ public class OrganizationalUnit {
         this.size = size;
     }
 
-    public Set<String> getAdmins() {
+    public Set<UserDetails> getAdmins() {
         return admins;
     }
 
-    public void setAdmins(Set<String> admins) {
+    public void setAdmins(Set<UserDetails> admins) {
         this.admins = admins;
     }
 
-    public Set<String> getMembers() {
+    public Set<UserDetails> getMembers() {
         return members;
     }
 
-    public void setMembers(Set<String> members) {
+    public void setMembers(Set<UserDetails> members) {
         this.members = members;
     }
-
 }

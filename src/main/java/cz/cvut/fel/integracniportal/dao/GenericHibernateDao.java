@@ -6,6 +6,7 @@ import com.mysema.query.jpa.hibernate.HibernateSubQuery;
 import com.mysema.query.jpa.hibernate.HibernateUpdateClause;
 import com.mysema.query.types.EntityPath;
 import cz.cvut.fel.integracniportal.model.AbstractEntity;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -69,6 +70,10 @@ public class GenericHibernateDao<ENTITY extends AbstractEntity> {
 
     public HibernateSubQuery subQuery() {
         return new HibernateSubQuery();
+    }
+
+    protected Session getCurrentSession() {
+        return sessionFactory.getCurrentSession();
     }
 
 }

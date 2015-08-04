@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Entity for file metadata.
@@ -17,6 +18,9 @@ public class FileMetadata extends AbstractEntity<String> {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "uuid", unique = true)
     private String uuid;
+
+    @Column(name = "space")
+    private String space;
 
     @Column(name = "filename", nullable = false)
     private String filename;
@@ -47,6 +51,18 @@ public class FileMetadata extends AbstractEntity<String> {
     @Column(name = "delete_on", nullable = true)
     private Date deleteOn;
 
+    @Column(name = "deleted")
+    private boolean deleted;
+
+    @Column(name = "online")
+    private boolean online;
+
+    @ManyToMany
+    @JoinTable(name = "resource_file_label", joinColumns = {@JoinColumn(name = "uuid")},
+            inverseJoinColumns = {@JoinColumn(name = "label_id")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "uuid"})})
+    private List<Label> labels;
+
     @Override
     public String getId() {
         return uuid;
@@ -63,6 +79,14 @@ public class FileMetadata extends AbstractEntity<String> {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getSpace() {
+        return space;
+    }
+
+    public void setSpace(String space) {
+        this.space = space;
     }
 
     public String getFilename() {
@@ -137,4 +161,27 @@ public class FileMetadata extends AbstractEntity<String> {
         this.deleteOn = deleteOn;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }

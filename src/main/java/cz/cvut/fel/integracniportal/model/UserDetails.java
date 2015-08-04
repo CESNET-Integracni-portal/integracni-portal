@@ -22,14 +22,8 @@ public class UserDetails extends AbstractEntity<Long> {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "org_unit_id", nullable = true)
-    private Long organizationalUnitId;
-
-    @Column(nullable = true)
-    private String alfrescoUsername;
-
-    @Column(nullable = true)
-    private String alfrescoPassword;
+    @ManyToOne
+    private OrganizationalUnit organizationalUnit;
 
     @ManyToMany
     private List<UserRole> userRoles;
@@ -37,6 +31,9 @@ public class UserDetails extends AbstractEntity<Long> {
     @ElementCollection
     @Enumerated(EnumType.STRING)
     private Set<Permission> permissions;
+
+    @OneToMany
+    private List<Label> labels;
 
     @Override
     public Long getId() {
@@ -64,28 +61,12 @@ public class UserDetails extends AbstractEntity<Long> {
         this.password = password;
     }
 
-    public Long getOrganizationalUnitId() {
-        return organizationalUnitId;
+    public OrganizationalUnit getOrganizationalUnit() {
+        return organizationalUnit;
     }
 
-    public void setOrganizationalUnitId(Long organizationalUnitId) {
-        this.organizationalUnitId = organizationalUnitId;
-    }
-
-    public String getAlfrescoUsername() {
-        return alfrescoUsername;
-    }
-
-    public void setAlfrescoUsername(String alfrescoUsername) {
-        this.alfrescoUsername = alfrescoUsername;
-    }
-
-    public String getAlfrescoPassword() {
-        return alfrescoPassword;
-    }
-
-    public void setAlfrescoPassword(String alfrescoPassword) {
-        this.alfrescoPassword = alfrescoPassword;
+    public void setOrganizationalUnit(OrganizationalUnit organizationalUnit) {
+        this.organizationalUnit = organizationalUnit;
     }
 
     public List<UserRole> getUserRoles() {
@@ -104,4 +85,11 @@ public class UserDetails extends AbstractEntity<Long> {
         this.permissions = permissions;
     }
 
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }

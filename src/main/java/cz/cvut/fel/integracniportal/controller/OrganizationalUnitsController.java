@@ -3,7 +3,6 @@ package cz.cvut.fel.integracniportal.controller;
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 import cz.cvut.fel.integracniportal.representation.OrganizationalUnitRepresentation;
 import cz.cvut.fel.integracniportal.service.OrganizationalUnitService;
-import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,14 +23,11 @@ public class OrganizationalUnitsController extends AbstractController {
     @Autowired
     private OrganizationalUnitService organizationalUnitService;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
     /**
      * Get all organizational units.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.1/unit", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/unit", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getAllUnits() {
         List<OrganizationalUnit> units = organizationalUnitService.getAllOrganizationalUnits();
@@ -49,7 +45,7 @@ public class OrganizationalUnitsController extends AbstractController {
      * @return Organizational unit.
      */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/unit/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getUnit(@PathVariable("id") Long id) {
         OrganizationalUnit unit = organizationalUnitService.getOrganizationalUnitById(id);
@@ -60,27 +56,28 @@ public class OrganizationalUnitsController extends AbstractController {
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
     }
 
-    /**
-     * Update a organizational unit.
-     *
-     * @param id Id of the organizational unit.
-     */
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.1/unit/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.2/unit/{id}/nameChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> alfrescoUpdateFileMetadata(@PathVariable("id") Long id,
-                                                             @RequestBody OrganizationalUnitRepresentation organizationalUnitRepresentation) {
-        OrganizationalUnit unit = organizationalUnitService.getOrganizationalUnitById(id);
-        if (unit == null) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity changeNameUnit(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
+        organizationalUnitService.updateUnit(unitId, representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
+    }
 
-        // Currently, the only thing that can be updated is list of admins
-        if (organizationalUnitRepresentation.getAdmins() != null) {
-            organizationalUnitService.setAdmins(unit, organizationalUnitRepresentation.getAdmins());
-        }
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/quotaChange", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity quotaChangeUnit(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
+        organizationalUnitService.updateUnit(unitId, representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/adminsAssignment", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity assignAdmin(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
+        organizationalUnitService.setAdmins(unitId, representation);
+        return new ResponseEntity(representation, HttpStatus.OK);
     }
 
 }
