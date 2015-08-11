@@ -1,9 +1,11 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.dao.OrganizationalUnitDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
+import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
@@ -31,6 +33,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserDetailsDao userDao;
+
+    @Autowired
+    private OrganizationalUnitDao orgUnitDao;
 
     @Autowired
     private UserRoleService userRoleService;
@@ -113,8 +118,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new AlreadyExistsException("user.alreadyExists");
         }
 
+        OrganizationalUnit orgUnit = orgUnitDao.getOrgUnitById(userDetailsRepresentation.getUnitId());
+
+        if (orgUnit == null) {
+            throw new NotFoundException("org.unit.notFound");
+        }
+
         UserDetails user = new UserDetails();
         updateUserFromRepresentation(user, userDetailsRepresentation);
+        user.setOrganizationalUnit(orgUnit);
         userDao.save(user);
         return user;
     }

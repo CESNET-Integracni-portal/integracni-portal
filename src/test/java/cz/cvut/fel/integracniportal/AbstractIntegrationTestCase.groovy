@@ -2,6 +2,8 @@ package cz.cvut.fel.integracniportal
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
 import com.github.springtestdbunit.annotation.DbUnitConfiguration
+import cz.cvut.fel.integracniportal.dao.UserDetailsDao
+import cz.cvut.fel.integracniportal.model.UserDetails
 import org.apache.commons.io.IOUtils
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -50,13 +52,16 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 	protected WebApplicationContext wac
 
     @Autowired
-    protected MethodSecurityInterceptor securityInterceptor;
+    protected MethodSecurityInterceptor securityInterceptor
+
+    @Autowired
+    private UserDetailsDao userDao;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this)
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(new User("admin", "admin", []), "admin", [])
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new User("test", "password", []), "test", [])
 
         SecurityContext securityContext = SecurityContextHolder.getContext()
         securityContext.setAuthentication(authentication)
@@ -67,6 +72,10 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         def builder = new MockHttpServletRequestBuilder(HttpMethod.GET, "forBuilder").session(session)
         this.mockMvc = webAppContextSetup(this.wac).defaultRequest(builder).build()
 	}
+
+    public UserDetails getUser(id) {
+        return userDao.getUserById(id);
+    }
 
     public ResultActions apiGet(String urlTemplate) throws Exception {
 		return mockMvc.perform(

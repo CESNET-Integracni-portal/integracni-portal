@@ -42,8 +42,8 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
 
     @Test
     void "should assign labels to a folder"() {
-        def label1 = labelService.createLabel(new LabelRepresentation(name: "work", owner: 0, color: "red"))
-        def label2 = labelService.createLabel(new LabelRepresentation(name: "cesnet", owner: 0, color: "blue"))
+        def label1 = labelService.createLabel(new LabelRepresentation(name: "work", color: "red"), getUser(1))
+        def label2 = labelService.createLabel(new LabelRepresentation(name: "cesnet", color: "blue"), getUser(1))
 
         apiPost("space/cesnet/folder/1001/addLabel", '{"labelId": ' + label1.getId() + '}')
                 .andExpect(status().isNoContent())
@@ -59,12 +59,12 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
 
     @Test
     void "assigning labels of two users should retrieve both for one user"() {
-        def user = userService.createUser(new UserDetailsRepresentation(username: "user", password: "xyz"))
+        def user = userService.createUser(new UserDetailsRepresentation(username: "user", password: "xyz", unitId: 1))
 
-        def label1 = labelService.createLabel(new LabelRepresentation(name: "work", owner: 0, color: "red"))
-        def label2 = labelService.createLabel(new LabelRepresentation(name: "cesnet", owner: user.getId(), color: "blue"))
+        def label1 = labelService.createLabel(new LabelRepresentation(name: "work", color: "red"), getUser(1))
+        def label2 = labelService.createLabel(new LabelRepresentation(name: "cesnet", color: "blue"), user)
 
-        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label1.getId()), userService.getCurrentUser())
+        labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label1.getId()), getUser(1))
         labelService.addLabelToFolder(1001, new LabelIdRepresentation(labelId: label2.getId()), user)
 
         apiGet("space/cesnet/folder/1001")
@@ -81,9 +81,9 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
 
     @Test
     void "should return 400 error for label thats not users"() {
-        def user = userService.createUser(new UserDetailsRepresentation(username: "user", password: "xyz"))
+        def user = userService.createUser(new UserDetailsRepresentation(username: "user", password: "xyz", unitId: 1))
 
-        def label = labelService.createLabel(new LabelRepresentation(name: "work", owner: user.getId(), color: "red"))
+        def label = labelService.createLabel(new LabelRepresentation(name: "work", color: "red"), user)
 
         apiPost("space/cesnet/file/1002/addLabel", '{"labelId": ' + label.getId() + '}')
                 .andExpect(status().isBadRequest())

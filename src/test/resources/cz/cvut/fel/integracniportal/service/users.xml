@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
+    <table name="organization_unit">
+        <column>unit_id</column>
+        <column>name</column>
+        <column>size</column>
+        <row>
+            <value>1</value>
+            <value>unit1</value>
+            <value>100000000</value>
+        </row>
+    </table>
+
+    <table name="organization_unit">
+        <column>unit_id</column>
+        <column>name</column>
+        <column>size</column>
+        <row>
+            <value>2</value>
+            <value>unit2</value>
+            <value>100000000</value>
+        </row>
+    </table>
+
     <table name="user_details">
         <column>user_id</column>
         <column>username</column>
         <column>password</column>
-        <column>org_unit_id</column>
+        <column>organizationalunit_unit_id</column>
         <row>
             <value>101</value>
             <value>a</value>
