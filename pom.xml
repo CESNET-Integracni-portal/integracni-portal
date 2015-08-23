@@ -11,6 +11,7 @@
         <spring.version>3.2.8.RELEASE</spring.version>
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <spring.integration.version>3.0.4.RELEASE</spring.integration.version>
+        <axon.version>2.4.2</axon.version>
         <jackson.version>2.3.2</jackson.version>
         <querydsl.version>3.5.1</querydsl.version>
         <flyway.version>3.2.1</flyway.version>
@@ -116,6 +117,28 @@
             <version>${spring.integration.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.axonframework</groupId>
+            <artifactId>axon-core</artifactId>
+            <version>${axon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.axonframework</groupId>
+            <artifactId>axon-test</artifactId>
+            <version>${axon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.inferred</groupId>
+            <artifactId>freebuilder</artifactId>
+            <version>1.0</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -128,6 +151,13 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Validation -->
@@ -222,6 +252,11 @@
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
             <version>${querydsl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
         </dependency>
 
         <!-- Cesnet -->

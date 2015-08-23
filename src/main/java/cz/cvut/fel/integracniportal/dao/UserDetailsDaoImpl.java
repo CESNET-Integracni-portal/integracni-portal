@@ -18,6 +18,11 @@ public class UserDetailsDaoImpl extends GenericHibernateDao<UserDetails> impleme
     }
 
     @Override
+    public UserDetails getReference(long userId) {
+        return load(userId);
+    }
+
+    @Override
     public UserDetails getUserById(long userId) {
         return get(userId);
     }

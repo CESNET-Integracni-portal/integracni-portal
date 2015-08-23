@@ -35,7 +35,7 @@ public interface LabelService {
 
     public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser);
 
-    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser);
+    public void addLabelToFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser);
 
-    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser);
+    public void removeLabelFromFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser);
 }

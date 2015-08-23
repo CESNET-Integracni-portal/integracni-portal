@@ -2,16 +2,23 @@ package cz.cvut.fel.integracniportal
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
 import com.github.springtestdbunit.annotation.DbUnitConfiguration
+import cz.cvut.fel.integracniportal.command.node.CreateFileCommand
+import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
+import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId
 import cz.cvut.fel.integracniportal.model.UserDetails
 import org.apache.commons.io.IOUtils
+import org.axonframework.commandhandling.gateway.CommandGateway
+import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4SpringockitoContextTests
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,8 +34,9 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.web.context.WebApplicationContext
+
+import javax.sql.DataSource
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup
@@ -55,7 +63,13 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     protected MethodSecurityInterceptor securityInterceptor
 
     @Autowired
-    private UserDetailsDao userDao;
+    private UserDetailsDao userDao
+
+    @Autowired
+    private DataSource dataSource
+
+    @Autowired
+    protected CommandGateway commandGateway
 
 	@Before
 	public void setup() {
@@ -69,9 +83,15 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         MockHttpSession session = new MockHttpSession()
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext)
 
-        def builder = new MockHttpServletRequestBuilder(HttpMethod.GET, "forBuilder").session(session)
-        this.mockMvc = webAppContextSetup(this.wac).defaultRequest(builder).build()
+        def defaultRequest = get("dummy").session(session)
+        this.mockMvc = webAppContextSetup(this.wac).defaultRequest(defaultRequest).build()
 	}
+
+    @After
+    public void drop() {
+        def template = new JdbcTemplate(dataSource)
+        template.execute("TRUNCATE SCHEMA public AND COMMIT")
+    }
 
     public UserDetails getUser(id) {
         return userDao.getUserById(id);
@@ -121,6 +141,30 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 
     public String getResourceAsString(String name) {
         return IOUtils.toString(getResource(name));
+    }
+
+    public void createFolder(String id, String name, String parentId, long ownerId = 1, String space = "cesnet") {
+        commandGateway.sendAndWait(new CreateFolderCommand(
+                FolderId.of(id),
+                name,
+                parentId == null ? null : FolderId.of(parentId),
+                UserId.of(ownerId),
+                space
+        ))
+    }
+
+    public void createFile(String id, String name, String parentId, long ownerId = 1, String space = "cesnet",
+                           long size = 1, String mimetype = "application/json") {
+        commandGateway.sendAndWait(new CreateFileCommand(
+                FileId.of(id),
+                name,
+                parentId == null ? null : FolderId.of(parentId),
+                UserId.of(ownerId),
+                space,
+                size,
+                mimetype,
+                Optional.empty()
+        ))
     }
 
 }

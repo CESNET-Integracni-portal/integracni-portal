@@ -76,12 +76,11 @@ public interface FileMetadataService {
 
     /**
      * Uploads a file and stores its metadata in database.
-     *
-     * @param parentFolderId Id of the folder to which the file should be uploaded.
-     * @param file           The file to be uploaded.
-     * @return Uuid identifier of the created file.
+     *  @param parentFolderId Id of the folder to which the file should be uploaded.
+     * @param spaceId
+     * @param file           The file to be uploaded.  @return Uuid identifier of the created file.
      */
-    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file);
+    public FileMetadata uploadFileToFolder(String parentFolderId, String spaceId, MultipartFile file);
 
     /**
      * Updates file and its metadata.
@@ -105,7 +104,7 @@ public interface FileMetadataService {
      * @param fileId   the ID of file to move
      * @param parentId the ID of folder to move the file to
      */
-    public void moveFile(String fileId, Long parentId);
+    public void moveFile(String fileId, String parentId);
 
     /**
      * Deletes a file and removes its metadata from database

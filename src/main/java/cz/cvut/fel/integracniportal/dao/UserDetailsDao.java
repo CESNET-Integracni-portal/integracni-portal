@@ -10,6 +10,13 @@ import java.util.List;
 public interface UserDetailsDao {
 
     /**
+     * Loads a reference to a {@link cz.cvut.fel.integracniportal.model.UserDetails}
+     * @param userId Id of the user.
+     * @return
+     */
+    public UserDetails getReference(long userId);
+
+    /**
      * Finds a user in database by his id.
      *
      * @param userId Id of the user.

@@ -3,12 +3,15 @@ package cz.cvut.fel.integracniportal.controller
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand
+import cz.cvut.fel.integracniportal.dao.FolderDao
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
+import cz.cvut.fel.integracniportal.exceptions.DuplicateNameException
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.transaction.annotation.Transactional
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
@@ -19,20 +22,52 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 @DatabaseSetup("classpath:fileMetadata.xml")
-@Transactional
 public class FolderController_moveFolder_Test extends AbstractIntegrationTestCase {
+
+    @Autowired
+    FolderDao folderDao
 
     @Test
     void "should move folder to different folder"() {
-        def json = getResourceAsString("parentFolder.json");
+        createFolder("1", "src", null)
+        createFolder("2", "fooBar", "1")
 
-        apiPost("space/cesnet/folder/1001/parentChange", json)
-                .andExpect(status().isNoContent())
+        createFolder("3", "dst", null)
 
-        apiGet("space/cesnet/folder/1001")
-                .andExpect(status().isOk())
-                .andExpect(jsonPath('$.breadcrumbs[0].id').value("1002"))
+        commandGateway.sendAndWait(new MoveFolderCommand(
+                FolderId.of("2"),
+                FolderId.of("3")
+        ))
 
+        assert folderDao.get("2").getParent().getId() == "3"
+
+    }
+
+    @Test(expected = DuplicateNameException)
+    void "should throw exception on folder move resulting in duplicate folder names in a parent folder"() {
+        createFolder("1", "src", null)
+        createFolder("2", "fooBar", "1")
+
+        createFolder("3", "dest", null)
+        createFolder("4", "fooBar", "3")
+
+        commandGateway.sendAndWait(new MoveFolderCommand(
+                FolderId.of("2"),
+                FolderId.of("3")
+        ))
+    }
+
+    @Test
+    void "moving folder to the same parent folder does nothing"() {
+        createFolder("1", "root", null)
+        createFolder("2", "dir", "1")
+
+        commandGateway.sendAndWait(new MoveFolderCommand(
+                FolderId.of("2"),
+                FolderId.of("1"),
+        ));
+
+        assert folderDao.get("2").getParent().getId() == "1"
     }
 
     @Test

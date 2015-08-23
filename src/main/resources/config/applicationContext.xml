@@ -9,6 +9,7 @@
     <!--<import resource="classpath*:/META-INF/spring/applicationContext*.xml" />-->
     <import resource="databaseConfig.xml"/>
     <import resource="springSecurity.xml"/>
+    <import resource="axonConfig.xml"/>
     <import resource="client-details.xml"/>
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>

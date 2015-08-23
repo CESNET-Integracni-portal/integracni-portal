@@ -10,7 +10,29 @@
                 http://www.springframework.org/schema/jdbc
                 http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <jdbc:embedded-database id="dataSource" type="H2" />
+    <jdbc:embedded-database id="dataSource" type="HSQL"/>
+
+    <!--<bean id="hsqldbServer" class="org.hsqldb.server.Server" init-method="start">-->
+        <!--<property name="properties" ref="hsqldbServerProperties"/>-->
+        <!--<property name="address" value="localhost"/>-->
+    <!--</bean>-->
+    <!--<bean id="hsqldbServerProperties" class="org.hsqldb.persist.HsqlProperties">-->
+        <!--<constructor-arg>-->
+            <!--<props>-->
+                <!--<prop key="server.database.0">mem:portal</prop>-->
+                <!--<prop key="server.dbname.0">database-server</prop>-->
+            <!--</props>-->
+        <!--</constructor-arg>-->
+    <!--</bean>-->
+
+    <!--<bean id="dataSource" class="org.hsqldb.jdbc.JDBCPool">-->
+        <!--<property name="url" value="jdbc:hsqldb:hsql://localhost:9001/database-server" />-->
+        <!--<property name="user" value="SA" />-->
+        <!--<property name="password" value="" />-->
+    <!--</bean>-->
+    <!--<bean id="hibernateDialect" class="java.lang.String">-->
+        <!--<constructor-arg value="org.hibernate.dialect.HSQLDialect" />-->
+    <!--</bean>-->
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>

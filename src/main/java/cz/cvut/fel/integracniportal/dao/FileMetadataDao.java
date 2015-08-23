@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.dao;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -56,4 +57,6 @@ public interface FileMetadataDao {
     public List<FileMetadata> getAllTopLevelFiles(String spaceId, UserDetails owner);
 
     public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labelIds, UserDetails user);
+
+    public FileMetadata load(Serializable id);
 }

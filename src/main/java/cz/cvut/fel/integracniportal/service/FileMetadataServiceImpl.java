@@ -1,11 +1,18 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.command.node.CreateFileCommand;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileState;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
+import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import cz.cvut.fel.integracniportal.exceptions.FileIOException;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Implementation of the {@link FileMetadataService}.
  */
 @Service
-@Transactional
 public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Autowired
@@ -33,6 +41,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Autowired
     private SpaceServiceImpl fileRepositoryService;
+
+    @Autowired
+    private CommandGateway gateway;
 
     @Override
     @Transactional(readOnly = true)
@@ -81,44 +92,42 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public FileMetadata uploadFileToRoot(String space, MultipartFile file) {
-        FileMetadata fileMetadata = new FileMetadata();
-
-        UserDetails currentUser = userDetailsService.getCurrentUser();
-
-        setFileMetadata(fileMetadata, file);
-
-        fileMetadata.setParent(null);
-        fileMetadata.setOwner(currentUser);
-        fileMetadata.setSpace(space);
-
-        createFileMetadata(fileMetadata);
-
-        try {
-            getFileApi(space).putFile(fileMetadata, file.getInputStream());
-
-            return fileMetadata;
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+        return uploadFile(null, space, file);
     }
 
     @Override
-    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
-        FileMetadata fileMetadata = new FileMetadata();
+    public FileMetadata uploadFileToFolder(String parentFolderId, String space, MultipartFile file) {
+        Folder folder = folderService.getFolderById(parentFolderId);
 
-        Folder parent = folderService.getFolderById(parentFolderId);
+        if (folder.getSpace().equals(space) == false) {
+            throw new NotFoundException("Folder not found in space");
+        }
+
+        FolderId folderId = FolderId.of(folder.getId());
+
+        return uploadFile(folderId, space, file);
+    }
+
+    public FileMetadata uploadFile(FolderId folderId, String space, MultipartFile file) {
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
-        setFileMetadata(fileMetadata, file);
+        String id = UUID.randomUUID().toString();
 
-        fileMetadata.setParent(parent);
-        fileMetadata.setOwner(currentUser);
-        fileMetadata.setSpace(parent.getSpace());
+        gateway.sendAndWait(new CreateFileCommand(
+                FileId.of(id),
+                file.getOriginalFilename(),
+                folderId,
+                UserId.of(currentUser.getId()),
+                space,
+                file.getSize(),
+                file.getContentType(),
+                Optional.of(FileState.ONLINE)
+        ));
 
-        createFileMetadata(fileMetadata);
+        FileMetadata fileMetadata = fileMetadataDao.getByUUID(id);
 
         try {
-            getFileApi(parent.getSpace()).putFile(fileMetadata, file.getInputStream());
+            getFileApi(space).putFile(fileMetadata, file.getInputStream());
 
             return fileMetadata;
         } catch (IOException e) {
@@ -149,7 +158,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void moveFile(String fileId, Long parentId) {
+    public void moveFile(String fileId, String parentId) {
         FileMetadata file = getFileMetadataByUuid(fileId);
         Folder parent = folderService.getFolderById(parentId);
 

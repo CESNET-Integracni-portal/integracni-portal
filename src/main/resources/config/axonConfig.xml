@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:axon="http://www.axonframework.org/schema/core"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.axonframework.org/schema/core http://www.axonframework.org/schema/axon-core.xsd">
+
+    <axon:annotation-config />
+
+    <axon:command-bus id="commandBus" transaction-manager="transactionManager"/>
+
+    <axon:event-bus id="eventBus"/>
+
+    <!--<axon:filesystem-event-store id="eventStore" base-dir="events"/>-->
+
+    <bean id="eventStoreSchema" class="org.axonframework.eventstore.jdbc.GenericEventSqlSchema"/>
+    <bean id="eventEntryStore" class="org.axonframework.eventstore.jdbc.DefaultEventEntryStore" init-method="createSchema">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+        <constructor-arg name="sqlSchema" ref="eventStoreSchema"/>
+    </bean>
+    <axon:jdbc-event-store id="eventStore" sql-schema="eventStoreSchema" data-source="dataSource"
+                           event-entry-store-ref="eventEntryStore"/>
+
+    <bean class="org.axonframework.commandhandling.gateway.DefaultCommandGateway">
+        <constructor-arg name="commandBus" ref="commandBus"/>
+        <constructor-arg name="commandDispatchInterceptors">
+            <list></list>
+        </constructor-arg>
+    </bean>
+
+    <axon:event-sourcing-repository id="fileAggregateRepository" event-bus="eventBus" event-store="eventStore"
+                                    aggregate-type="cz.cvut.fel.integracniportal.domain.node.File"/>
+    <axon:event-sourcing-repository id="folderAggregateRepository" event-bus="eventBus" event-store="eventStore"
+                                    aggregate-type="cz.cvut.fel.integracniportal.domain.node.Folder"/>
+
+</beans>

@@ -11,12 +11,11 @@ import java.util.List;
  */
 @Entity
 @Table(name = "resource_folder", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "name"}))
-public class Folder extends AbstractEntity<Long> {
+public class Folder extends AbstractEntity<String> {
 
     @Id
-    @Column(name = "folder_id", unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long folderId;
+    @Column(name = "folder_id")
+    private String folderId;
 
     @Column(name = "space")
     private String space;
@@ -58,12 +57,12 @@ public class Folder extends AbstractEntity<Long> {
     private List<Label> labels;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return folderId;
     }
 
     @Override
-    public void setId(Long folderId) {
+    public void setId(String folderId) {
         this.folderId = folderId;
     }
 

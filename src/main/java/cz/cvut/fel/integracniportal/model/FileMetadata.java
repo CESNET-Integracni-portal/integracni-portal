@@ -1,7 +1,5 @@
 package cz.cvut.fel.integracniportal.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -14,9 +12,7 @@ import java.util.List;
 public class FileMetadata extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "uuid", unique = true)
+    @Column(name = "uuid")
     private String uuid;
 
     @Column(name = "space")

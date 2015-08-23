@@ -40,6 +40,11 @@ public class GenericHibernateDao<ENTITY extends AbstractEntity> {
         return (ENTITY) hibernateTemplate.get(entityClass, id);
     }
 
+    @SuppressWarnings("unchecked")
+    public ENTITY load(Serializable id) {
+        return (ENTITY) hibernateTemplate.load(entityClass, id);
+    }
+
     public void save(ENTITY entity) {
         hibernateTemplate.save(entity);
     }

@@ -8,6 +8,7 @@
 
     <import resource="test-databaseConfig.xml"/>
     <import resource="springSecurity.xml"/>
+    <import resource="axonConfig.xml"/>
     <import resource="client-details.xml"/>
     <import resource="oauth2-configuration.xml"/>
     <import resource="token-store.xml"/>

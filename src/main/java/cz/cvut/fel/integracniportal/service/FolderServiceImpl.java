@@ -1,6 +1,9 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
+import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import cz.cvut.fel.integracniportal.exceptions.InvalidStateException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
@@ -8,11 +11,13 @@ import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import cz.cvut.fel.integracniportal.representation.TopLevelFolderRepresentation;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Radek Jezdik
@@ -33,9 +38,12 @@ public class FolderServiceImpl implements FolderService {
     @Autowired
     private FileMetadataService fileMetadataService;
 
+    @Autowired
+    private CommandGateway commandGateway;
+
     @Override
     @Transactional(readOnly = true)
-    public Folder getFolderById(long id) {
+    public Folder getFolderById(String id) {
         Folder folder = folderDao.get(id);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
@@ -45,7 +53,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public FolderRepresentation getFolderRepresentationById(long id, UserDetails currentUser) {
+    public FolderRepresentation getFolderRepresentationById(String id, UserDetails currentUser) {
         Folder folder = folderDao.getForUser(id, currentUser);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
@@ -77,11 +85,12 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public Folder createFolder(Folder folder, UserDetails owner) {
-        FileApiAdapter fileApi = getFileApi(folder.getSpace());
 
         folder.setOwner(owner);
 
         folderDao.createFolder(folder);
+
+        FileApiAdapter fileApi = getFileApi(folder.getSpace());
         fileApi.createFolder(folder);
 
         return folder;
@@ -89,17 +98,28 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public Folder createTopLevelFolder(String folderName, String spaceId, UserDetails owner) {
-        Folder folder = new Folder();
-        folder.setName(folderName);
-        folder.setSpace(spaceId);
-
-        return createFolder(folder, owner);
+        return createFolder(folderName, spaceId, null, owner);
     }
 
     @Override
-    public Folder createSubFolder(String folderName, Long parentId, UserDetails owner) {
+    public Folder createSubFolder(String folderName, String parentId, UserDetails owner) {
         Folder parent = getFolderById(parentId);
-        return createSubFolder(folderName, parent, owner);
+
+        return createFolder(folderName, parent.getSpace(), FolderId.of(parentId), owner);
+    }
+
+    private Folder createFolder(String folderName, String space, FolderId parentId, UserDetails owner) {
+        String id = UUID.randomUUID().toString();
+
+        commandGateway.sendAndWait(new CreateFolderCommand(
+                new FolderId(id),
+                folderName,
+                parentId,
+                UserId.of(owner.getId()),
+                space
+        ));
+
+        return getFolderById(id);
     }
 
     @Override
@@ -118,7 +138,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Folder renameFolder(Long folderId, String newName) {
+    public Folder renameFolder(String folderId, String newName) {
         Folder folder = getFolderById(folderId);
 
         getFileApi(folder.getSpace()).renameFolder(folder, newName);
@@ -130,7 +150,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void removeFolder(Long folderId) {
+    public void removeFolder(String folderId) {
         Folder folder = getFolderById(folderId);
         removeFolder(folder, true);
     }
@@ -155,7 +175,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolder(Long folderId, Long parentId) {
+    public void moveFolder(String folderId, String parentId) {
         Folder folder = getFolderById(folderId);
         Folder parent = getFolderById(parentId);
 
@@ -174,7 +194,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolderOnline(Long folderId) {
+    public void moveFolderOnline(String folderId) {
         Folder folder = getFolderById(folderId);
         if (folder.isOnline()) {
             return;
@@ -185,7 +205,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolderOffline(Long folderId) {
+    public void moveFolderOffline(String folderId) {
         Folder folder = getFolderById(folderId);
         if (folder.isOnline() == false) {
             return;
@@ -196,19 +216,19 @@ public class FolderServiceImpl implements FolderService {
 
 
     @Override
-    public void favoriteFolder(Long folderId, UserDetails currentUser) {
+    public void favoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }
 
     @Override
-    public void unfavoriteFolder(Long folderId, UserDetails currentUser) {
+    public void unfavoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }
 
     @Override
-    public void shareFolder(Long folderId, List<Long> userIds, UserDetails currentUser) {
+    public void shareFolder(String folderId, List<Long> userIds, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }

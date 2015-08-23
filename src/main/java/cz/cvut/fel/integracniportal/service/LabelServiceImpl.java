@@ -142,7 +142,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
+    public void addLabelToFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         Label label = getLabelById(representation.getLabelId());
         if (label.getOwner().getId().equals(currentUser.getId()) == false) {
@@ -160,7 +160,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
+    public void removeLabelFromFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         List<Label> labels = folder.getLabels();
         if (labels == null) {

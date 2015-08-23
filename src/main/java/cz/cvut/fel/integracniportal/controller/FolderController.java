@@ -47,7 +47,7 @@ public class FolderController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getFolder(@PathVariable String spaceId,
-                                    @PathVariable Long folderId) {
+                                    @PathVariable String folderId) {
         ensureSpace(spaceId);
         FolderRepresentation folderRepresentation = folderService.getFolderRepresentationById(folderId, userService.getCurrentUser());
         return new ResponseEntity(folderRepresentation, HttpStatus.OK);
@@ -64,7 +64,7 @@ public class FolderController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{parentFolderId}/folder", method = POST, consumes = "application/json")
     @ResponseBody
     public ResponseEntity createSubFolder(@PathVariable String spaceId,
-                                          @PathVariable Long parentFolderId,
+                                          @PathVariable String parentFolderId,
                                           @RequestBody NameRepresentation folderRepresentation) {
         ensureSpace(spaceId);
         UserDetails currentUser = userService.getCurrentUser();
@@ -82,10 +82,10 @@ public class FolderController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/file", method = POST)
     @ResponseBody
     public ResponseEntity uploadFile(@PathVariable String spaceId,
-                                     @PathVariable Long folderId,
+                                     @PathVariable String folderId,
                                      @RequestParam MultipartFile file) {
         ensureSpace(spaceId);
-        FileMetadata fileMetadata = fileMetadataService.uploadFileToFolder(folderId, file);
+        FileMetadata fileMetadata = fileMetadataService.uploadFileToFolder(folderId, spaceId, file);
         return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
@@ -99,7 +99,7 @@ public class FolderController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/nameChange", method = POST)
     @ResponseBody
     public ResponseEntity renameFolder(@PathVariable String spaceId,
-                                       @PathVariable Long folderId,
+                                       @PathVariable String folderId,
                                        @RequestBody NameRepresentation representation) {
         ensureSpace(spaceId);
         folderService.renameFolder(folderId, representation.getName());
@@ -116,7 +116,7 @@ public class FolderController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/parentChange", method = POST)
     @ResponseBody
     public ResponseEntity moveFolder(@PathVariable String spaceId,
-                                     @PathVariable Long folderId,
+                                     @PathVariable String folderId,
                                      @RequestBody FolderParentRepresentation representation) {
         ensureSpace(spaceId);
         folderService.moveFolder(folderId, representation.getParentId());
@@ -131,7 +131,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/trash", method = POST)
     public ResponseEntity moveFolderToBin(@PathVariable String spaceId,
-                                          @PathVariable Long folderId) {
+                                          @PathVariable String folderId) {
         ensureSpace(spaceId);
         folderService.removeFolder(folderId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -145,7 +145,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/online", method = POST)
     public ResponseEntity moveToOnline(@PathVariable String spaceId,
-                                       @PathVariable Long folderId) {
+                                       @PathVariable String folderId) {
         ensureSpace(spaceId);
         folderService.moveFolderOnline(folderId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -159,7 +159,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/offline", method = POST)
     public ResponseEntity moveToOffline(@PathVariable String spaceId,
-                                        @PathVariable Long folderId) {
+                                        @PathVariable String folderId) {
         ensureSpace(spaceId);
         folderService.moveFolderOffline(folderId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -173,7 +173,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/addLabel", method = POST)
     public ResponseEntity addLabel(@PathVariable String spaceId,
-                                   @PathVariable Long folderId,
+                                   @PathVariable String folderId,
                                    @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
         labelService.addLabelToFolder(folderId, representation, userService.getCurrentUser());
@@ -188,7 +188,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/removeLabel", method = POST)
     public ResponseEntity removeLabel(@PathVariable String spaceId,
-                                      @PathVariable Long folderId,
+                                      @PathVariable String folderId,
                                       @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
         labelService.removeLabelFromFolder(folderId, representation, userService.getCurrentUser());
@@ -203,7 +203,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/favorite", method = POST)
     public ResponseEntity favoriteFolder(@PathVariable String spaceId,
-                                         @PathVariable Long folderId) {
+                                         @PathVariable String folderId) {
         ensureSpace(spaceId);
         folderService.favoriteFolder(folderId, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -217,7 +217,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/unfavorite", method = POST)
     public ResponseEntity unfavoriteFolder(@PathVariable String spaceId,
-                                           @PathVariable Long folderId) {
+                                           @PathVariable String folderId) {
         ensureSpace(spaceId);
         folderService.unfavoriteFolder(folderId, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -232,7 +232,7 @@ public class FolderController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/share", method = POST)
     public ResponseEntity shareFolder(@PathVariable String spaceId,
-                                      @PathVariable Long folderId,
+                                      @PathVariable String folderId,
                                       @RequestBody ShareRepresentation representation) {
         ensureSpace(spaceId);
         folderService.shareFolder(folderId, representation.getShareWith(), userService.getCurrentUser());

@@ -11,9 +11,11 @@ import java.util.List;
  */
 public interface FolderDao {
 
+    Folder load(Serializable id);
+
     Folder get(Serializable id);
 
-    Folder getForUser(Long id, UserDetails currentUser);
+    Folder getForUser(String id, UserDetails currentUser);
 
     void update(Folder folder);
 
