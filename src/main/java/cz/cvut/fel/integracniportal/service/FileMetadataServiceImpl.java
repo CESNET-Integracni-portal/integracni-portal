@@ -1,6 +1,8 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.command.node.CreateFileCommand;
+import cz.cvut.fel.integracniportal.command.node.MoveFileCommand;
+import cz.cvut.fel.integracniportal.command.node.RenameFileCommand;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileState;
@@ -149,27 +151,22 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void renameFile(String fileId, String name) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
-        fileMetadata.setName(name);
-        updateFileMetadata(fileMetadata);
+        gateway.sendAndWait(new RenameFileCommand(
+                FileId.of(fileId),
+                name
+        ));
 
-        // TODO: bug #6 (calling api with already renamed file metadata)
-        getFileApi(fileMetadata.getSpace()).renameFile(fileMetadata, name);
+//        // TODO: bug #6 (calling api with already renamed file metadata)
+//        getFileApi(fileMetadata.getSpace()).renameFile(fileMetadata, name);
     }
 
     @Override
     public void moveFile(String fileId, String parentId) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
-        Folder parent = folderService.getFolderById(parentId);
-
-        if (file.getParent() != null && file.getParent().equals(parent)) {
-            return; // same parent, file not moved
-        }
-
-        file.setParent(parent);
-
-        updateFileMetadata(file);
-        getFileApi(file.getSpace()).moveFile(file, parent);
+        gateway.sendAndWait(new MoveFileCommand(
+                FileId.of(fileId),
+                FolderId.of(parentId)
+        ));
+//        getFileApi(file.getSpace()).moveFile(file, parent);
     }
 
     @Override
