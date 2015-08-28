@@ -5,7 +5,6 @@ import com.mysema.query.jpa.hibernate.HibernateQuery;
 import com.mysema.query.jpa.hibernate.HibernateSubQuery;
 import com.mysema.query.jpa.hibernate.HibernateUpdateClause;
 import com.mysema.query.types.EntityPath;
-import cz.cvut.fel.integracniportal.model.AbstractEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import java.io.Serializable;
 /**
  * @author Radek Jezdik
  */
-public class GenericHibernateDao<ENTITY extends AbstractEntity> {
+public class GenericHibernateDao<ENTITY> {
 
     private Class entityClass;
 

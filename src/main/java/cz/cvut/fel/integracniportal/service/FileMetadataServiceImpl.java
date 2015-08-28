@@ -150,7 +150,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void renameFile(String fileId, String name) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
-        fileMetadata.setFilename(name);
+        fileMetadata.setName(name);
         updateFileMetadata(fileMetadata);
 
         // TODO: bug #6 (calling api with already renamed file metadata)
@@ -215,7 +215,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     private void setFileMetadata(FileMetadata fileMetadata, MultipartFile file) {
-        fileMetadata.setFilename(file.getOriginalFilename());
+        fileMetadata.setName(file.getOriginalFilename());
         fileMetadata.setMimetype(file.getContentType());
         fileMetadata.setFilesize(file.getSize());
     }

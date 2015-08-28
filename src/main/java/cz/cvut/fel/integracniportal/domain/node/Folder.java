@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.domain.node;
 
 import cz.cvut.fel.integracniportal.domain.node.events.FolderCreatedEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedToRootEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderRenamedEvent;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
@@ -30,15 +31,25 @@ public class Folder extends AbstractNodeAggregateRoot {
     }
 
     public void renameFolder(String newName) {
-        if (!name.equals(newName)) {
-            apply(new FolderRenamedEvent(id, newName));
+        if (name.equals(newName)) {
+            return;
         }
+        apply(new FolderRenamedEvent(id, newName));
     }
 
-    public void moveFolder(FolderId newParent) {
-        if (!parentFolder.equals(newParent)) {
-            apply(new FolderMovedEvent(id, newParent));
+    public void moveFolder(FolderId newParent, UserId sentBy) {
+        if (parentFolder == null && newParent == null) {
+            return;
         }
+        if (parentFolder != null && parentFolder.equals(newParent)) {
+            return;
+        }
+
+        FolderMovedEvent event = (newParent != null)
+                ? new FolderMovedEvent(id, newParent)
+                : new FolderMovedToRootEvent(id, sentBy);
+
+        apply(event);
     }
 
     @EventSourcingHandler

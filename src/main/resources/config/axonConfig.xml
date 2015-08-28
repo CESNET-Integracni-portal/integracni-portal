@@ -8,7 +8,11 @@
 
     <axon:annotation-config />
 
-    <axon:command-bus id="commandBus" transaction-manager="transactionManager"/>
+    <axon:command-bus id="commandBus" transaction-manager="transactionManager">
+        <axon:dispatchInterceptors>
+            <bean class="cz.cvut.fel.integracniportal.command.node.AddUserCommandDispatchInterceptor"/>
+        </axon:dispatchInterceptors>
+    </axon:command-bus>
 
     <axon:event-bus id="eventBus"/>
 
@@ -19,8 +23,7 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
         <constructor-arg name="sqlSchema" ref="eventStoreSchema"/>
     </bean>
-    <axon:jdbc-event-store id="eventStore" sql-schema="eventStoreSchema" data-source="dataSource"
-                           event-entry-store-ref="eventEntryStore"/>
+    <axon:jdbc-event-store id="eventStore" data-source="dataSource" event-entry-store-ref="eventEntryStore"/>
 
     <bean class="org.axonframework.commandhandling.gateway.DefaultCommandGateway">
         <constructor-arg name="commandBus" ref="commandBus"/>

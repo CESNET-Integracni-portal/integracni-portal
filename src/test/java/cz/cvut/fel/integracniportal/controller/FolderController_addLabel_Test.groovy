@@ -9,6 +9,7 @@ import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation
 import cz.cvut.fel.integracniportal.service.FolderService
 import cz.cvut.fel.integracniportal.service.LabelService
 import cz.cvut.fel.integracniportal.service.UserDetailsService
+import org.junit.Ignore
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,8 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-@DatabaseSetup("classpath:fileMetadata.xml")
+@DatabaseSetup("classpath:user.xml")
 @Transactional
+@Ignore
 public class FolderController_addLabel_Test extends AbstractIntegrationTestCase {
 
     @Autowired

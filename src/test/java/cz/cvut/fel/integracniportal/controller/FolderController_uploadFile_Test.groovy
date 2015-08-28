@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.controller
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import org.junit.Ignore
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.mock.web.MockMultipartFile
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 @DatabaseSetup("classpath:fileMetadata.xml")
 @Transactional
+@Ignore
 public class FolderController_uploadFile_Test extends AbstractIntegrationTestCase {
 
     final FILE_NAME = "x.json"

@@ -45,11 +45,19 @@ public class File extends AbstractNodeAggregateRoot {
         apply(new FileRenamedEvent(id, newName));
     }
 
-    public void moveFile(FolderId newParent) {
-        if (parentFolder.equals(newParent)) {
+    public void moveFile(FolderId newParent, UserId sentBy) {
+        if (parentFolder == null && newParent == null) {
             return;
         }
-        apply(new FileMovedEvent(id, newParent));
+        if (parentFolder != null && parentFolder.equals(newParent)) {
+            return;
+        }
+
+        FileMovedEvent event = (newParent != null)
+                ? new FileMovedEvent(id, newParent)
+                : new FileMovedToRootEvent(id, sentBy);
+
+        apply(event);
     }
 
     public void moveFileOffline() {
@@ -64,6 +72,10 @@ public class File extends AbstractNodeAggregateRoot {
         apply(new StartMovingFileOnlineEvent(id));
     }
 
+    public void onMoveOfflineStart(StartMovingFileOfflineEvent event) {
+        fileState = FileState.MOVING_TO_OFFLINE;
+    }
+
     @EventSourcingHandler
     public void onFileCreated(FileCreatedEvent event) {
         id = event.getId();
@@ -76,7 +88,4 @@ public class File extends AbstractNodeAggregateRoot {
         fileState = event.getFileState();
     }
 
-    public void onMoveOfflineStart(StartMovingFileOfflineEvent event) {
-        fileState = FileState.MOVING_TO_OFFLINE;
-    }
 }

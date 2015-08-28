@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller
 
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import org.junit.Ignore
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.test.context.ContextConfiguration
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
+@Ignore
 public class SpaceController_getSpaces_Test extends AbstractIntegrationTestCase {
 
     @Test

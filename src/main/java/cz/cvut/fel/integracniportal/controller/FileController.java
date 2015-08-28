@@ -225,7 +225,7 @@ public class FileController extends AbstractController {
         InputStream fileStream = fileMetadataService.getFileAsInputStream(fileId);
 
         response.setContentType(fileMetadata.getMimetype());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getFilename() + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getName() + "\"");
         IOUtils.copy(fileStream, response.getOutputStream());
 
         response.flushBuffer();

@@ -4,6 +4,7 @@ import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderCreatedEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedToRootEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderRenamedEvent;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -56,6 +57,15 @@ public class FolderUpdater {
         Folder newParent = folderDao.load(event.getNewParent().getId());
 
         folder.setParent(newParent);
+
+        folderDao.update(folder);
+    }
+
+    @EventHandler
+    public void moveFolder(FolderMovedToRootEvent event) {
+        Folder folder = folderDao.load(event.getId().getId());
+
+        folder.setParent(null);
 
         folderDao.update(folder);
     }

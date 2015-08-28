@@ -10,13 +10,10 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class FolderCreatedEvent extends AbstractNodeEvent {
-
-    private FolderId id;
+public class FolderCreatedEvent extends NodeCreatedEvent<FolderId> {
 
     public FolderCreatedEvent(FolderId id, String name, FolderId parentFolder, UserId owner, String space) {
-        super(name, parentFolder, owner, space);
-        this.id = id;
+        super(id, name, parentFolder, owner, space);
     }
 
 }

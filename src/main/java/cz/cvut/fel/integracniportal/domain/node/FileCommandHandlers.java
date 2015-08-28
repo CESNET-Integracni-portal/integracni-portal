@@ -2,17 +2,16 @@ package cz.cvut.fel.integracniportal.domain.node;
 
 import cz.cvut.fel.integracniportal.command.node.*;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
+import cz.cvut.fel.integracniportal.dao.NodeNameDao;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileState;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.exceptions.DuplicateNameException;
-import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.model.Folder;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author Radek Jezdik
@@ -24,7 +23,10 @@ public class FileCommandHandlers {
     private Repository<File> repository;
 
     @Autowired
-    private FolderDao dao;
+    private FolderDao folderDao;
+
+    @Autowired
+    private NodeNameDao nodeNameDao;
 
     @CommandHandler
     public void handle(CreateFileCommand command) {
@@ -47,6 +49,12 @@ public class FileCommandHandlers {
         file.moveFileOffline();
     }
 
+    @CommandHandler
+    public void moveFileOnline(MoveFileOnlineCommand command) {
+        File file = repository.load(command.getId());
+        file.moveFileOnline();
+    }
+
     private void createFile(CreateFileCommand command) {
         File file = new File(
                 command.getId(),
@@ -57,6 +65,9 @@ public class FileCommandHandlers {
                 command.getSize(),
                 command.getMimetype(),
                 command.getFileState().orElse(FileState.ONLINE));
+
+        checkUniqueName(file.getName(), file.getParentFolder(), file, command);
+
         repository.add(file);
     }
 
@@ -67,58 +78,42 @@ public class FileCommandHandlers {
             return;
         }
 
-        Folder parent = dao.get(file.getParentFolder().getId());
+        checkUniqueName(command.getNewName(), file.getParentFolder(), file, command);
 
-        boolean fileNameExists = fileNameExistsInFolder(parent, command.getNewName());
-
-        if (fileNameExists == false) {
-            file.renameFile(command.getNewName());
-        } else {
-            throw new DuplicateNameException();
-        }
-
+        file.renameFile(command.getNewName());
     }
 
     private void moveFile(MoveFileCommand command) {
         File file = repository.load(command.getId());
 
-        if (file.getParentFolder().equals(command.getNewParent())) {
+        if (file.getParentFolder() == null && command.getNewParent() == null) {
+            return;
+        }
+        if (file.getParentFolder() != null && file.getParentFolder().equals(command.getNewParent())) {
             return;
         }
 
-        Folder newParentFolder = dao.get(command.getNewParent().getId());
+        checkUniqueName(file.getName(), command.getNewParent(), file, command);
 
-        boolean fileNameExists = fileNameExistsInFolder(newParentFolder, file.getName());
+        file.moveFile(command.getNewParent(), command.getSentBy());
+    }
 
-        if (fileNameExists == false) {
-            file.moveFile(command.getNewParent());
+    private void checkUniqueName(String name, FolderId parentFolder, File file, UserAwareCommand command) {
+        boolean exists;
+
+        if (parentFolder == null) {
+            exists = nodeNameDao.nameInRootExists(name, command.getSentBy(), file.getSpace());
         } else {
+            exists = nodeNameDao.nameExists(name, parentFolder);
+        }
+
+        if (exists) {
             throw new DuplicateNameException();
         }
-    }
-
-    private boolean fileNameExistsInFolder(Folder newParentFolder, String name) {
-        List<FileMetadata> files = newParentFolder.getFiles();
-
-        if (files == null) {
-            return false;
-        }
-
-        for (FileMetadata f : files) {
-            if (f.getFilename().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @CommandHandler
-    public void moveFileOnline(MoveFileOnlineCommand command) {
-        File file = repository.load(command.getId());
-        file.moveFileOnline();
     }
 
     public void setRepository(Repository<File> repository) {
         this.repository = repository;
     }
+
 }

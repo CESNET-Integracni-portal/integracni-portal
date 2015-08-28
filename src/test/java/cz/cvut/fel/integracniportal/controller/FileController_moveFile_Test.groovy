@@ -13,16 +13,14 @@ import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-
 /**
- * Test for {@link FolderController#moveFolder(java.lang.String, java.lang.Long, cz.cvut.fel.integracniportal.representation.FolderParentRepresentation)}
+ * Test for {@link FileController#moveFile(java.lang.String, java.lang.String, cz.cvut.fel.integracniportal.representation.FolderParentRepresentation)}
  *
  * @author Radek Jezdik
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-@DatabaseSetup("classpath:fileMetadata.xml")
+@DatabaseSetup("classpath:user.xml")
 public class FileController_moveFile_Test extends AbstractIntegrationTestCase {
 
     @Autowired
@@ -42,16 +40,30 @@ public class FileController_moveFile_Test extends AbstractIntegrationTestCase {
         assert dao.getByUUID("3").getParent().id == "2"
     }
 
-    @Test(expected = DuplicateNameException)
-    void "should throw exception on folder move resulting in duplicate folder names in a parent folder"() {
+    @Test
+    void "should move file to root"() {
         createFolder("1", "dir", null)
         createFile("2", "foo", "1")
-        createFile("3", "foo", null)
 
         commandGateway.sendAndWait(new MoveFileCommand(
-                FileId.of("3"),
+                FileId.of("2"),
+                null,
+        ));
+
+        assert dao.getByUUID("2").getParent() == null
+    }
+
+    @Test
+    void "should move file from root to subfolder"() {
+        createFolder("1", "dir", null)
+        createFile("2", "foo", null)
+
+        commandGateway.sendAndWait(new MoveFileCommand(
+                FileId.of("2"),
                 FolderId.of("1"),
         ));
+
+        assert dao.getByUUID("2").getParent().getId() == "1"
     }
 
     @Test
@@ -68,28 +80,52 @@ public class FileController_moveFile_Test extends AbstractIntegrationTestCase {
     }
 
     @Test
-    void "should return 400 when trying to move folder to itself"() {
-        def json = '{"parentId" : "1001"}'
+    void "moving file to the same folder which is the root does nothing"() {
+        createFile("2", "foo", null)
 
-        apiPost("space/cesnet/folder/1001/parentChange", json)
-                .andExpect(status().isBadRequest())
+        commandGateway.sendAndWait(new MoveFileCommand(
+                FileId.of("2"),
+                null,
+        ));
 
+        assert dao.getByUUID("2").getParent() == null
     }
 
     @Test
-    void "should return 404 error for non-existing folder"() {
-        def json = getResourceAsString("parentFolder.json");
+    void "should move file to the root folder"() {
+        createFolder("1", "dir", null)
+        createFile("2", "foo", "1")
 
-        apiPost("space/cesnet/folder/666/parentChange", json)
-                .andExpect(status().isNotFound())
+        commandGateway.sendAndWait(new MoveFileCommand(
+                FileId.of("2"),
+                null,
+        ));
+
+        assert dao.getByUUID("2").getParent() == null
     }
 
-    @Test
-    void "should return 404 error for non-existing space"() {
-        def json = getResourceAsString("parentFolder.json");
+    @Test(expected = DuplicateNameException)
+    void "should throw exception on file move resulting in duplicate file names in the parent folder"() {
+        createFolder("1", "dir", null)
+        createFile("2", "foo", "1")
+        createFile("3", "foo", null)
 
-        apiPost("space/xxx/folder/1001/parentChange", json)
-                .andExpect(status().isNotFound())
+        commandGateway.sendAndWait(new MoveFileCommand(
+                FileId.of("3"),
+                FolderId.of("1"),
+        ));
+    }
+
+    @Test(expected = DuplicateNameException)
+    void "should throw exception on file move resulting in duplicate file names in the parent folder which is the root folder"() {
+        createFolder("1", "dir", null)
+        createFile("2", "foo", "1")
+        createFile("3", "foo", null)
+
+        commandGateway.sendAndWait(new MoveFileCommand(
+                FileId.of("2"),
+                null,
+        ));
     }
 
 }

@@ -38,8 +38,8 @@ public class FileMetadataRepresentation {
     }
 
     public FileMetadataRepresentation(FileMetadata fileMetadata) {
-        uuid = fileMetadata.getUuid();
-        filename = fileMetadata.getFilename();
+        uuid = fileMetadata.getId();
+        filename = fileMetadata.getName();
         mimetype = fileMetadata.getMimetype();
         filesize = fileMetadata.getFilesize();
         if (fileMetadata.getOwner() != null) {

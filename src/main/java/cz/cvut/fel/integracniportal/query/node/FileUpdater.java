@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.domain.node.events.FileCreatedEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FileMovedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.FileMovedToRootEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.FileRenamedEvent;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -39,7 +40,7 @@ public class FileUpdater {
         FileMetadata file = new FileMetadata();
         file.setId(event.getId().getId());
         file.setOwner(owner);
-        file.setFilename(event.getName());
+        file.setName(event.getName());
         file.setSpace(event.getSpace());
         file.setMimetype(event.getMimetype());
         file.setFilesize(event.getSize());
@@ -55,7 +56,7 @@ public class FileUpdater {
     public void renameFile(FileRenamedEvent event) {
         FileMetadata file = fileDao.load(event.getId().getId());
 
-        file.setFilename(event.getNewName());
+        file.setName(event.getNewName());
 
         fileDao.update(file);
     }
@@ -67,6 +68,13 @@ public class FileUpdater {
 
         file.setParent(folder);
 
+        fileDao.update(file);
+    }
+
+    @EventHandler
+    public void moveFileToRoot(FileMovedToRootEvent event) {
+        FileMetadata file = fileDao.load(event.getId().getId());
+        file.setParent(null);
         fileDao.update(file);
     }
 

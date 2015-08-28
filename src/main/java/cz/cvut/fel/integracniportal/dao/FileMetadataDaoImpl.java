@@ -55,8 +55,8 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     @Override
     public List<FileMetadata> getFilesForDeletion() {
         return from(fileMetadata)
-                .where(fileMetadata.deleteOn.isNotNull())
-                .where(fileMetadata.deleteOn.lt(new Date()))
+                .where(fileMetadata.deletedOn.isNotNull())
+                .where(fileMetadata.deletedOn.lt(new Date()))
                 .list(fileMetadata);
     }
 
@@ -66,7 +66,7 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
                 .where(fileMetadata.owner.eq(owner))
                 .where(fileMetadata.parent.isNull())
                 .where(fileMetadata.space.eq(spaceId))
-                .orderBy(fileMetadata.filename.asc())
+                .orderBy(fileMetadata.name.asc())
                 .list(fileMetadata);
     }
 
@@ -81,7 +81,7 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
                         .leftJoin(file2.labels, label)
                         .where(label.labelId.notIn(labelIds).or(file2.labels.isEmpty()))
                         .list(file2)))
-                .orderBy(fileMetadata.filename.asc())
+                .orderBy(fileMetadata.name.asc())
                 .distinct()
                 .list(fileMetadata);
     }

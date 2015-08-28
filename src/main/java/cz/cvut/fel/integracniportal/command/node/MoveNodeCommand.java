@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-abstract public class MoveNodeCommand<T> {
+abstract public class MoveNodeCommand<T> extends UserAwareCommand {
 
     private final T id;
 

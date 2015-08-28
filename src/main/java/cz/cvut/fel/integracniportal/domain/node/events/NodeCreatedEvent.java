@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.domain.node.events;
 
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.NodeId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,9 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class AbstractNodeEvent {
+public class NodeCreatedEvent<T extends NodeId> {
+
+    protected T id;
 
     protected String name;
 

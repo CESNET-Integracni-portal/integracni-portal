@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-abstract public class RenameNodeCommand<T> {
+abstract public class RenameNodeCommand<T> extends UserAwareCommand {
 
     private final T id;
 

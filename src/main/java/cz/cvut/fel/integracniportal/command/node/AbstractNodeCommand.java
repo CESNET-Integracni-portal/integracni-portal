@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-abstract public class AbstractNodeCommand<T> {
+abstract public class AbstractNodeCommand<T> extends UserAwareCommand {
 
     protected final T id;
 

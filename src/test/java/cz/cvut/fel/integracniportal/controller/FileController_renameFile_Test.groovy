@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration
  */
 @ContextConfiguration(loader = SpringockitoWebContextLoader.class)
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
-@DatabaseSetup("classpath:fileMetadata.xml")
+@DatabaseSetup("classpath:user.xml")
 public class FileController_renameFile_Test extends AbstractIntegrationTestCase {
 
     @Autowired
@@ -35,19 +35,7 @@ public class FileController_renameFile_Test extends AbstractIntegrationTestCase 
                 "fooBar",
         ));
 
-        fileDao.getByUUID("2").getFilename() == "fooBar"
-    }
-
-    @Test(expected = DuplicateNameException)
-    void "should throw exception on file rename resulting in duplicate file names in a parent folder"() {
-        createFolder("1", "dir", null)
-        createFile("2", "foo", "1")
-        createFile("3", "bar", "1")
-
-        commandGateway.sendAndWait(new RenameFileCommand(
-                FileId.of("3"),
-                "foo",
-        ));
+        fileDao.getByUUID("2").getName() == "fooBar"
     }
 
     @Test
@@ -59,7 +47,30 @@ public class FileController_renameFile_Test extends AbstractIntegrationTestCase 
                 "foo"
         ))
 
-        assert fileDao.getByUUID("1").getFilename() == "foo"
+        assert fileDao.getByUUID("1").getName() == "foo"
+    }
+
+    @Test(expected = DuplicateNameException)
+    void "should throw exception on file rename resulting in duplicate file names in the parent folder"() {
+        createFolder("1", "dir", null)
+        createFile("2", "foo", "1")
+        createFile("3", "bar", "1")
+
+        commandGateway.sendAndWait(new RenameFileCommand(
+                FileId.of("3"),
+                "foo",
+        ));
+    }
+
+    @Test(expected = DuplicateNameException)
+    void "should throw exception on file rename resulting in duplicate file names in the parent folder which is the root folder"() {
+        createFile("1", "foo", null)
+        createFile("2", "bar", null)
+
+        commandGateway.sendAndWait(new RenameFileCommand(
+                FileId.of("2"),
+                "foo",
+        ));
     }
 
 }

@@ -12,9 +12,7 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class FileCreatedEvent extends AbstractNodeEvent {
-
-    protected FileId id;
+public class FileCreatedEvent extends NodeCreatedEvent<FileId> {
 
     private final long size;
 
@@ -23,8 +21,7 @@ public class FileCreatedEvent extends AbstractNodeEvent {
     private final FileState fileState;
 
     public FileCreatedEvent(FileId id, String name, FolderId parentFolder, UserId owner, String space, long size, String mimetype, FileState fileState) {
-        super(name, parentFolder, owner, space);
-        this.id = id;
+        super(id, name, parentFolder, owner, space);
         this.size = size;
         this.mimetype = mimetype;
         this.fileState = fileState;

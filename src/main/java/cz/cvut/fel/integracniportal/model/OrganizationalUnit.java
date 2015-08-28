@@ -5,11 +5,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "organization_unit")
-public class OrganizationalUnit extends AbstractEntity<Long>{
+public class OrganizationalUnit extends AbstractEntity<Long> {
 
     @Id
     @GeneratedValue
-    @Column(name="unit_id")
+    @Column(name = "unit_id")
     private Long unitId;
 
     @Column(unique = true, nullable = false)

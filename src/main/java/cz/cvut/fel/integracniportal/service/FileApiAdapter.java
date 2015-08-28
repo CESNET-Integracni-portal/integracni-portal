@@ -143,7 +143,7 @@ public class FileApiAdapter {
         FileDefinition fileDefinition = new FileDefinition();
 
         fileDefinition.setId(fileMetadata.getId());
-        fileDefinition.setName(fileMetadata.getFilename());
+        fileDefinition.setName(fileMetadata.getName());
         fileDefinition.setSize(fileMetadata.getFilesize());
         fileDefinition.setMimeType(fileMetadata.getMimetype());
         fileDefinition.setDateCreated(fileMetadata.getCreatedOn());
