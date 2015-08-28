@@ -4,6 +4,7 @@ import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
 import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand;
 import cz.cvut.fel.integracniportal.command.node.RenameFolderCommand;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
+import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,9 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
     private void moveFolder(MoveFolderCommand command) {
         Folder folder = repository.load(command.getId());
 
+        if (folder.getId().equals(command.getNewParent())) {
+            throw new IllegalOperationException("Cannot move folder to itself");
+        }
         if (folder.getParentFolder() == null && command.getNewParent() == null) {
             return;
         }

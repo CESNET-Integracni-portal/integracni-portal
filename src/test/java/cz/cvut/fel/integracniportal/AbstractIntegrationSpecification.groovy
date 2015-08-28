@@ -13,8 +13,6 @@ import org.apache.commons.io.IOUtils
 import org.axonframework.commandhandling.gateway.CommandGateway
 import org.junit.After
 import org.junit.Before
-import org.junit.runner.RunWith
-import org.kubek2k.springockito.annotations.experimental.junit.AbstractJUnit4SpringockitoContextTests
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -30,12 +28,13 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.web.context.WebApplicationContext
+import spock.lang.Specification
 
 import javax.sql.DataSource
 
@@ -45,21 +44,20 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 /**
  * @author Radek Jezdik
  */
-@RunWith(SpringJUnit4ClassRunner)
 @WebAppConfiguration
 @ContextConfiguration(locations = [
         "file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml",
         "classpath:config/test-applicationContext.xml"
 ])
-@TestExecutionListeners([TransactionDbUnitTestExecutionListener, TransactionalTestExecutionListener])
+@TestExecutionListeners([TransactionDbUnitTestExecutionListener, TransactionalTestExecutionListener, DependencyInjectionTestExecutionListener])
 @DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public abstract class AbstractIntegrationTestCase extends AbstractJUnit4SpringockitoContextTests {
+abstract class AbstractIntegrationSpecification extends Specification {
 
     protected MockMvc mockMvc
 
     @Autowired
-	protected WebApplicationContext wac
+    protected WebApplicationContext wac
 
     @Autowired
     protected MethodSecurityInterceptor securityInterceptor
@@ -73,9 +71,9 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     @Autowired
     protected CommandGateway commandGateway
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this)
+    @Before
+    public void setupIntegrationTest() {
+        MockitoAnnotations.initMocks(this)
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(new User("test", "password", []), "test", [])
 
@@ -87,7 +85,7 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 
         def defaultRequest = get("dummy").session(session)
         this.mockMvc = webAppContextSetup(this.wac).defaultRequest(defaultRequest).build()
-	}
+    }
 
     @After
     public void drop() {
@@ -100,16 +98,16 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
     }
 
     public ResultActions apiGet(String urlTemplate) throws Exception {
-		return mockMvc.perform(
-				get(fromApi(urlTemplate))
-		)
-	}
+        return mockMvc.perform(
+                get(fromApi(urlTemplate))
+        )
+    }
 
-	public ResultActions apiPost(String urlTemplate) throws Exception {
+    public ResultActions apiPost(String urlTemplate) throws Exception {
         return mockMvc.perform(
                 post(fromApi(urlTemplate))
         )
-	}
+    }
 
     public ResultActions apiPost(String urlTemplate, String content) throws Exception {
         return mockMvc.perform(
@@ -133,8 +131,8 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         )
     }
 
-	public static String fromApi(String urlTemplate) {
-		return "/rest/v0.2/" + urlTemplate
+    public static String fromApi(String urlTemplate) {
+        return "/rest/v0.2/" + urlTemplate
     }
 
     public InputStream getResource(String name) {
