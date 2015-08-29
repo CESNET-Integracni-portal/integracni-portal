@@ -27,10 +27,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("3", "dst", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("2"),
-                    FolderId.of("3")
-            ))
+            dispatch new MoveFolderCommand(FolderId.of("2"), FolderId.of("3"))
 
         then:
              folderDao.get("2").getParent().getId() == "3"
@@ -43,10 +40,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("2"),
-                    null,
-            ));
+            dispatch new MoveFolderCommand(FolderId.of("2"), null)
 
         then:
              folderDao.get("2").getParent() == null
@@ -58,10 +52,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("2", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("2"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFolderCommand(FolderId.of("2"), FolderId.of("1"))
 
         then:
              folderDao.get("2").getParent().getId() == "1"
@@ -73,10 +64,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("2", "dir", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("1"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFolderCommand(FolderId.of("1"), FolderId.of("1"))
 
         then:
             thrown(IllegalOperationException)
@@ -88,10 +76,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("2", "dir", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("2"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFolderCommand(FolderId.of("2"), FolderId.of("1"))
 
         then:
              folderDao.get("2").getParent().getId() == "1"
@@ -102,10 +87,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("1", "root", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("1"),
-                    null,
-            ));
+            dispatch new MoveFolderCommand(FolderId.of("1"), null)
 
         then:
              folderDao.get("1").getParent() == null
@@ -118,10 +100,7 @@ public class MoveFolderIntegrationSpec extends AbstractIntegrationSpecification 
             createFolder("3", "fooBar", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFolderCommand(
-                    FolderId.of("2"),
-                    null
-            ))
+            dispatch new MoveFolderCommand(FolderId.of("2"), null)
 
         then:
             thrown(DuplicateNameException)

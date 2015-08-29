@@ -1,24 +1,25 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.command.label.*;
 import cz.cvut.fel.integracniportal.dao.LabelDao;
-import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
-import cz.cvut.fel.integracniportal.exceptions.InvalidStateException;
+import cz.cvut.fel.integracniportal.domain.label.valueobjects.LabelId;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.NodeId;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.Label;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.representation.LabelIdRepresentation;
 import cz.cvut.fel.integracniportal.representation.LabelRepresentation;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
- * Created by Vavat on 24. 3. 2015.
+ *
  */
 @Service
 @Transactional
@@ -28,35 +29,19 @@ public class LabelServiceImpl implements LabelService {
     private LabelDao labelDao;
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private FolderService folderService;
-
-    @Autowired
-    private FileMetadataService fileMetadataService;
+    private CommandGateway commandGateway;
 
     @Override
-    public List<Label> getAllLabels() {
-        return labelDao.getAllLabels();
-    }
-
-    @Override
-    public List<Label> getUserLabels(long userId) {
-        List<Label> result = labelDao.getUserLabels(userId);
+    public List<Label> getUserLabels(UserDetails owner) {
+        List<Label> result = labelDao.getUserLabels(owner.getId());
         if (result == null) {
-            throw new NotFoundException("labels.notFound.user.id", userId);
+            throw new NotFoundException("labels.notFound.user.id", owner);
         }
         return result;
     }
 
     @Override
-    public Label getLabelByName(String name) {
-        return labelDao.getLabelByName(name);
-    }
-
-    @Override
-    public Label getLabelById(long labelId) {
+    public Label getLabelById(String labelId) {
         Label label = labelDao.get(labelId);
         if (label == null) {
             throw new NotFoundException("label.notFound.id", labelId);
@@ -66,125 +51,67 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Label createLabel(LabelRepresentation labelRepresentation, UserDetails owner) {
-        if (getLabelByName(labelRepresentation.getName()) != null) {
-            throw new AlreadyExistsException("label.alreadyExists");
-        }
-        Label label = new Label();
-        updateLabelFromRepresentation(label, labelRepresentation);
-        label.setOwner(owner);
-        labelDao.save(label);
-        return label;
+        String id = UUID.randomUUID().toString();
+
+        commandGateway.sendAndWait(new CreateLabelCommand(
+                LabelId.of(id),
+                labelRepresentation.getName(),
+                labelRepresentation.getColor()
+        ));
+
+        return labelDao.get(id);
     }
 
     @Override
-    public Label updateLabel(Long labelId, LabelRepresentation labelRepresentation) {
-        Label label = getLabelById(labelId);
-        updateLabelFromRepresentation(label, labelRepresentation);
-        labelDao.save(label);
-        return label;
-    }
+    public Label updateLabel(String labelId, LabelRepresentation labelRepresentation) {
+        commandGateway.sendAndWait(new UpdateLabelCommand(
+                LabelId.of(labelId),
+                labelRepresentation.getName(),
+                labelRepresentation.getColor()
+        ));
 
-    private void updateLabelFromRepresentation(Label label, LabelRepresentation labelRepresentation) {
-        if (labelRepresentation.getName() != null) {
-            label.setName(labelRepresentation.getName());
-        }
-        if (labelRepresentation.getColor() != null) {
-            label.setColor(labelRepresentation.getColor());
-        }
+        return labelDao.get(labelId);
     }
 
     @Override
-    public void saveLabel(Label label) {
-        labelDao.save(label);
+    public void deleteLabel(String labelId) {
+        commandGateway.sendAndWait(new DeleteLabelCommand(
+                LabelId.of(labelId)
+        ));
     }
 
     @Override
-    public void removeLabel(Label label) {
-        labelDao.delete(label);
+    public void addLabelToFile(String fileId, String labelId) {
+        addLabelToNode(FileId.of(fileId), labelId);
     }
 
     @Override
-    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
-        Label label = getLabelById(representation.getLabelId());
-        if (label.getOwner().getId().equals(currentUser.getId()) == false) {
-            throw new InvalidStateException("Could not add label of other user");
-        }
-        if (file.getLabels() == null) {
-            file.setLabels(new ArrayList<Label>());
-        }
-        if (containsLabel(label, file.getLabels())) {
-            throw new AlreadyExistsException("label.alreadyExists.onFile.id", file.getId());
-        } else {
-            file.getLabels().add(label);
-        }
-        fileMetadataService.updateFileMetadata(file);
+    public void removeLabelFromFile(String fileId, String labelId) {
+        removeLabelToNode(FileId.of(fileId), labelId);
     }
 
     @Override
-    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
-        List<Label> labels = file.getLabels();
-        if (labels == null) {
-            throw new NotFoundException("label.onFile.notFound.id", representation.getLabelId());
-        }
-        for (Label label : labels) {
-            if (label.getLabelId().equals(representation.getLabelId())) {
-                if (label.getOwner().getId().equals(currentUser.getId()) == false) {
-                    throw new InvalidStateException("Could not add label of other user");
-                }
-                labels.remove(label);
-                break;
-            }
-        }
-        file.setLabels(labels);
-        fileMetadataService.updateFileMetadata(file);
+    public void addLabelToFolder(String folderId, String labelId) {
+        addLabelToNode(FolderId.of(folderId), labelId);
     }
 
     @Override
-    public void addLabelToFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
-        Folder folder = folderService.getFolderById(folderId);
-        Label label = getLabelById(representation.getLabelId());
-        if (label.getOwner().getId().equals(currentUser.getId()) == false) {
-            throw new InvalidStateException("Could not add label of other user");
-        }
-        if (folder.getLabels() == null) {
-            folder.setLabels(new ArrayList<Label>());
-        }
-        if (folder.getLabels().contains(label)) {
-            throw new AlreadyExistsException("label.alreadyExists.onFolder.id", folder.getId());
-        } else {
-            folder.getLabels().add(label);
-        }
-        folderService.updateFolder(folder);
+    public void removeLabelFromFolder(String folderId, String labelId) {
+        removeLabelToNode(FolderId.of(folderId), labelId);
     }
 
-    @Override
-    public void removeLabelFromFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
-        Folder folder = folderService.getFolderById(folderId);
-        List<Label> labels = folder.getLabels();
-        if (labels == null) {
-            throw new NotFoundException("label.onFolder.notFound.id", representation.getLabelId());
-        }
-        for (Label label : labels) {
-            if (label.getLabelId().equals(representation.getLabelId())) {
-                if (label.getOwner().getId().equals(currentUser.getId()) == false) {
-                    throw new InvalidStateException("Could not add label of other user");
-                }
-                labels.remove(label);
-                break;
-            }
-        }
-        folder.setLabels(labels);
-        folderService.updateFolder(folder);
+    private void addLabelToNode(NodeId nodeId, String labelId) {
+        commandGateway.sendAndWait(new AddLabelToNodeCommand(
+                LabelId.of(labelId),
+                nodeId
+        ));
     }
 
-    private boolean containsLabel(Label label, List<Label> list) {
-        for (Label tmp : list) {
-            if (tmp.getLabelId().equals(label.getLabelId())) {
-                return true;
-            }
-        }
-        return false;
+    private void removeLabelToNode(NodeId nodeId, String labelId) {
+        commandGateway.sendAndWait(new RemoveLabelFromNodeCommand(
+                LabelId.of(labelId),
+                nodeId
+        ));
     }
+
 }

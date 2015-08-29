@@ -8,7 +8,7 @@ import java.util.List;
 import static cz.cvut.fel.integracniportal.model.QLabel.label;
 
 /**
- * Created by Vavat on 7. 3. 2015.
+ *
  */
 @Repository
 public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao {
@@ -24,17 +24,19 @@ public class LabelDaoImpl extends GenericHibernateDao<Label> implements LabelDao
     }
 
     @Override
-    public List<Label> getUserLabels(long id) {
+    public List<Label> getUserLabels(Long ownerId) {
         return from(label)
-                .where(label.owner.userId.eq(id))
+                .where(label.owner.userId.eq(ownerId))
                 .list(label);
     }
 
     @Override
-    public Label getLabelByName(String name) {
+    public boolean labelExists(Long ownerId, String name, String color) {
         return from(label)
+                .where(label.owner.userId.eq(ownerId))
                 .where(label.name.eq(name))
-                .uniqueResult(label);
+                .where(label.color.eq(color))
+                .exists();
     }
 
 }

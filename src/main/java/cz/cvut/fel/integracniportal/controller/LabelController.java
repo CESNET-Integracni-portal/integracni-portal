@@ -32,7 +32,7 @@ public class LabelController extends AbstractController {
     @RequestMapping(value = "/v0.2/label", method = RequestMethod.GET)
     @ResponseBody
     public List<LabelRepresentation> getLabels() {
-        List<Label> labelList = labelService.getAllLabels();
+        List<Label> labelList = labelService.getUserLabels(userService.getCurrentUser());
         List<LabelRepresentation> result = new ArrayList<LabelRepresentation>(labelList.size());
         for (Label label : labelList) {
             result.add(new LabelRepresentation(label));
@@ -53,28 +53,28 @@ public class LabelController extends AbstractController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.2/label/{labelId}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateLabel(@PathVariable("labelid") Long labelId,
+    public ResponseEntity updateLabel(@PathVariable("labelId") String labelId,
                                       @RequestBody LabelRepresentation labelRepresentation) {
         labelService.updateLabel(labelId, labelRepresentation);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v0.2/label/{labelId}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity getLabel(@PathVariable("labelid") Long labelId) {
+    public ResponseEntity getLabel(@PathVariable("labelId") String labelId) {
         Label label = labelService.getLabelById(labelId);
         LabelRepresentation labelRepresentation = new LabelRepresentation(label);
         return new ResponseEntity(labelRepresentation, HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/label/{labelid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v0.2/label/{labelId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteLabel(@PathVariable("labelid") Long labelId) {
-        labelService.removeLabel(labelService.getLabelById(labelId));
+    public ResponseEntity deleteLabel(@PathVariable("labelId") String labelId) {
+        labelService.deleteLabel(labelId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

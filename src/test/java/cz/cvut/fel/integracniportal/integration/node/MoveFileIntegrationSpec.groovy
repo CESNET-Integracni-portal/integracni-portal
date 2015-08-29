@@ -27,10 +27,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("3", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("3"),
-                    FolderId.of("2"),
-            ));
+            dispatch new MoveFileCommand(FileId.of("3"), FolderId.of("2"))
 
         then:
             dao.getByUUID("3").getParent().id == "2"
@@ -42,10 +39,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    null,
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"), null)
 
         then:
             dao.getByUUID("2").getParent() == null
@@ -57,10 +51,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("2", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"), FolderId.of("1"))
 
         then:
             dao.getByUUID("2").getParent().getId() == "1"
@@ -72,10 +63,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"), FolderId.of("1"))
 
         then:
             dao.getByUUID("2").getParent().getId() == "1"
@@ -86,10 +74,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("2", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    null,
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"), null)
 
         then:
             dao.getByUUID("2").getParent() == null
@@ -101,10 +86,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    null,
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"), null)
 
         then:
             dao.getByUUID("2").getParent() == null
@@ -117,10 +99,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("3", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("3"),
-                    FolderId.of("1"),
-            ));
+            dispatch new MoveFileCommand(FileId.of("3"), FolderId.of("1"))
 
         then:
             thrown(DuplicateNameException)
@@ -133,10 +112,7 @@ public class MoveFileIntegrationSpec extends AbstractIntegrationSpecification {
             createFile("3", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new MoveFileCommand(
-                    FileId.of("2"),
-                    null,
-            ));
+            dispatch new MoveFileCommand(FileId.of("2"),null)
 
         then:
             thrown(DuplicateNameException)

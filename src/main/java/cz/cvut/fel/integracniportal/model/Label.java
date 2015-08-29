@@ -9,12 +9,11 @@ import javax.persistence.*;
 @Table(name = "label", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "color", "owner"})
 })
-public class Label extends AbstractEntity<Long> {
+public class Label extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue
     @Column(name = "label_id")
-    private Long labelId;
+    private String labelId;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -27,20 +26,20 @@ public class Label extends AbstractEntity<Long> {
     private UserDetails owner;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return labelId;
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(String id) {
         this.labelId = id;
     }
 
-    public Long getLabelId() {
+    public String getLabelId() {
         return labelId;
     }
 
-    public void setLabelId(Long labelId) {
+    public void setLabelId(String labelId) {
         this.labelId = labelId;
     }
 

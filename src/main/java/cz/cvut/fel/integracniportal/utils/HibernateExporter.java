@@ -1,11 +1,12 @@
-package cz.cvut.fel.integracniportal.service;
+package cz.cvut.fel.integracniportal.utils;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
 
-import java.io.*;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 /**
  * @author Radek Jezdik
@@ -32,21 +33,16 @@ public class HibernateExporter {
         Dialect hibDialect = Dialect.getDialect(hibernateConfiguration.getProperties());
         PrintWriter writer = new PrintWriter(out);
 
-            if (generateCreateQueries) {
-                String[] createSQL = hibernateConfiguration.generateSchemaCreationScript(hibDialect);
-                write(writer, createSQL, FormatStyle.DDL.getFormatter());
-            }
-            if (generateDropQueries) {
-                String[] dropSQL = hibernateConfiguration.generateDropSchemaScript(hibDialect);
-                write(writer, dropSQL, FormatStyle.DDL.getFormatter());
-            }
+        if (generateCreateQueries) {
+            String[] createSQL = hibernateConfiguration.generateSchemaCreationScript(hibDialect);
+            write(writer, createSQL, FormatStyle.DDL.getFormatter());
+        }
+        if (generateDropQueries) {
+            String[] dropSQL = hibernateConfiguration.generateDropSchemaScript(hibDialect);
+            write(writer, dropSQL, FormatStyle.DDL.getFormatter());
+        }
         writer.flush();
         writer.close();
-    }
-
-    public void export(File exportFile) throws FileNotFoundException {
-
-        export(new FileOutputStream(exportFile), generateCreateQueries, generateDropQueries);
     }
 
     public void exportToConsole() {
@@ -64,15 +60,17 @@ public class HibernateExporter {
 
         hibernateConfiguration = new Configuration();
 
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Folder.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.FileMetadata.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Node.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Group.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Label.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.OrganizationalUnit.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Permission.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserDetails.class);
-            hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserRole.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Node.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Folder.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.FileMetadata.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.NodeName.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Group.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Label.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.OrganizationalUnit.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Permission.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserDetails.class);
+        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserRole.class);
+
         hibernateConfiguration.setProperty("hibernate.dialect", dialect);
         return hibernateConfiguration;
     }
@@ -94,8 +92,8 @@ public class HibernateExporter {
     }
 
     public static void main(String[] args) {
-      HibernateExporter exporter = new HibernateExporter("org.hibernate.dialect.PostgreSQLDialect", "com.geowarin.model");
-//        HibernateExporter exporter = new HibernateExporter("org.hibernate.dialect.MySQL5Dialect", "com.geowarin.model");
+        HibernateExporter exporter = new HibernateExporter("org.hibernate.dialect.HSQLDialect", "com.geowarin.model");
         exporter.exportToConsole();
     }
+
 }

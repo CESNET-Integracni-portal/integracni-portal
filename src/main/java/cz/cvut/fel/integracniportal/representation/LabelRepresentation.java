@@ -9,7 +9,7 @@ import cz.cvut.fel.integracniportal.model.Label;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LabelRepresentation {
 
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -32,11 +32,11 @@ public class LabelRepresentation {
         this.color = color;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

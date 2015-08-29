@@ -24,10 +24,7 @@ public class RenameFolderIntegrationSpec extends AbstractIntegrationSpecificatio
             createFolder("1", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new RenameFolderCommand(
-                    FolderId.of("1"),
-                    "foo"
-            ))
+            dispatch new RenameFolderCommand(FolderId.of("1"), "foo")
 
         then:
             folderDao.get("1").getName() == "foo";
@@ -39,10 +36,7 @@ public class RenameFolderIntegrationSpec extends AbstractIntegrationSpecificatio
             createFolder("2", "bar", null)
 
         when:
-            commandGateway.sendAndWait(new RenameFolderCommand(
-                    FolderId.of("2"),
-                    "foo"
-            ))
+            dispatch new RenameFolderCommand(FolderId.of("2"), "foo")
 
         then:
             thrown(DuplicateNameException)
@@ -55,10 +49,7 @@ public class RenameFolderIntegrationSpec extends AbstractIntegrationSpecificatio
             createFolder("3", "bar", "1")
 
         when:
-            commandGateway.sendAndWait(new RenameFolderCommand(
-                    FolderId.of("3"),
-                    "foo"
-            ))
+            dispatch new RenameFolderCommand(FolderId.of("3"), "foo")
 
         then:
             thrown(DuplicateNameException)
@@ -70,10 +61,7 @@ public class RenameFolderIntegrationSpec extends AbstractIntegrationSpecificatio
             createFolder("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new RenameFolderCommand(
-                    FolderId.of("2"),
-                    "foo"
-            ))
+            dispatch new RenameFolderCommand(FolderId.of("2"), "foo")
 
         then:
             noExceptionThrown()

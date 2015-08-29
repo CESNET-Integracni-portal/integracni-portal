@@ -176,7 +176,7 @@ public class FolderController extends AbstractController {
                                    @PathVariable String folderId,
                                    @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.addLabelToFolder(folderId, representation, userService.getCurrentUser());
+        labelService.addLabelToFolder(folderId, representation.getLabelId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -191,7 +191,7 @@ public class FolderController extends AbstractController {
                                       @PathVariable String folderId,
                                       @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
-        labelService.removeLabelFromFolder(folderId, representation, userService.getCurrentUser());
+        labelService.removeLabelFromFolder(folderId, representation.getLabelId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

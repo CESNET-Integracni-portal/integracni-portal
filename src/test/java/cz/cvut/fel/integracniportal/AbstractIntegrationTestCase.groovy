@@ -2,12 +2,7 @@ package cz.cvut.fel.integracniportal
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
 import com.github.springtestdbunit.annotation.DbUnitConfiguration
-import cz.cvut.fel.integracniportal.command.node.CreateFileCommand
-import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao
-import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId
-import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
-import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId
 import cz.cvut.fel.integracniportal.model.UserDetails
 import org.apache.commons.io.IOUtils
 import org.axonframework.commandhandling.gateway.CommandGateway
@@ -53,7 +48,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 ])
 @TestExecutionListeners([TransactionDbUnitTestExecutionListener, TransactionalTestExecutionListener])
 @DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public abstract class AbstractIntegrationTestCase extends AbstractJUnit4SpringockitoContextTests {
 
     protected MockMvc mockMvc
@@ -143,30 +138,6 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
 
     public String getResourceAsString(String name) {
         return IOUtils.toString(getResource(name));
-    }
-
-    public void createFolder(String id, String name, String parentId, long ownerId = 1, String space = "cesnet") {
-        commandGateway.sendAndWait(new CreateFolderCommand(
-                FolderId.of(id),
-                name,
-                parentId == null ? null : FolderId.of(parentId),
-                UserId.of(ownerId),
-                space
-        ))
-    }
-
-    public void createFile(String id, String name, String parentId, long ownerId = 1, String space = "cesnet",
-                           long size = 1, String mimetype = "application/json") {
-        commandGateway.sendAndWait(new CreateFileCommand(
-                FileId.of(id),
-                name,
-                parentId == null ? null : FolderId.of(parentId),
-                UserId.of(ownerId),
-                space,
-                size,
-                mimetype,
-                Optional.empty()
-        ))
     }
 
 }

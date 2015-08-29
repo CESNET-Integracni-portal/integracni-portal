@@ -3,11 +3,9 @@ package cz.cvut.fel.integracniportal.domain.node;
 import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
 import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand;
 import cz.cvut.fel.integracniportal.command.node.RenameFolderCommand;
-import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.Repository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,9 +18,6 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
 
     @Resource(name = "folderAggregateRepository")
     private Repository<Folder> repository;
-
-    @Autowired
-    private FolderDao dao;
 
     @CommandHandler
     public void handle(CreateFolderCommand command) {

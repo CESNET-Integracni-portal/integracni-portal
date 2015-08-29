@@ -7,13 +7,13 @@ package cz.cvut.fel.integracniportal.representation;
  */
 public class LabelIdRepresentation {
 
-    private Long labelId;
+    private String labelId;
 
-    public Long getLabelId() {
+    public String getLabelId() {
         return labelId;
     }
 
-    public void setLabelId(Long labelId) {
+    public void setLabelId(String labelId) {
         this.labelId = labelId;
     }
 }

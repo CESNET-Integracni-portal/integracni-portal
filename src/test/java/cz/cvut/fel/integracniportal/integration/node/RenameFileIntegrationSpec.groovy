@@ -25,10 +25,7 @@ public class RenameFileIntegrationSpec extends AbstractIntegrationSpecification 
             createFile("2", "foo", "1")
 
         when:
-            commandGateway.sendAndWait(new RenameFileCommand(
-                    FileId.of("2"),
-                    "fooBar"
-            ));
+            dispatch new RenameFileCommand(FileId.of("2"), "fooBar")
 
         then:
             fileDao.getByUUID("2").getName() == "fooBar"
@@ -39,10 +36,7 @@ public class RenameFileIntegrationSpec extends AbstractIntegrationSpecification 
             createFile("1", "foo", null)
 
         when:
-            commandGateway.sendAndWait(new RenameFileCommand(
-                    FileId.of("1"),
-                    "foo"
-            ))
+            dispatch new RenameFileCommand(FileId.of("1"), "foo")
 
         then:
             fileDao.getByUUID("1").getName() == "foo"
@@ -55,10 +49,7 @@ public class RenameFileIntegrationSpec extends AbstractIntegrationSpecification 
             createFile("3", "bar", "1")
 
         when:
-            commandGateway.sendAndWait(new RenameFileCommand(
-                    FileId.of("3"),
-                    "foo"
-            ));
+            dispatch new RenameFileCommand(FileId.of("3"), "foo")
 
         then:
             thrown(DuplicateNameException)
@@ -70,10 +61,7 @@ public class RenameFileIntegrationSpec extends AbstractIntegrationSpecification 
             createFile("2", "bar", null)
 
         when:
-            commandGateway.sendAndWait(new RenameFileCommand(
-                    FileId.of("2"),
-                    "foo"
-            ));
+            dispatch new RenameFileCommand(FileId.of("2"), "foo")
 
         then:
             thrown(DuplicateNameException)

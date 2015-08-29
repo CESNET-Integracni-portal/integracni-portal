@@ -11,6 +11,8 @@ import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId
 import cz.cvut.fel.integracniportal.model.UserDetails
 import org.apache.commons.io.IOUtils
 import org.axonframework.commandhandling.gateway.CommandGateway
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.junit.After
 import org.junit.Before
 import org.mockito.MockitoAnnotations
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.mock.web.MockHttpSession
+import org.springframework.orm.hibernate3.SessionFactoryUtils
 import org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -29,6 +32,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -49,9 +53,14 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml",
         "classpath:config/test-applicationContext.xml"
 ])
-@TestExecutionListeners([TransactionDbUnitTestExecutionListener, TransactionalTestExecutionListener, DependencyInjectionTestExecutionListener])
+@TestExecutionListeners([
+        TransactionDbUnitTestExecutionListener,
+        TransactionalTestExecutionListener,
+        DependencyInjectionTestExecutionListener,
+        DirtiesContextTestExecutionListener
+])
 @DbUnitConfiguration(dataSetLoader = XmlDataSetLoader)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 abstract class AbstractIntegrationSpecification extends Specification {
 
     protected MockMvc mockMvc
@@ -71,6 +80,11 @@ abstract class AbstractIntegrationSpecification extends Specification {
     @Autowired
     protected CommandGateway commandGateway
 
+    @Autowired
+    private SessionFactory sessionFactory
+
+    private Session session
+
     @Before
     public void setupIntegrationTest() {
         MockitoAnnotations.initMocks(this)
@@ -89,8 +103,22 @@ abstract class AbstractIntegrationSpecification extends Specification {
 
     @After
     public void drop() {
-        def template = new JdbcTemplate(dataSource)
-        template.execute("TRUNCATE SCHEMA public AND COMMIT")
+        if (dataSource) {
+            def template = new JdbcTemplate(dataSource)
+            template.execute("TRUNCATE SCHEMA public AND COMMIT")
+        }
+        if (session) {
+            session.close()
+            session = null
+        }
+    }
+
+    public <T> T get(Class<T> clas, Serializable id) {
+        if (session) {
+            session.close()
+        }
+        session = SessionFactoryUtils.getNewSession(sessionFactory)
+        return (T) session.get(clas, id)
     }
 
     public UserDetails getUser(id) {
@@ -143,8 +171,12 @@ abstract class AbstractIntegrationSpecification extends Specification {
         return IOUtils.toString(getResource(name));
     }
 
+    public void dispatch(Object command) {
+        commandGateway.sendAndWait(command)
+    }
+
     public void createFolder(String id, String name, String parentId, long ownerId = 1, String space = "cesnet") {
-        commandGateway.sendAndWait(new CreateFolderCommand(
+        dispatch(new CreateFolderCommand(
                 FolderId.of(id),
                 name,
                 parentId == null ? null : FolderId.of(parentId),
@@ -155,7 +187,7 @@ abstract class AbstractIntegrationSpecification extends Specification {
 
     public void createFile(String id, String name, String parentId, long ownerId = 1, String space = "cesnet",
                            long size = 1, String mimetype = "application/json") {
-        commandGateway.sendAndWait(new CreateFileCommand(
+        dispatch(new CreateFileCommand(
                 FileId.of(id),
                 name,
                 parentId == null ? null : FolderId.of(parentId),
