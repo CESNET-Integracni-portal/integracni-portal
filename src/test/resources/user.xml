@@ -22,5 +22,11 @@
             <value>password</value>
             <value>1</value>
         </row>
+        <row>
+            <value>2</value>
+            <value>test2</value>
+            <value>password</value>
+            <value>1</value>
+        </row>
     </table>
 </dataset>
