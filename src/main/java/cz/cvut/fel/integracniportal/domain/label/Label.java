@@ -31,11 +31,6 @@ public class Label extends AbstractAnnotatedAggregateRoot<LabelId> {
 
     private Set<NodeId> labeledNodes = new HashSet<NodeId>();
 
-    public Label(LabelId id, Set<NodeId> labeledNodes) {
-        this.id = id;
-        this.labeledNodes = labeledNodes;
-    }
-
     public Label(LabelId id, String name, String color, UserId owner) {
         apply(new LabelCreatedEvent(id, name, color, owner));
     }

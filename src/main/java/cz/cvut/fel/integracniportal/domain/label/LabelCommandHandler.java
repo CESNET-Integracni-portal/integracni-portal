@@ -48,7 +48,6 @@ public class LabelCommandHandler {
         removeLabelFromNode(command);
     }
 
-    @CommandHandler
     private void createLabel(CreateLabelCommand command) {
         checkUnique(command.getSentBy(), command.getName(), command.getColor());
 
