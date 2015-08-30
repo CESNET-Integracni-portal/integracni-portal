@@ -3,13 +3,12 @@ package cz.cvut.fel.integracniportal.integration.label
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationSpecification
 import cz.cvut.fel.integracniportal.command.label.CreateLabelCommand
-import cz.cvut.fel.integracniportal.command.node.MoveFileCommand
 import cz.cvut.fel.integracniportal.domain.label.valueobjects.LabelId
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException
 import cz.cvut.fel.integracniportal.model.Label
 
 /**
- * Integration test for {@link MoveFileCommand}.
+ * Integration test for {@link CreateLabelCommand}.
  *
  * @author Radek Jezdik
  */
@@ -28,7 +27,7 @@ public class CreateLabelIntegrationSpec extends AbstractIntegrationSpecification
             label.getOwner().getId() == 1
     }
 
-    def "duplicate label (name, color, owner) results in error"() {
+    def "creating duplicate label (name, color, owner) results in error"() {
         when:
             dispatch new CreateLabelCommand(LabelId.of("1"), "work", "red")
             dispatch new CreateLabelCommand(LabelId.of("2"), "work", "red")

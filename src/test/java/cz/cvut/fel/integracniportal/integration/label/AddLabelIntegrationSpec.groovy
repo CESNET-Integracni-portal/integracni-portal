@@ -4,23 +4,17 @@ import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationSpecification
 import cz.cvut.fel.integracniportal.command.label.AddLabelToNodeCommand
 import cz.cvut.fel.integracniportal.command.label.CreateLabelCommand
-import cz.cvut.fel.integracniportal.command.node.MoveFileCommand
-import cz.cvut.fel.integracniportal.dao.LabelDao
 import cz.cvut.fel.integracniportal.domain.label.valueobjects.LabelId
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
 import cz.cvut.fel.integracniportal.model.Folder
-import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Integration test for {@link MoveFileCommand}.
+ * Integration test for {@link AddLabelToNodeCommand}.
  *
  * @author Radek Jezdik
  */
 @DatabaseSetup("classpath:user.xml")
 public class AddLabelIntegrationSpec extends AbstractIntegrationSpecification {
-
-    @Autowired
-    LabelDao labelDao
 
     def "should add a label to a folder"() {
         given:

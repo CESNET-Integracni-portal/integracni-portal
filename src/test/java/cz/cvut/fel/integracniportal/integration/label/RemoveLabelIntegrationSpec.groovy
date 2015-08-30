@@ -5,25 +5,19 @@ import cz.cvut.fel.integracniportal.AbstractIntegrationSpecification
 import cz.cvut.fel.integracniportal.command.label.AddLabelToNodeCommand
 import cz.cvut.fel.integracniportal.command.label.CreateLabelCommand
 import cz.cvut.fel.integracniportal.command.label.RemoveLabelFromNodeCommand
-import cz.cvut.fel.integracniportal.command.node.MoveFileCommand
-import cz.cvut.fel.integracniportal.dao.LabelDao
 import cz.cvut.fel.integracniportal.domain.label.valueobjects.LabelId
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
 import cz.cvut.fel.integracniportal.model.Folder
-import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Integration test for {@link MoveFileCommand}.
+ * Integration test for {@link RemoveLabelFromNodeCommand}.
  *
  * @author Radek Jezdik
  */
 @DatabaseSetup("classpath:user.xml")
 public class RemoveLabelIntegrationSpec extends AbstractIntegrationSpecification {
 
-    @Autowired
-    LabelDao labelDao
-
-    def "should add a label to a folder"() {
+    def "should remove a label from a folder"() {
         given:
             dispatch new CreateLabelCommand(LabelId.of("1"), "work", "red")
             dispatch new CreateLabelCommand(LabelId.of("2"), "school", "blue")

@@ -2,13 +2,12 @@ package cz.cvut.fel.integracniportal.integration.node
 
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationSpecification
-import cz.cvut.fel.integracniportal.command.node.MoveFileCommand
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao
 import cz.cvut.fel.integracniportal.exceptions.DuplicateNameException
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Integration test for {@link MoveFileCommand}.
+ * Integration test for {@link cz.cvut.fel.integracniportal.command.node.CreateFileCommand}.
  *
  * @author Radek Jezdik
  */
