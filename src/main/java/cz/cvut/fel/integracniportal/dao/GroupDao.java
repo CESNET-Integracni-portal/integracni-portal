@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface GroupDao {
 
+    public Group load(Serializable id);
+
     public Group get(Serializable id);
 
     public List<Group> getUserGroups(UserDetails owner);
@@ -18,5 +20,7 @@ public interface GroupDao {
     public void save(Group group);
 
     public void delete(Group group);
+
+    public boolean groupExists(Long id, String name);
 
 }

@@ -10,12 +10,11 @@ import java.util.Set;
 @Table(name = "user_group", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "owner"})
 })
-public class Group extends AbstractEntity<Long> {
+public class Group extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue
     @Column(name = "group_id")
-    private Long groupId;
+    private String groupId;
 
     @Column(nullable = false)
     private String name;
@@ -32,12 +31,12 @@ public class Group extends AbstractEntity<Long> {
 
 
     @Override
-    public Long getId() {
+    public String getId() {
         return groupId;
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(String id) {
         groupId = id;
     }
 

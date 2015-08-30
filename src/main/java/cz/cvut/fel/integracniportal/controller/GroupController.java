@@ -52,7 +52,7 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity delete(@PathVariable("id") Long groupId) {
+    public ResponseEntity delete(@PathVariable("id") String groupId) {
         groupService.deleteGroup(groupId);
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -60,7 +60,7 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group/{id}/nameChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity changeName(@PathVariable("id") Long groupId, @RequestBody NameRepresentation representation) {
+    public ResponseEntity changeName(@PathVariable("id") String groupId, @RequestBody NameRepresentation representation) {
         groupService.renameGroup(groupId, representation.getName());
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -68,7 +68,7 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group/{id}/addMember", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity addMember(@PathVariable("id") Long groupId, @RequestBody GroupMemberIdRepresentation representation) {
+    public ResponseEntity addMember(@PathVariable("id") String groupId, @RequestBody GroupMemberIdRepresentation representation) {
         groupService.addMember(groupId, representation.getMemberId());
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -76,7 +76,7 @@ public class GroupController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/group/{id}/removeMember", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity removeMember(@PathVariable("id") Long groupId, @RequestBody GroupMemberIdRepresentation representation) {
+    public ResponseEntity removeMember(@PathVariable("id") String groupId, @RequestBody GroupMemberIdRepresentation representation) {
         groupService.removeMember(groupId, representation.getMemberId());
         return new ResponseEntity(HttpStatus.OK);
     }

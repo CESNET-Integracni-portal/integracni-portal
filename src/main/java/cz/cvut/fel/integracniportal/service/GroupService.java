@@ -15,12 +15,12 @@ public interface GroupService {
 
     public Group createUserGroup(UserDetails owner, GroupRepresentation group);
 
-    public void deleteGroup(Long groupId);
+    public void deleteGroup(String groupId);
 
-    public void renameGroup(Long groupId, String name);
+    public void renameGroup(String groupId, String name);
 
-    public void addMember(Long groupId, Long memberId);
+    public void addMember(String groupId, Long memberId);
 
-    public void removeMember(Long groupId, Long memberId);
+    public void removeMember(String groupId, Long memberId);
 
 }

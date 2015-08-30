@@ -38,5 +38,7 @@
                                     aggregate-type="cz.cvut.fel.integracniportal.domain.node.Folder"/>
     <axon:event-sourcing-repository id="labelAggregateRepository" event-bus="eventBus" event-store="eventStore"
                                     aggregate-type="cz.cvut.fel.integracniportal.domain.label.Label"/>
+    <axon:event-sourcing-repository id="groupAggregateRepository" event-bus="eventBus" event-store="eventStore"
+                                    aggregate-type="cz.cvut.fel.integracniportal.domain.group.Group"/>
 
 </beans>
