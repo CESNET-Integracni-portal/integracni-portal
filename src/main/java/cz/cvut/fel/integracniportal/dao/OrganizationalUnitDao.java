@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,13 +10,17 @@ import java.util.List;
  */
 public interface OrganizationalUnitDao {
 
+    public OrganizationalUnit load(Serializable id);
+
     public List<OrganizationalUnit> getAllUnits();
 
-    public OrganizationalUnit getOrgUnitById(Long id);
+    public OrganizationalUnit getOrgUnitById(String id);
 
     public OrganizationalUnit getOrgUnitByName(String name);
 
     public void save(OrganizationalUnit organizationalUnit);
 
     public void delete(OrganizationalUnit organizationalUnit);
+
+    public boolean unitExists(String name);
 }

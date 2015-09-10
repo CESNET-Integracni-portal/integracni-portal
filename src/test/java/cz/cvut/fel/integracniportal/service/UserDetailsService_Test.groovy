@@ -116,7 +116,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation();
         userDetailsRepresentation.setUsername("newUser");
         userDetailsRepresentation.setPassword("password");
-        userDetailsRepresentation.setUnitId(1);
+        userDetailsRepresentation.setUnitId("1");
         userDetailsService.createUser(userDetailsRepresentation);
 
         // Confirm that the user has been created
@@ -124,7 +124,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         assertNotNull(userDetails);
         assertEquals(userDetails.getUsername(), "newUser");
         assertTrue(passwordEncoder.matches("password", userDetails.getPassword()));
-        assertEquals(userDetails.getOrganizationalUnit().getId(), 1);
+        assertEquals(userDetails.getOrganizationalUnit().getId(), "1");
 
         // Confirm that the user has been added to a unit
         List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit(1);

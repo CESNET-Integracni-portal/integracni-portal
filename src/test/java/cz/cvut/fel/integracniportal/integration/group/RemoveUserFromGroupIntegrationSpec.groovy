@@ -43,7 +43,7 @@ public class RemoveUserFromGroupIntegrationSpec extends AbstractIntegrationSpeci
             assert get(Group, "1").getMembers().size() == 1
 
         when:
-            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of(2))
+            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of(666))
 
         then:
             def members = get(Group, "1").getMembers()

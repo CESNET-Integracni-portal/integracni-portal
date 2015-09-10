@@ -15,17 +15,19 @@ import cz.cvut.fel.integracniportal.model.Label
 @DatabaseSetup("classpath:user.xml")
 public class DeleteLabelIntegrationSpec extends AbstractIntegrationSpecification {
 
+    def id = "1"
+
     def "should delete the label"() {
         given:
-            dispatch new CreateLabelCommand(LabelId.of("1"), "work", "red")
+            dispatch new CreateLabelCommand(LabelId.of(id), "work", "red")
 
-            assert get(Label, "1") != null
+            assert get(Label, id) != null
 
         when:
-            dispatch new DeleteLabelCommand(LabelId.of("1"))
+            dispatch new DeleteLabelCommand(LabelId.of(id))
 
         then:
-            get(Label, "1") == null
+            get(Label, id) == null
     }
 
 }

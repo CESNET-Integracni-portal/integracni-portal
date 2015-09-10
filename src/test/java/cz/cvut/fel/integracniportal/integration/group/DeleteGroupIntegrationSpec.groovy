@@ -15,17 +15,19 @@ import cz.cvut.fel.integracniportal.model.Group
 @DatabaseSetup("classpath:user.xml")
 public class DeleteGroupIntegrationSpec extends AbstractIntegrationSpecification {
 
+    def id = "1"
+
     def "should delete a group"() {
         given:
-            dispatch new CreateGroupCommand(GroupId.of("1"), "group")
+            dispatch new CreateGroupCommand(GroupId.of(id), "group")
 
-            assert get(Group, "1") != null
+            assert get(Group, id) != null
 
         when:
-            dispatch new DeleteGroupCommand(GroupId.of("1"))
+            dispatch new DeleteGroupCommand(GroupId.of(id))
 
         then:
-            get(Group, "1") == null
+            get(Group, id) == null
     }
 
 }

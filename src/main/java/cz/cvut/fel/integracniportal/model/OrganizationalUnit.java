@@ -5,12 +5,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "organization_unit")
-public class OrganizationalUnit extends AbstractEntity<Long> {
+public class OrganizationalUnit extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue
     @Column(name = "unit_id")
-    private Long unitId;
+    private String unitId;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -30,12 +29,12 @@ public class OrganizationalUnit extends AbstractEntity<Long> {
     private Set<UserDetails> members;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return unitId;
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(String id) {
         this.unitId = id;
     }
 

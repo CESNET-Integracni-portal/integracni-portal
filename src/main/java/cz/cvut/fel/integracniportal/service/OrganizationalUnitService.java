@@ -1,7 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
-import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.OrganizationalUnitRepresentation;
 
 import java.util.List;
@@ -10,23 +9,18 @@ public interface OrganizationalUnitService {
 
     public List<OrganizationalUnit> getAllOrganizationalUnits();
 
-    public OrganizationalUnit getOrganizationalUnitById(Long id);
+    public OrganizationalUnit getOrganizationalUnitById(String id);
 
     public OrganizationalUnit getOrganizationUnitByName(String name);
 
-    public void setAdmins(Long id, OrganizationalUnitRepresentation unit);
-
-    public void setMembers(Long id, OrganizationalUnitRepresentation unit);
-
     public OrganizationalUnit createUnit(OrganizationalUnitRepresentation unit);
 
-    public OrganizationalUnit updateUnit(Long unitId, OrganizationalUnitRepresentation unit);
+    public OrganizationalUnit renameUnit(String unitId, String newName);
 
-    public OrganizationalUnit addAdmin(Long unitId, UserDetails admin);
+    public void addAdmin(String unitId, Long userId);
 
-    public OrganizationalUnit removeAdmin(Long unitId, UserDetails admin);
+    public void removeAdmin(String unitId, Long userId);
 
-    public void saveUnit(OrganizationalUnit unit);
+    public void updateUnitQuota(String unitId, Long size);
 
-    public void removeUnit(OrganizationalUnit unit);
 }

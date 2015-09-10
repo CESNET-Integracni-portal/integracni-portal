@@ -7,9 +7,6 @@ import java.util.List;
 
 import static cz.cvut.fel.integracniportal.model.QOrganizationalUnit.organizationalUnit;
 
-/**
- * Created by Vavat on 29. 3. 2015.
- */
 @Repository
 public class OrganizationalUnitDaoImpl extends GenericHibernateDao<OrganizationalUnit> implements OrganizationalUnitDao {
 
@@ -24,7 +21,7 @@ public class OrganizationalUnitDaoImpl extends GenericHibernateDao<Organizationa
     }
 
     @Override
-    public OrganizationalUnit getOrgUnitById(Long id) {
+    public OrganizationalUnit getOrgUnitById(String id) {
         return get(id);
     }
 
@@ -34,4 +31,12 @@ public class OrganizationalUnitDaoImpl extends GenericHibernateDao<Organizationa
                 .where(organizationalUnit.name.eq(name))
                 .uniqueResult(organizationalUnit);
     }
+
+    @Override
+    public boolean unitExists(String name) {
+        return from(organizationalUnit)
+                .where(organizationalUnit.name.eq(name))
+                .exists();
+    }
+
 }

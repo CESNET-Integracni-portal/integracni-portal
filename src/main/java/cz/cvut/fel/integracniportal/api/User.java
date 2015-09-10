@@ -9,7 +9,7 @@ public class User {
 
     private String username;
 
-    private Long organizationalUnitId;
+    private String organizationalUnitId;
 
     public Long getId() {
         return id;
@@ -27,11 +27,11 @@ public class User {
         this.username = username;
     }
 
-    public void setOrganizationalUnitId(Long organizationalUnitId) {
+    public void setOrganizationalUnitId(String organizationalUnitId) {
         this.organizationalUnitId = organizationalUnitId;
     }
 
-    public Long getOrganizationalUnitId() {
+    public String getOrganizationalUnitId() {
         return organizationalUnitId;
     }
 }

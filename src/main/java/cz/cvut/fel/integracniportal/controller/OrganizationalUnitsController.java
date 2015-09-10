@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 import cz.cvut.fel.integracniportal.representation.OrganizationalUnitRepresentation;
+import cz.cvut.fel.integracniportal.representation.UserIdRepresentation;
 import cz.cvut.fel.integracniportal.service.OrganizationalUnitService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,18 @@ public class OrganizationalUnitsController extends AbstractController {
     }
 
     /**
+     * Get all organizational units.
+     */
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity createUnit(@RequestBody OrganizationalUnitRepresentation representation) {
+        OrganizationalUnit unit = organizationalUnitService.createUnit(representation);
+        OrganizationalUnitRepresentation newRepresentation = new OrganizationalUnitRepresentation(unit);
+        return new ResponseEntity(newRepresentation, HttpStatus.OK);
+    }
+
+    /**
      * Get a specific organizational unit.
      *
      * @param id Id of the organizational unit.
@@ -47,7 +60,7 @@ public class OrganizationalUnitsController extends AbstractController {
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.2/unit/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getUnit(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> getUnit(@PathVariable("id") String id) {
         OrganizationalUnit unit = organizationalUnitService.getOrganizationalUnitById(id);
         if (unit == null) {
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
@@ -59,25 +72,37 @@ public class OrganizationalUnitsController extends AbstractController {
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.2/unit/{id}/nameChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity changeNameUnit(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
-        organizationalUnitService.updateUnit(unitId, representation);
-        return new ResponseEntity(representation, HttpStatus.OK);
+    public ResponseEntity changeNameUnit(@PathVariable("id") String unitId,
+                                         @RequestBody OrganizationalUnitRepresentation representation) {
+        organizationalUnitService.renameUnit(unitId, representation.getName());
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
     @RequestMapping(value = "/v0.2/unit/{id}/quotaChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity quotaChangeUnit(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
-        organizationalUnitService.updateUnit(unitId, representation);
-        return new ResponseEntity(representation, HttpStatus.OK);
+    public ResponseEntity quotaChangeUnit(@PathVariable("id") String unitId,
+                                          @RequestBody OrganizationalUnitRepresentation representation) {
+        organizationalUnitService.updateUnitQuota(unitId, representation.getSize());
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('units', 'main_admin')")
-    @RequestMapping(value = "/v0.2/unit/{id}/adminsAssignment", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.2/unit/{id}/assignAdmin", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity assignAdmin(@PathVariable("id") Long unitId, @RequestBody OrganizationalUnitRepresentation representation) {
-        organizationalUnitService.setAdmins(unitId, representation);
-        return new ResponseEntity(representation, HttpStatus.OK);
+    public ResponseEntity assignAdmin(@PathVariable("id") String unitId,
+                                      @RequestBody UserIdRepresentation representation) {
+        organizationalUnitService.addAdmin(unitId, representation.getUserId());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('units', 'main_admin')")
+    @RequestMapping(value = "/v0.2/unit/{id}/unassignAdmin", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity unassignAdmin(@PathVariable("id") String unitId,
+                                        @RequestBody UserIdRepresentation representation) {
+        organizationalUnitService.removeAdmin(unitId, representation.getUserId());
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }

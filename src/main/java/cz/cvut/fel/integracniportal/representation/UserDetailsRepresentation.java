@@ -23,7 +23,7 @@ public class UserDetailsRepresentation {
 
     private String password;
 
-    private Long unitId;
+    private String unitId;
 
     private List<LabelRepresentation> labels;
 
@@ -97,11 +97,11 @@ public class UserDetailsRepresentation {
         this.password = password;
     }
 
-    public Long getUnitId() {
+    public String getUnitId() {
         return unitId;
     }
 
-    public void setUnitId(Long unitId) {
+    public void setUnitId(String unitId) {
         this.unitId = unitId;
     }
 
