@@ -2,6 +2,9 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
+import cz.cvut.fel.integracniportal.representation.UserPasswordRepresentation;
+import cz.cvut.fel.integracniportal.representation.UserPermissionsRepresentation;
+import cz.cvut.fel.integracniportal.representation.UserRolesRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import cz.cvut.fel.integracniportal.validator.UserDetailsResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,7 @@ public class UserController extends AbstractController {
         binder.setValidator(userDetailsResourceValidator);
     }
 
-    @PreAuthorize("hasAnyRole('externists', 'main_admin')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/user", method = RequestMethod.GET)
     @ResponseBody
     public List<UserDetailsRepresentation> getAllUsers() {
@@ -44,7 +47,7 @@ public class UserController extends AbstractController {
         return result;
     }
 
-    @PreAuthorize("hasRole('externists')")
+    @PreAuthorize("hasAnyRole('externists', 'main_admin')")
     @RequestMapping(value = "/v0.2/user", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity createUser(@Validated @RequestBody UserDetailsRepresentation userDetailsResource, BindingResult bindingResult) {
@@ -66,11 +69,29 @@ public class UserController extends AbstractController {
     }
 
     @PreAuthorize("hasRole('externists')")
-    @RequestMapping(value = "/v0.2/user/{userid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v0.2/user/{userid}/passwordChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> updateUser(@PathVariable("userid") Long userId,
-                                             @RequestBody UserDetailsRepresentation userDetailsResource) {
-        userDetailsService.updateUser(userId, userDetailsResource);
+    public ResponseEntity<String> changePassword(@PathVariable("userid") Long userId,
+                                                 @RequestBody UserPasswordRepresentation passwordRepresentation) {
+        userDetailsService.changePassword(userId, passwordRepresentation.getPassword(), passwordRepresentation.getOldPassword());
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("hasRole('externists')")
+    @RequestMapping(value = "/v0.2/user/{userid}/rolesAssignment", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> updateRoles(@PathVariable("userid") Long userId,
+                                              @RequestBody UserRolesRepresentation rolesRepresentation) {
+        userDetailsService.updateRoles(userId, rolesRepresentation.getRoles());
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("hasRole('externists')")
+    @RequestMapping(value = "/v0.2/user/{userid}/permissionsGrant", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> updatePermissions(@PathVariable("userid") Long userId,
+                                                    @RequestBody UserPermissionsRepresentation rolesRepresentation) {
+        userDetailsService.updatePermissions(userId, rolesRepresentation.getPermissions());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 

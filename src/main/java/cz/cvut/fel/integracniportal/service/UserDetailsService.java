@@ -57,15 +57,6 @@ public interface UserDetailsService {
     public UserDetails createUser(UserDetailsRepresentation userDetailsResource);
 
     /**
-     * Updates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.
-     *
-     * @param userId              id of the user to be updated
-     * @param userDetailsResource the user details
-     * @return the user details
-     */
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsResource);
-
-    /**
      * Saves the user into database.
      *
      * @param user UserDetails login credentials which are to be saved.
@@ -78,5 +69,27 @@ public interface UserDetailsService {
      * @param user UserDetails login credentials which are to be removed.
      */
     public void removeUser(UserDetails user);
+
+    /**
+     * Changes the user's password
+     * @param userId id of the user for which to change the password
+     * @param newPassword the new password for the user
+     * @param oldPassword the old password for check
+     */
+    public void changePassword(Long userId, String newPassword, String oldPassword);
+
+    /**
+     * Updates the user's roles to the given list of roles
+     * @param userId id of the user for which to update roles
+     * @param roles the list of roles
+     */
+    public void updateRoles(Long userId, List<String> roles);
+
+    /**
+     * Updates the user's permissions to the given list of permissions
+     * @param userId id of the user for which to update permissions
+     * @param permissions the list of permissions
+     */
+    public void updatePermissions(Long userId, List<String> permissions);
 
 }
