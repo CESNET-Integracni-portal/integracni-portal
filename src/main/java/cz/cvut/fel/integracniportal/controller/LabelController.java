@@ -32,7 +32,7 @@ public class LabelController extends AbstractController {
     @RequestMapping(value = "/v0.2/label", method = RequestMethod.GET)
     @ResponseBody
     public List<LabelRepresentation> getLabels() {
-        List<Label> labelList = labelService.getAllLabels();
+        List<Label> labelList = labelService.getUserLabels(userService.getCurrentUser());
         List<LabelRepresentation> result = new ArrayList<LabelRepresentation>(labelList.size());
         for (Label label : labelList) {
             result.add(new LabelRepresentation(label));

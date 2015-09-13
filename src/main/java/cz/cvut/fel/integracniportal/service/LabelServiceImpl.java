@@ -42,12 +42,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public List<Label> getUserLabels(long userId) {
-        List<Label> result = labelDao.getUserLabels(userId);
-        if (result == null) {
-            throw new NotFoundException("labels.notFound.user.id", userId);
-        }
-        return result;
+    public List<Label> getUserLabels(UserDetails owner) {
+        return labelDao.getUserLabels(owner.getId());
     }
 
     @Override

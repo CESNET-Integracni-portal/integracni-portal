@@ -17,7 +17,7 @@ public interface LabelService {
 
     public List<Label> getAllLabels();
 
-    public List<Label> getUserLabels(long userId);
+    public List<Label> getUserLabels(UserDetails userId);
 
     public Label getLabelById(long labelId);
 
