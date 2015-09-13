@@ -33,11 +33,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public List<Label> getUserLabels(UserDetails owner) {
-        List<Label> result = labelDao.getUserLabels(owner.getId());
-        if (result == null) {
-            throw new NotFoundException("labels.notFound.user.id", owner);
-        }
-        return result;
+        return labelDao.getUserLabels(owner.getId());
     }
 
     @Override
