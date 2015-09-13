@@ -43,4 +43,10 @@
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
+    <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate" depends-on="sessionFactory">
+        <property name="baselineOnMigrate" value="true" />
+        <property name="locations" value="classpath:db/migrations" />
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
 </beans>
