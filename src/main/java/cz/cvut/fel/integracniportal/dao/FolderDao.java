@@ -23,7 +23,7 @@ public interface FolderDao {
 
     List<Folder> getSpaceTopLevelFolders(String spaceId, UserDetails user);
 
-    List<Folder> getFoldersByLabels(String spaceId, List<Long> labelIds, UserDetails owner);
+    List<Folder> getFoldersByLabels(String spaceId, List<String> labelIds, UserDetails owner);
 
     void createFolder(Folder folder);
 }

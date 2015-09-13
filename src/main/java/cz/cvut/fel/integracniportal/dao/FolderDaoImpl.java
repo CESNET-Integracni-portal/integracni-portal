@@ -41,7 +41,7 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
     }
 
     @Override
-    public List<Folder> getFoldersByLabels(String spaceId, List<Long> labelIds, UserDetails user) {
+    public List<Folder> getFoldersByLabels(String spaceId, List<String> labelIds, UserDetails user) {
         QFolder folder2 = new QFolder("folder2");
         return from(folder)
                 .where(folder.space.eq(spaceId))

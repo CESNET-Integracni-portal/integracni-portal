@@ -55,8 +55,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labels, UserDetails owner) {
-        return fileMetadataDao.getFilesByLabels(spaceId, labels, owner);
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<String> labelIds, UserDetails owner) {
+        return fileMetadataDao.getFilesByLabels(spaceId, labelIds, owner);
     }
 
     @Override

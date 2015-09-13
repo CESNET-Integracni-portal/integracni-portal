@@ -45,7 +45,7 @@ public interface UserDetailsDao {
      * @param organizationalUnitId Id of the organizational unit.
      * @return List of users in the organizational unit
      */
-    public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId);
+    public List<UserDetails> getAllUsersInOrganizationalUnit(String organizationalUnitId);
 
     /**
      * Saves the user into database.

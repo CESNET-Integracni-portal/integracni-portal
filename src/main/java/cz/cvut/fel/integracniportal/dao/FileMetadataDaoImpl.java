@@ -71,7 +71,7 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     }
 
     @Override
-    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labelIds, UserDetails owner) {
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<String> labelIds, UserDetails owner) {
         QFileMetadata file2 = new QFileMetadata("file2");
         return from(fileMetadata)
                 .where(fileMetadata.owner.eq(owner))

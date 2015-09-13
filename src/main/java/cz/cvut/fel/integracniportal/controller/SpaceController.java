@@ -54,7 +54,7 @@ public class SpaceController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}", method = GET)
     public ResponseEntity<TopLevelFolderRepresentation> getRoot(
             @PathVariable String spaceId,
-            @RequestParam(required = false) List<Long> labels) {
+            @RequestParam(required = false) List<String> labels) {
 
         TopLevelFolderRepresentation topLevelFolder;
         if (labels != null && labels.isEmpty() == false) {

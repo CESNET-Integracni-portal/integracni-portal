@@ -108,7 +108,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
 
     @Test
     void "should return list of users in organizational unit 1"() {
-        List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit(1);
+        List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit("1");
         assertEquals(usersInUnit.size(), 1);
         assertEquals(usersInUnit.get(0).getId(), 101);
         assertEquals(usersInUnit.get(0).getUsername(), "a");
@@ -130,7 +130,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         assertEquals(userDetails.getOrganizationalUnit().getId(), "1");
 
         // Confirm that the user has been added to a unit
-        List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit(1);
+        List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit("1");
         boolean userFound = false;
         for (UserDetails userInUnit: usersInUnit) {
             if (userInUnit.getUsername().equals("newUser")) {

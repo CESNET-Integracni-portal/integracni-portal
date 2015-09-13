@@ -46,7 +46,7 @@ public interface UserDetailsService {
      * @param organizationalUnitId Id of the organizational unit.
      * @return List of users in the organizational unit
      */
-    public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId);
+    public List<UserDetails> getAllUsersInOrganizationalUnit(String organizationalUnitId);
 
     /**
      * Creates a user from supplied {@link cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation}.

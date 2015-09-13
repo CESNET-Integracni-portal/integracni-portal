@@ -110,7 +110,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public List<UserDetails> getAllUsersInOrganizationalUnit(Long organizationalUnitId) {
+    public List<UserDetails> getAllUsersInOrganizationalUnit(String organizationalUnitId) {
         return userDao.getAllUsersInOrganizationalUnit(organizationalUnitId);
     }
 
@@ -169,8 +169,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public void changePassword(Long userId, String newPassword, String oldPassword) {
         UserDetails userDetails = getUserById(userId);
-
-        String encodedPasswordCheck = passwordEncoder.encode(oldPassword);
 
         if (passwordEncoder.matches(oldPassword, userDetails.getPassword()) == false) {
             throw new IllegalOperationException("Old password check failed");

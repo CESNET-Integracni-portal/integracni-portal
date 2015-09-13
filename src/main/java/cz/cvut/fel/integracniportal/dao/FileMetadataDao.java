@@ -56,7 +56,7 @@ public interface FileMetadataDao {
 
     public List<FileMetadata> getAllTopLevelFiles(String spaceId, UserDetails owner);
 
-    public List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labelIds, UserDetails user);
+    public List<FileMetadata> getFilesByLabels(String spaceId, List<String> labelIds, UserDetails user);
 
     public FileMetadata load(Serializable id);
 }

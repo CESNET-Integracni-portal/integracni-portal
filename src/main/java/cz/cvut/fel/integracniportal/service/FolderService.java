@@ -47,7 +47,7 @@ public interface FolderService {
     /**
      * Returns all files and folders that have the given labels assigned.
      */
-    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<Long> labels, UserDetails owner);
+    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<String> labelIds, UserDetails owner);
 
     /**
      * Creates new folder in database.

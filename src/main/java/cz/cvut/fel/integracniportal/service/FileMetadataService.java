@@ -19,7 +19,7 @@ public interface FileMetadataService {
     List<FileMetadata> getTopLevelFiles(String spaceId, UserDetails owner);
 
     @Transactional(readOnly = true)
-    List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labels, UserDetails owner);
+    List<FileMetadata> getFilesByLabels(String spaceId, List<String> labelIds, UserDetails owner);
 
     /**
      * Finds a file metadata in database by its uuid.

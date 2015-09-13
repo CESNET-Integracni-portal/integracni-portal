@@ -76,9 +76,9 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<Long> labels, UserDetails owner) {
-        List<Folder> folders = folderDao.getFoldersByLabels(spaceId, labels, owner);
-        List<FileMetadata> files = fileMetadataService.getFilesByLabels(spaceId, labels, owner);
+    public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<String> labelIds, UserDetails owner) {
+        List<Folder> folders = folderDao.getFoldersByLabels(spaceId, labelIds, owner);
+        List<FileMetadata> files = fileMetadataService.getFilesByLabels(spaceId, labelIds, owner);
         TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(folders, files, owner);
         return representation;
     }
