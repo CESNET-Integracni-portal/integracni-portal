@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,11 +31,13 @@ public class OrganizationalUnitRepresentation {
         this.name = organizationalUnit.getName();
         this.size = organizationalUnit.getSize();
         if(organizationalUnit.getAdmins() != null){
+            admins = new HashSet<String>();
             for(UserDetails userDetails: organizationalUnit.getAdmins()){
                 admins.add(userDetails.getUsername());
             }
         }
         if(organizationalUnit.getMembers() != null){
+            members = new HashSet<String>();
             for(UserDetails userDetails: organizationalUnit.getMembers()){
                 members.add(userDetails.getUsername());
             }
