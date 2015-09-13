@@ -59,8 +59,8 @@
         </row>
         <row>
             <value>102</value>
-            <value>A role that is not used by any user.</value>
-            <value>unused</value>
+            <value>Some other role.</value>
+            <value>foo</value>
         </row>
     </table>
 
@@ -79,7 +79,7 @@
 
     <table name="user_details_user_role">
         <column>user_details_user_id</column>
-        <column>userroles_user_role_id</column>
+        <column>userRoles_user_role_id</column>
         <row>
             <value>101</value>
             <value>101</value>

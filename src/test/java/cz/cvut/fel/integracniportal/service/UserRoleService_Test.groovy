@@ -130,12 +130,12 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
     }
 
     @Test
-    void "should remove user role 'unused'"() {
+    void "should remove user role 'foo'"() {
         // Check that the user role exists prior to testing
-        UserRole userRole = userRoleService.getRoleByName("unused");
+        UserRole userRole = userRoleService.getRoleByName("foo");
         assertNotNull(userRole);
         assertEquals(102, userRole.getId());
-        assertEquals("unused", userRole.getName());
+        assertEquals("foo", userRole.getName());
 
         // Remove the user role
         userRoleService.deleteRole(userRole);
@@ -143,11 +143,11 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
         // Check that the user role no longer exists
         try {
             userRoleService.getRoleById(102);
-            fail("User role 'unused' with id 102 still exists after being removed.");
+            fail("User role 'foo' with id 102 still exists after being removed.");
         } catch (NotFoundException e) {
             // OK
         }
-        assertNull(userRoleService.getRoleByName("unused"));
+        assertNull(userRoleService.getRoleByName("foo"));
     }
 
 }

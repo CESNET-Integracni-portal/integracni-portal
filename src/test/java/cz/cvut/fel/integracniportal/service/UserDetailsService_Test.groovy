@@ -1,7 +1,9 @@
 package cz.cvut.fel.integracniportal.service
+
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import cz.cvut.fel.integracniportal.exceptions.InvalidStateException
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException
 import cz.cvut.fel.integracniportal.model.UserDetails
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 
 import static org.junit.Assert.*
 import static org.mockito.Mockito.when
+
 /**
  * @author Petr Strnad
  */
@@ -139,27 +142,68 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
     }
 
     @Test
-    void "should update user 'a' to user 'x'"() {
+    void "should update user a's password"() {
+        // Check that the user exists prior to testing
+        UserDetails userDetails = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetails);
+        userDetails.setPassword(passwordEncoder.encode("myOldPassword"))
+        userDetailsService.saveUser(userDetails)
+
+        userDetailsService.changePassword(userDetails.getId(), "myNewPassword", "myOldPassword")
+
+        UserDetails userDetailsUpdated = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetailsUpdated)
+        assertTrue(passwordEncoder.matches("myNewPassword", userDetailsUpdated.getPassword()));
+    }
+
+    @Test
+    void "should not update user a's password if old password doesn't match"() {
+        // Check that the user exists prior to testing
+        UserDetails userDetails = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetails);
+        userDetails.setPassword(passwordEncoder.encode("myOldPassword"))
+        userDetailsService.saveUser(userDetails)
+
+        try {
+            userDetailsService.changePassword(userDetails.getId(), "myNewPassword", "wrongOldPassword")
+            fail("should have thrown exception")
+        } catch (InvalidStateException e) {
+            // ok
+        }
+
+        UserDetails userDetails2 = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetails2)
+        assertTrue(passwordEncoder.matches("myOldPassword", userDetails2.getPassword()));
+    }
+
+    @Test
+    void "should update user a's roles"() {
         // Check that the user exists prior to testing
         UserDetails userDetails = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetails);
         assertEquals(userDetails.getId(), 101);
-        assertEquals(userDetails.getUsername(), "a");
+        assertTrue(userDetails.getUserRoles().size() == 1);
 
-        // Update user's name, password, and unit id
-        UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation();
-        userDetailsRepresentation.setUsername("x");
-        userDetailsRepresentation.setPassword("newPassword");
-        userDetailsService.updateUser(userDetails.getId(), userDetailsRepresentation);
+        userDetailsService.updateRoles(userDetails.getId(), ["externists", "foo"]);
 
-        // Check that the user is
-        UserDetails userDetailsOld = userDetailsService.getUserByUsername("a");
-        assertNull(userDetailsOld);
-
-        UserDetails userDetailsUpdated = userDetailsService.getUserByUsername("x");
+        UserDetails userDetailsUpdated = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetailsUpdated)
-        assertEquals(userDetailsUpdated.getUsername(), "x");
-        assertTrue(passwordEncoder.matches("newPassword", userDetails.getPassword()));
+        assertTrue(userDetailsUpdated.getUserRoles().size() == 2);
+    }
+
+    @Test
+    void "should update user a's permissions"() {
+        // Check that the user exists prior to testing
+        UserDetails userDetails = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetails);
+        assertEquals(userDetails.getId(), 101);
+        assertTrue(userDetails.getPermissions().size() == 0);
+
+        userDetailsService.updatePermissions(userDetails.getId(), ["externists", "password"]);
+
+        UserDetails userDetailsUpdated = userDetailsService.getUserByUsername("a");
+        assertNotNull(userDetailsUpdated)
+        assertTrue(userDetailsUpdated.getPermissions().size() == 2);
     }
 
     @Test

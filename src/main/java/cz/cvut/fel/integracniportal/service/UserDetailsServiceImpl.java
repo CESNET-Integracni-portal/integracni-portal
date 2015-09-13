@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.dao.OrganizationalUnitDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
+import cz.cvut.fel.integracniportal.exceptions.InvalidStateException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
 import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
@@ -64,6 +65,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * TODO admin není v db
      * FIXME admin není v db
+     *
      * @return
      */
     @Override
@@ -76,7 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
 
-        if(specialUserDetails != null) {
+        if (specialUserDetails != null) {
             return specialUserDetails;
         } else {
             return getUserByUsername(loggedUser.getUsername());
@@ -125,53 +127,89 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         UserDetails user = new UserDetails();
-        updateUserFromRepresentation(user, userDetailsRepresentation);
-        user.setOrganizationalUnit(orgUnit);
-        userDao.save(user);
-        return user;
-    }
 
-    @Override
-    public UserDetails updateUser(Long userId, UserDetailsRepresentation userDetailsRepresentation) {
-        UserDetails userDetails = getUserById(userId);
-        updateUserFromRepresentation(userDetails, userDetailsRepresentation);
-        userDao.save(userDetails);
-        return userDetails;
-    }
-
-    private void updateUserFromRepresentation(UserDetails userDetails, UserDetailsRepresentation userDetailsRepresentation) {
         if (userDetailsRepresentation.getUsername() != null) {
-            userDetails.setUsername(userDetailsRepresentation.getUsername());
+            user.setUsername(userDetailsRepresentation.getUsername());
         }
         if (userDetailsRepresentation.getPassword() != null) {
             String encodedPassword = passwordEncoder.encode(userDetailsRepresentation.getPassword());
-            userDetails.setPassword(encodedPassword);
+            user.setPassword(encodedPassword);
         }
         if (userDetailsRepresentation.getDirectPermissions() != null) {
-            if (userDetails.getPermissions() == null) {
-                userDetails.setPermissions(new HashSet<Permission>());
+            if (user.getPermissions() == null) {
+                user.setPermissions(new HashSet<Permission>());
             } else {
-                userDetails.getPermissions().clear();
+                user.getPermissions().clear();
             }
             for (String permissionName : userDetailsRepresentation.getDirectPermissions()) {
                 Permission permission = Permission.create(permissionName);
-                userDetails.getPermissions().add(permission);
+                user.getPermissions().add(permission);
             }
         }
         if (userDetailsRepresentation.getRoles() != null) {
-            if (userDetails.getUserRoles() == null) {
-                userDetails.setUserRoles(new ArrayList<UserRole>());
+            if (user.getUserRoles() == null) {
+                user.setUserRoles(new ArrayList<UserRole>());
             } else {
-                userDetails.getUserRoles().clear();
+                user.getUserRoles().clear();
             }
             for (String roleName : userDetailsRepresentation.getRoles()) {
                 UserRole role = userRoleService.getRoleByName(roleName);
                 if (role == null) {
                     throw new UserRoleNotFoundException("role.notFound", roleName);
                 }
-                userDetails.getUserRoles().add(role);
+                user.getUserRoles().add(role);
             }
         }
+
+        user.setOrganizationalUnit(orgUnit);
+        userDao.save(user);
+        return user;
+    }
+
+    @Override
+    public void changePassword(Long userId, String newPassword, String oldPassword) {
+        UserDetails userDetails = getUserById(userId);
+
+        if (passwordEncoder.matches(oldPassword, userDetails.getPassword()) == false) {
+            throw new InvalidStateException("Old password check failed");
+        }
+
+        String newEncodedPassword = passwordEncoder.encode(newPassword);
+        userDetails.setPassword(newEncodedPassword);
+        saveUser(userDetails);
+    }
+
+    @Override
+    public void updateRoles(Long userId, List<String> roles) {
+        UserDetails userDetails = getUserById(userId);
+        if (userDetails.getUserRoles() == null) {
+            userDetails.setUserRoles(new ArrayList<UserRole>());
+        } else {
+            userDetails.getUserRoles().clear();
+        }
+        for (String roleName : roles) {
+            UserRole role = userRoleService.getRoleByName(roleName);
+            if (role == null) {
+                throw new UserRoleNotFoundException("role.notFound", roleName);
+            }
+            userDetails.getUserRoles().add(role);
+        }
+        saveUser(userDetails);
+    }
+
+    @Override
+    public void updatePermissions(Long userId, List<String> permissions) {
+        UserDetails userDetails = getUserById(userId);
+        if (userDetails.getPermissions() == null) {
+            userDetails.setPermissions(new HashSet<Permission>());
+        } else {
+            userDetails.getPermissions().clear();
+        }
+        for (String permissionName : permissions) {
+            Permission permission = Permission.create(permissionName);
+            userDetails.getPermissions().add(permission);
+        }
+        saveUser(userDetails);
     }
 
     @Override
