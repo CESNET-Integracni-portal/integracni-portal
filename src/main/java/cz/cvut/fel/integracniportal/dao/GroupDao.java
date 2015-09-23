@@ -21,6 +21,6 @@ public interface GroupDao {
 
     public void delete(Group group);
 
-    public boolean groupExists(Long id, String name);
+    public boolean groupExists(String id, String name);
 
 }

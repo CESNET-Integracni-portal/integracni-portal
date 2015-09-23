@@ -14,7 +14,7 @@ public interface LabelDao {
 
     public List<Label> getAllLabels();
 
-    public List<Label> getUserLabels(Long id);
+    public List<Label> getUserLabels(String id);
 
     public Label get(Serializable id);
 
@@ -22,6 +22,6 @@ public interface LabelDao {
 
     public void delete(Label label);
 
-    public boolean labelExists(Long userId, String name, String color);
+    public boolean labelExists(String userId, String name, String color);
 
 }

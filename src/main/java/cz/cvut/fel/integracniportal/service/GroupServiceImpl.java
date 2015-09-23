@@ -61,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addMember(String groupId, Long memberId) {
+    public void addMember(String groupId, String memberId) {
         commandGateway.sendAndWait(new AddUserToGroupCommand(
                 GroupId.of(groupId),
                 UserId.of(memberId)
@@ -69,7 +69,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void removeMember(String groupId, Long memberId) {
+    public void removeMember(String groupId, String memberId) {
         commandGateway.sendAndWait(new RemoveUserFromGroupCommand(
                 GroupId.of(groupId),
                 UserId.of(memberId)

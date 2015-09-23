@@ -122,7 +122,7 @@ abstract class AbstractIntegrationSpecification extends Specification {
     }
 
     public UserDetails getUser(id) {
-        return userDao.getUserById(id);
+        return this.get(UserDetails, id);
     }
 
     public ResultActions apiGet(String urlTemplate) throws Exception {
@@ -175,7 +175,7 @@ abstract class AbstractIntegrationSpecification extends Specification {
         commandGateway.sendAndWait(command)
     }
 
-    public void createFolder(String id, String name, String parentId, long ownerId = 1, String space = "cesnet") {
+    public void createFolder(String id, String name, String parentId, String ownerId = "1", String space = "cesnet") {
         dispatch(new CreateFolderCommand(
                 FolderId.of(id),
                 name,
@@ -185,7 +185,7 @@ abstract class AbstractIntegrationSpecification extends Specification {
         ))
     }
 
-    public void createFile(String id, String name, String parentId, long ownerId = 1, String space = "cesnet",
+    public void createFile(String id, String name, String parentId, String ownerId = "1", String space = "cesnet",
                            long size = 1, String mimetype = "application/json") {
         dispatch(new CreateFileCommand(
                 FileId.of(id),

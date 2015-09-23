@@ -1,6 +1,6 @@
 package cz.cvut.fel.integracniportal.representation;
 
-import cz.cvut.fel.integracniportal.model.Permission;
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class UserRoleRepresentation {
 
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -29,11 +29,11 @@ public class UserRoleRepresentation {
         this.permissions.addAll(userRole.getPermissions());
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

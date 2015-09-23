@@ -18,8 +18,8 @@
 
     <!--<axon:filesystem-event-store id="eventStore" base-dir="events"/>-->
 
-    <bean id="eventStoreSchema" class="org.axonframework.eventstore.jdbc.GenericEventSqlSchema"/>
-    <bean id="eventEntryStore" class="org.axonframework.eventstore.jdbc.DefaultEventEntryStore" init-method="createSchema">
+    <bean id="eventStoreSchema" class="org.axonframework.eventstore.jdbc.PostgresEventSqlSchema"/>
+    <bean id="eventEntryStore" class="org.axonframework.eventstore.jdbc.DefaultEventEntryStore" >
         <constructor-arg name="dataSource" ref="dataSource"/>
         <constructor-arg name="sqlSchema" ref="eventStoreSchema"/>
     </bean>
@@ -32,6 +32,21 @@
         </constructor-arg>
     </bean>
 
+    <axon:saga-manager id="sagaManager">
+        <axon:types>
+            cz.cvut.fel.integracniportal.domain.user.saga.UserEmailVerificationSaga
+            cz.cvut.fel.integracniportal.domain.user.saga.RestoreLostUserPasswordSaga
+        </axon:types>
+    </axon:saga-manager>
+
+    <bean class="org.axonframework.eventhandling.scheduling.java.SimpleEventSchedulerFactoryBean">
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+
+    <axon:event-sourcing-repository id="userAggregateRepository" event-bus="eventBus" event-store="eventStore"
+                                    aggregate-type="cz.cvut.fel.integracniportal.domain.user.User"/>
+    <axon:event-sourcing-repository id="userRoleAggregateRepository" event-bus="eventBus" event-store="eventStore"
+                                    aggregate-type="cz.cvut.fel.integracniportal.domain.userrole.UserRole"/>
     <axon:event-sourcing-repository id="fileAggregateRepository" event-bus="eventBus" event-store="eventStore"
                                     aggregate-type="cz.cvut.fel.integracniportal.domain.node.File"/>
     <axon:event-sourcing-repository id="folderAggregateRepository" event-bus="eventBus" event-store="eventStore"

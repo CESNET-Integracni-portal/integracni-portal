@@ -14,17 +14,20 @@
     <table name="user_details">
         <column>user_id</column>
         <column>username</column>
+        <column>email</column>
         <column>password</column>
         <column>organizationalunit_unit_id</column>
         <row>
             <value>1</value>
             <value>test</value>
+            <value>test@test</value>
             <value>password</value>
             <value>1</value>
         </row>
         <row>
             <value>2</value>
             <value>test2</value>
+            <value>test2@test2</value>
             <value>password</value>
             <value>1</value>
         </row>

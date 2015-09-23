@@ -62,7 +62,7 @@ public class UserController extends AbstractController {
     @PreAuthorize("hasAnyRole('externists', 'main_admin')")
     @RequestMapping(value = "/v0.2/user/{userid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity getUser(@PathVariable("userid") Long userId) {
+    public ResponseEntity getUser(@PathVariable("userid") String userId) {
         UserDetails userDetails = userDetailsService.getUserById(userId);
         UserDetailsRepresentation userDetailsRepresentation = new UserDetailsRepresentation(userDetails);
         return new ResponseEntity(userDetailsRepresentation, HttpStatus.OK);
@@ -71,7 +71,7 @@ public class UserController extends AbstractController {
     @PreAuthorize("hasRole('externists')")
     @RequestMapping(value = "/v0.2/user/{userid}/passwordChange", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> changePassword(@PathVariable("userid") Long userId,
+    public ResponseEntity<String> changePassword(@PathVariable("userid") String userId,
                                                  @RequestBody UserPasswordRepresentation passwordRepresentation) {
         userDetailsService.changePassword(userId, passwordRepresentation.getPassword(), passwordRepresentation.getOldPassword());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
@@ -80,7 +80,7 @@ public class UserController extends AbstractController {
     @PreAuthorize("hasRole('externists')")
     @RequestMapping(value = "/v0.2/user/{userid}/rolesAssignment", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> updateRoles(@PathVariable("userid") Long userId,
+    public ResponseEntity<String> updateRoles(@PathVariable("userid") String userId,
                                               @RequestBody UserRolesRepresentation rolesRepresentation) {
         userDetailsService.updateRoles(userId, rolesRepresentation.getRoles());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
@@ -89,7 +89,7 @@ public class UserController extends AbstractController {
     @PreAuthorize("hasRole('externists')")
     @RequestMapping(value = "/v0.2/user/{userid}/permissionsGrant", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> updatePermissions(@PathVariable("userid") Long userId,
+    public ResponseEntity<String> updatePermissions(@PathVariable("userid") String userId,
                                                     @RequestBody UserPermissionsRepresentation rolesRepresentation) {
         userDetailsService.updatePermissions(userId, rolesRepresentation.getPermissions());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);

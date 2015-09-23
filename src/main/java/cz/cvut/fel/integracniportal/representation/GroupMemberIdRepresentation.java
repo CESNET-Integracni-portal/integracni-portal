@@ -5,13 +5,13 @@ package cz.cvut.fel.integracniportal.representation;
  */
 public class GroupMemberIdRepresentation {
 
-    private Long memberId;
+    private String memberId;
 
-    public Long getMemberId() {
+    public String getMemberId() {
         return memberId;
     }
 
-    public void setMemberId(Long memberId) {
+    public void setMemberId(String memberId) {
         this.memberId = memberId;
     }
 }

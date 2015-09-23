@@ -1,4 +1,4 @@
-package cz.cvut.fel.integracniportal.model;
+package cz.cvut.fel.integracniportal.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,6 +17,7 @@ public enum Permission {
      * The MAIN_ADMIN.
      */
     MAIN_ADMIN("main_admin", true),
+
     /**
      * Permission to edit organizational units.
      */

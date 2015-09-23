@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
+import cz.cvut.fel.integracniportal.domain.Permission;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -8,12 +10,11 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_role")
-public class UserRole extends AbstractEntity<Long> {
+public class UserRole extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue
     @Column(name = "user_role_id")
-    private Long userRoleId;
+    private String userRoleId;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -25,12 +26,12 @@ public class UserRole extends AbstractEntity<Long> {
     private Set<Permission> permissions;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return userRoleId;
     }
 
     @Override
-    public void setId(Long userRoleId) {
+    public void setId(String userRoleId) {
         this.userRoleId = userRoleId;
     }
 

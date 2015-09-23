@@ -1,6 +1,6 @@
 package cz.cvut.fel.integracniportal.controller;
 
-import cz.cvut.fel.integracniportal.model.Permission;
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserRoleRepresentation;
 import cz.cvut.fel.integracniportal.service.UserRoleService;

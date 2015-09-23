@@ -1,6 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.model.Permission;
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.apache.log4j.Logger;

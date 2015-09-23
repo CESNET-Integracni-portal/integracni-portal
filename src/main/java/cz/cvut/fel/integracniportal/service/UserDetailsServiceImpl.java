@@ -1,22 +1,21 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.dao.OrganizationalUnitDao;
+import cz.cvut.fel.integracniportal.command.user.CreateUserCommand;
+import cz.cvut.fel.integracniportal.command.user.SetUserPermissionsCommand;
+import cz.cvut.fel.integracniportal.command.user.SetUserRolesCommand;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
-import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
-import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
+import cz.cvut.fel.integracniportal.domain.Permission;
+import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
+import cz.cvut.fel.integracniportal.domain.userrole.valueobjects.UserRoleId;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
-import cz.cvut.fel.integracniportal.exceptions.UserRoleNotFoundException;
-import cz.cvut.fel.integracniportal.model.OrganizationalUnit;
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,6 @@ import java.util.*;
  * Implementation of the {@link cz.cvut.fel.integracniportal.service.UserDetailsService}.
  */
 @Service
-@Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -36,20 +34,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserDetailsDao userDao;
 
     @Autowired
-    private OrganizationalUnitDao orgUnitDao;
-
-    @Autowired
-    private UserRoleService userRoleService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private CommandGateway commandGateway;
 
     @Autowired
     @Qualifier("adminUserService")
     private org.springframework.security.core.userdetails.UserDetailsService adminUserService;
 
     @Override
-    public UserDetails getUserById(long userId) {
+    @Transactional
+    public UserDetails getUserById(String userId) {
         UserDetails userDetails = userDao.getUserById(userId);
         if (userDetails == null) {
             throw new NotFoundException("user.notFound.id", userId);
@@ -58,6 +51,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
+    @Transactional
     public UserDetails getUserByUsername(String username) {
         return userDao.getUserByUsername(username);
     }
@@ -69,6 +63,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return
      */
     @Override
+    @Transactional
     public UserDetails getCurrentUser() {
         Authentication authentication = authenticationService.getCurrentAuthentication();
         User loggedUser = (User) authentication.getPrincipal();
@@ -90,7 +85,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             org.springframework.security.core.userdetails.UserDetails adminDetails = adminUserService.loadUserByUsername(loggedUser.getUsername());
 
             UserDetails userDetails = new UserDetails();
-            userDetails.setId(0L);
+            userDetails.setId("0");
             userDetails.setUsername(adminDetails.getUsername());
 
             Set<Permission> permissions = new HashSet<Permission>();
@@ -105,119 +100,78 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
+    @Transactional
     public List<UserDetails> getAllUsers() {
         return userDao.getAllUsers();
     }
 
     @Override
+    @Transactional
     public List<UserDetails> getAllUsersInOrganizationalUnit(String organizationalUnitId) {
         return userDao.getAllUsersInOrganizationalUnit(organizationalUnitId);
     }
 
     @Override
     public UserDetails createUser(UserDetailsRepresentation userDetailsRepresentation) {
-        if (getUserByUsername(userDetailsRepresentation.getUsername()) != null) {
-            throw new AlreadyExistsException("user.alreadyExists");
-        }
+        String userId = UUID.randomUUID().toString();
 
-        OrganizationalUnit orgUnit = orgUnitDao.getOrgUnitById(userDetailsRepresentation.getUnitId());
+        commandGateway.sendAndWait(new CreateUserCommand(
+                UserId.of(userId),
+                userDetailsRepresentation.getUsername(),
+                "test@email.cz"));
 
-        if (orgUnit == null) {
-            throw new NotFoundException("org.unit.notFound");
-        }
-
-        UserDetails user = new UserDetails();
-
-        if (userDetailsRepresentation.getUsername() != null) {
-            user.setUsername(userDetailsRepresentation.getUsername());
-        }
-        if (userDetailsRepresentation.getPassword() != null) {
-            String encodedPassword = passwordEncoder.encode(userDetailsRepresentation.getPassword());
-            user.setPassword(encodedPassword);
-        }
-        if (userDetailsRepresentation.getDirectPermissions() != null) {
-            if (user.getPermissions() == null) {
-                user.setPermissions(new HashSet<Permission>());
-            } else {
-                user.getPermissions().clear();
-            }
-            for (String permissionName : userDetailsRepresentation.getDirectPermissions()) {
-                Permission permission = Permission.create(permissionName);
-                user.getPermissions().add(permission);
-            }
-        }
-        if (userDetailsRepresentation.getRoles() != null) {
-            if (user.getUserRoles() == null) {
-                user.setUserRoles(new ArrayList<UserRole>());
-            } else {
-                user.getUserRoles().clear();
-            }
-            for (String roleName : userDetailsRepresentation.getRoles()) {
-                UserRole role = userRoleService.getRoleByName(roleName);
-                if (role == null) {
-                    throw new UserRoleNotFoundException("role.notFound", roleName);
-                }
-                user.getUserRoles().add(role);
-            }
-        }
-
-        user.setOrganizationalUnit(orgUnit);
-        userDao.save(user);
-        return user;
+        return getUserById(userId);
     }
 
     @Override
-    public void changePassword(Long userId, String newPassword, String oldPassword) {
-        UserDetails userDetails = getUserById(userId);
+    public void changePassword(String userId, String newPassword, String oldPassword) {
 
-        if (passwordEncoder.matches(oldPassword, userDetails.getPassword()) == false) {
-            throw new IllegalOperationException("Old password check failed");
-        }
+        // TODO
+//
+//        commandGateway.sendAndWait(new SetUserPasswordCommand(
+//                UserId.of(userId),
+//                userDetailsRepresentation.getUsername(),
+//                "test@email.cz"));
 
-        String newEncodedPassword = passwordEncoder.encode(newPassword);
-        userDetails.setPassword(newEncodedPassword);
-        saveUser(userDetails);
+
     }
 
     @Override
-    public void updateRoles(Long userId, List<String> roles) {
-        UserDetails userDetails = getUserById(userId);
-        if (userDetails.getUserRoles() == null) {
-            userDetails.setUserRoles(new ArrayList<UserRole>());
-        } else {
-            userDetails.getUserRoles().clear();
+    public void updateRoles(String userId, List<String> roles) {
+        Set<UserRoleId> roleIds = new HashSet<UserRoleId>();
+
+        for (String role : roles) {
+            roleIds.add(UserRoleId.of(role));
         }
-        for (String roleName : roles) {
-            UserRole role = userRoleService.getRoleByName(roleName);
-            if (role == null) {
-                throw new UserRoleNotFoundException("role.notFound", roleName);
-            }
-            userDetails.getUserRoles().add(role);
-        }
-        saveUser(userDetails);
+
+        commandGateway.sendAndWait(new SetUserRolesCommand(
+                UserId.of(userId),
+                roleIds
+        ));
     }
 
     @Override
-    public void updatePermissions(Long userId, List<String> permissions) {
-        UserDetails userDetails = getUserById(userId);
-        if (userDetails.getPermissions() == null) {
-            userDetails.setPermissions(new HashSet<Permission>());
-        } else {
-            userDetails.getPermissions().clear();
+    public void updatePermissions(String userId, List<String> permissions) {
+        Set<Permission> permissionSet = new HashSet<Permission>();
+
+        for (String permission : permissions) {
+            permissionSet.add(Permission.create(permission));
         }
-        for (String permissionName : permissions) {
-            Permission permission = Permission.create(permissionName);
-            userDetails.getPermissions().add(permission);
-        }
-        saveUser(userDetails);
+
+        commandGateway.sendAndWait(new SetUserPermissionsCommand(
+                UserId.of(userId),
+                permissionSet
+        ));
     }
 
     @Override
+    @Transactional
     public void saveUser(UserDetails user) {
         userDao.save(user);
     }
 
     @Override
+    @Transactional
     public void removeUser(UserDetails user) {
         userDao.delete(user);
     }
@@ -228,14 +182,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void setUserDao(UserDetailsDao userDao) {
         this.userDao = userDao;
-    }
-
-    public void setUserRoleService(UserRoleService userRoleService) {
-        this.userRoleService = userRoleService;
-    }
-
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
     }
 
 }

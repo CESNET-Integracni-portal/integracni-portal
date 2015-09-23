@@ -3,6 +3,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="eventStoreSchema" class="org.axonframework.eventstore.jdbc.GenericEventSqlSchema"/>
+
     <bean id="eventEntryStore" class="cz.cvut.fel.integracniportal.SchemaDroppingEventEntryStore" init-method="createSchema" destroy-method="dropSchema">
         <constructor-arg name="dataSource" ref="dataSource"/>
         <constructor-arg name="sqlSchema" ref="eventStoreSchema"/>

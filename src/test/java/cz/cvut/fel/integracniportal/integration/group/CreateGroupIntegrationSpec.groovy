@@ -23,12 +23,14 @@ public class CreateGroupIntegrationSpec extends AbstractIntegrationSpecification
             def group = get(Group, "1")
             group.id == "1"
             group.name == "group"
-            group.getOwner().getId() == 1
+            group.getOwner().getId() == "1"
     }
 
     def "creating duplicate group name results in error"() {
-        when:
+        given:
             dispatch new CreateGroupCommand(GroupId.of("1"), "group")
+
+        when:
             dispatch new CreateGroupCommand(GroupId.of("2"), "group")
 
         then:

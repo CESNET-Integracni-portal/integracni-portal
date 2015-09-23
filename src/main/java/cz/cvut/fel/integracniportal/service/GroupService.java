@@ -19,8 +19,8 @@ public interface GroupService {
 
     public void renameGroup(String groupId, String name);
 
-    public void addMember(String groupId, Long memberId);
+    public void addMember(String groupId, String memberId);
 
-    public void removeMember(String groupId, Long memberId);
+    public void removeMember(String groupId, String memberId);
 
 }

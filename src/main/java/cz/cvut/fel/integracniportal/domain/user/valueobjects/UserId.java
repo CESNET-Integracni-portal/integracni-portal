@@ -8,13 +8,13 @@ import lombok.Value;
 @Value(staticConstructor = "of")
 public class UserId {
 
-    private Long id;
+    private String id;
 
-    public UserId(Long id) {
+    public UserId(String id) {
         this.id = id;
     }
 
-    public static UserId of(Long id) {
+    public static UserId of(String id) {
         return new UserId(id);
     }
 

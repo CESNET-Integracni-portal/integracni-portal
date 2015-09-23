@@ -30,4 +30,11 @@ public class UserRoleDaoImpl extends GenericHibernateDao<UserRole> implements Us
                 .list(userRole);
     }
 
+    @Override
+    public boolean userRoleExists(String name) {
+        return from(userRole)
+                .where(userRole.name.eq(name))
+                .exists();
+    }
+
 }

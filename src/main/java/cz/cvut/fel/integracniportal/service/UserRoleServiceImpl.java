@@ -1,10 +1,10 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.UserRoleDao;
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.PermissionNotAssignableToRoleException;
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

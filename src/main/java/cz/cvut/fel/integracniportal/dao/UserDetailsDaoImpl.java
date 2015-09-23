@@ -18,12 +18,12 @@ public class UserDetailsDaoImpl extends GenericHibernateDao<UserDetails> impleme
     }
 
     @Override
-    public UserDetails getReference(long userId) {
+    public UserDetails getReference(String userId) {
         return load(userId);
     }
 
     @Override
-    public UserDetails getUserById(long userId) {
+    public UserDetails getUserById(String userId) {
         return get(userId);
     }
 
@@ -45,6 +45,20 @@ public class UserDetailsDaoImpl extends GenericHibernateDao<UserDetails> impleme
         return from(userDetails)
                 .where(userDetails.organizationalUnit.unitId.eq(organizationalUnitId))
                 .list(userDetails);
+    }
+
+    @Override
+    public boolean usernameExists(String username) {
+        return from(userDetails)
+                .where(userDetails.username.eq(username))
+                .exists();
+    }
+
+    @Override
+    public boolean emailExists(String email) {
+        return from(userDetails)
+                .where(userDetails.email.eq(email))
+                .exists();
     }
 
 }

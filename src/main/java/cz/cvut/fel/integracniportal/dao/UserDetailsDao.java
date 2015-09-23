@@ -14,7 +14,7 @@ public interface UserDetailsDao {
      * @param userId Id of the user.
      * @return
      */
-    public UserDetails getReference(long userId);
+    public UserDetails getReference(String userId);
 
     /**
      * Finds a user in database by his id.
@@ -22,7 +22,7 @@ public interface UserDetailsDao {
      * @param userId Id of the user.
      * @return UserDetails login credentials.
      */
-    public UserDetails getUserById(long userId);
+    public UserDetails getUserById(String userId);
 
     /**
      * Finds a user in database by his username.
@@ -60,5 +60,19 @@ public interface UserDetailsDao {
      * @param user UserDetails login credentials which are to be removed.
      */
     public void delete(UserDetails user);
+
+    /**
+     * Returns true if username already exists.
+     * @param username the username
+     * @return
+     */
+    public boolean usernameExists(String username);
+
+    /**
+     * Returns true if email already exists.
+     * @param email the email
+     * @return
+     */
+    public boolean emailExists(String email);
 
 }

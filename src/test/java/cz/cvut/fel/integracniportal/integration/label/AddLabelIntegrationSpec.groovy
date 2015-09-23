@@ -34,12 +34,12 @@ public class AddLabelIntegrationSpec extends AbstractIntegrationSpecification {
             def label1 = labels.get(0);
             label1.getName() == "work"
             label1.getColor() == "red"
-            label1.getOwner().getId() == 1
+            label1.getOwner().getId() == "1"
 
             def label2 = labels.get(1);
             label2.getName() == "school"
             label2.getColor() == "blue"
-            label2.getOwner().getId() == 1
+            label2.getOwner().getId() == "1"
     }
 
     def "adding the same label twice does nothing"() {

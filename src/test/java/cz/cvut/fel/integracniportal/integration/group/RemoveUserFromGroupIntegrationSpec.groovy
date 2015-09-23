@@ -21,34 +21,34 @@ public class RemoveUserFromGroupIntegrationSpec extends AbstractIntegrationSpeci
         given:
             dispatch new CreateGroupCommand(GroupId.of("1"), "foo")
 
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(1))
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(2))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("1"))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("2"))
 
             assert get(Group, "1").getMembers().size() == 2
 
         when:
-            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of(1))
+            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of("1"))
 
         then:
             def members = get(Group, "1").getMembers()
             members.size() == 1
-            members.contains(getUser(2))
+            members.contains(getUser("2"))
     }
 
     def "removing a user that was not added to a group does nothing"() {
         given:
             dispatch new CreateGroupCommand(GroupId.of("1"), "foo")
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(1))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("1"))
 
             assert get(Group, "1").getMembers().size() == 1
 
         when:
-            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of(666))
+            dispatch new RemoveUserFromGroupCommand(GroupId.of("1"), UserId.of("666"))
 
         then:
             def members = get(Group, "1").getMembers()
             members.size() == 1
-            members.contains(getUser(1))
+            members.contains(getUser("1"))
     }
 
 }

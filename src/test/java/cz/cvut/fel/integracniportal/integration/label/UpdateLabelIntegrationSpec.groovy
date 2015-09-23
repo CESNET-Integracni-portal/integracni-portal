@@ -28,7 +28,7 @@ public class UpdateLabelIntegrationSpec extends AbstractIntegrationSpecification
             label.id == "1"
             label.name == "school"
             label.color == "blue"
-            label.getOwner().getId() == 1
+            label.getOwner().getId() == "1"
     }
 
     def "updating label resulting in duplicate label (name, color, user) throws exception"() {

@@ -1,8 +1,8 @@
 package cz.cvut.fel.integracniportal.representation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.model.Label;
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.model.UserRole;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailsRepresentation {
 
-    private Long id;
+    private String id;
 
     private String username;
 
@@ -43,7 +43,7 @@ public class UserDetailsRepresentation {
     public UserDetailsRepresentation(UserDetails userDetails, boolean withRoles) {
         this.id = userDetails.getId();
         this.username = userDetails.getUsername();
-        this.unitId = userDetails.getOrganizationalUnit().getId();
+        this.unitId = userDetails.getOrganizationalUnit() != null ? userDetails.getOrganizationalUnit().getId() : null;
         if (withRoles) {
             for (Permission permission : Permission.values()) {
                 permissions.put(permission.toString(), false);
@@ -73,11 +73,11 @@ public class UserDetailsRepresentation {
         }
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

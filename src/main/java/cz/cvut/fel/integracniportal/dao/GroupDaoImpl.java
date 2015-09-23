@@ -26,7 +26,7 @@ public class GroupDaoImpl extends GenericHibernateDao<Group> implements GroupDao
     }
 
     @Override
-    public boolean groupExists(Long id, String name) {
+    public boolean groupExists(String id, String name) {
         return from(group)
                 .where(group.owner.userId.eq(id))
                 .where(group.name.eq(name))

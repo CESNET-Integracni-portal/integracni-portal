@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
+import cz.cvut.fel.integracniportal.domain.Permission;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
@@ -9,17 +11,19 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_details")
-public class UserDetails extends AbstractEntity<Long> {
+public class UserDetails extends AbstractEntity<String> {
 
     @Id
-    @GeneratedValue
     @Column(name = "user_id")
-    private Long userId;
+    private String userId;
 
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column
     private String password;
 
     @ManyToOne
@@ -36,12 +40,12 @@ public class UserDetails extends AbstractEntity<Long> {
     private List<Label> labels;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return userId;
     }
 
     @Override
-    public void setId(Long userId) {
+    public void setId(String userId) {
         this.userId = userId;
     }
 
@@ -51,6 +55,14 @@ public class UserDetails extends AbstractEntity<Long> {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

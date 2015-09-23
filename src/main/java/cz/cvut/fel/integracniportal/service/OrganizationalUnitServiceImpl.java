@@ -76,7 +76,7 @@ public class OrganizationalUnitServiceImpl implements OrganizationalUnitService 
     }
 
     @Override
-    public void addAdmin(String unitId, Long userId) {
+    public void addAdmin(String unitId, String userId) {
         commandGateway.sendAndWait(new AssignOrganizationalUnitAdminCommand(
                 OrganizationalUnitId.of(unitId),
                 UserId.of(userId)
@@ -84,7 +84,7 @@ public class OrganizationalUnitServiceImpl implements OrganizationalUnitService 
     }
 
     @Override
-    public void removeAdmin(String unitId, Long userId) {
+    public void removeAdmin(String unitId, String userId) {
         commandGateway.sendAndWait(new UnassignOrganizationalUnitAdminCommand(
                 OrganizationalUnitId.of(unitId),
                 UserId.of(userId)

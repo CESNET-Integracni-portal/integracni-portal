@@ -17,9 +17,9 @@ public interface OrganizationalUnitService {
 
     public OrganizationalUnit renameUnit(String unitId, String newName);
 
-    public void addAdmin(String unitId, Long userId);
+    public void addAdmin(String unitId, String userId);
 
-    public void removeAdmin(String unitId, Long userId);
+    public void removeAdmin(String unitId, String userId);
 
     public void updateUnitQuota(String unitId, Long size);
 

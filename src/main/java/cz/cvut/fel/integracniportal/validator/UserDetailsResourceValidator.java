@@ -1,7 +1,7 @@
 package cz.cvut.fel.integracniportal.validator;
 
+import cz.cvut.fel.integracniportal.domain.Permission;
 import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
-import cz.cvut.fel.integracniportal.model.Permission;
 import cz.cvut.fel.integracniportal.model.UserRole;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import cz.cvut.fel.integracniportal.service.UserRoleService;

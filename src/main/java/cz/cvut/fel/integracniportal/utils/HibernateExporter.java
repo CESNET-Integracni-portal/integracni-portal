@@ -67,7 +67,6 @@ public class HibernateExporter {
         hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Group.class);
         hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Label.class);
         hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.OrganizationalUnit.class);
-        hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.Permission.class);
         hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserDetails.class);
         hibernateConfiguration.addAnnotatedClass(cz.cvut.fel.integracniportal.model.UserRole.class);
 

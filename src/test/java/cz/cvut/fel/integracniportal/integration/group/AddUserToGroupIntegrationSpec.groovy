@@ -22,20 +22,20 @@ public class AddUserToGroupIntegrationSpec extends AbstractIntegrationSpecificat
             dispatch new CreateGroupCommand(GroupId.of("2"), "bar")
 
         when:
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(1))
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(2))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("1"))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("2"))
 
-            dispatch new AddUserToGroupCommand(GroupId.of("2"), UserId.of(1))
+            dispatch new AddUserToGroupCommand(GroupId.of("2"), UserId.of("1"))
 
         then:
             def members1 = get(Group, "1").getMembers()
             members1.size() == 2
-            members1.contains(getUser(1))
-            members1.contains(getUser(2))
+            members1.contains(getUser("1"))
+            members1.contains(getUser("2"))
 
             def members2 = get(Group, "2").getMembers()
             members2.size() == 1
-            members2.contains(getUser(1))
+            members2.contains(getUser("1"))
     }
 
     def "adding the same user to group does nothing"() {
@@ -43,13 +43,13 @@ public class AddUserToGroupIntegrationSpec extends AbstractIntegrationSpecificat
             dispatch new CreateGroupCommand(GroupId.of("1"), "foo")
 
         when:
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(1))
-            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of(1))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("1"))
+            dispatch new AddUserToGroupCommand(GroupId.of("1"), UserId.of("1"))
 
         then:
             def members1 = get(Group, "1").getMembers()
             members1.size() == 1
-            members1.contains(getUser(1))
+            members1.contains(getUser("1"))
     }
 
 }

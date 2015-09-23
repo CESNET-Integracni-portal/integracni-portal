@@ -1,9 +1,10 @@
 package cz.cvut.fel.integracniportal.service
+
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import cz.cvut.fel.integracniportal.domain.Permission
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException
-import cz.cvut.fel.integracniportal.model.Permission
 import cz.cvut.fel.integracniportal.model.UserRole
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
@@ -15,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 
 import static org.junit.Assert.*
+
 /**
  * @author Petr Strnad
  */

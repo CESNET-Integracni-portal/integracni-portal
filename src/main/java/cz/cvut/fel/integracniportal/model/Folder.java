@@ -27,6 +27,10 @@ public class Folder extends Node {
     public List<Folder> getFolders() {
         List<Folder> folders = new ArrayList<Folder>();
 
+        if (getChildNodes() == null) {
+            return folders;
+        }
+
         for (Node node : getChildNodes()) {
             if (node instanceof Folder) {
                 folders.add((Folder) node);
@@ -38,15 +42,19 @@ public class Folder extends Node {
 
     @Transient
     public List<FileMetadata> getFiles() {
-        List<FileMetadata> folders = new ArrayList<FileMetadata>();
+        List<FileMetadata> files = new ArrayList<FileMetadata>();
+
+        if (getChildNodes() == null) {
+            return files;
+        }
 
         for (Node node : getChildNodes()) {
             if (node instanceof FileMetadata) {
-                folders.add((FileMetadata) node);
+                files.add((FileMetadata) node);
             }
         }
 
-        return folders;
+        return files;
     }
 
 }

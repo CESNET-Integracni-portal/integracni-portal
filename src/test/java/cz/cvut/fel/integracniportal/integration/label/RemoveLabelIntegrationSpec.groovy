@@ -39,7 +39,7 @@ public class RemoveLabelIntegrationSpec extends AbstractIntegrationSpecification
             def label = labels.get(0);
             label.getName() == "school"
             label.getColor() == "blue"
-            label.getOwner().getId() == 1
+            label.getOwner().getId() == "1"
     }
 
     def "removing label that was not added does nothing"() {

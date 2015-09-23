@@ -24,7 +24,7 @@ public class CreateLabelIntegrationSpec extends AbstractIntegrationSpecification
             label.id == "1"
             label.name == "work"
             label.color == "red"
-            label.getOwner().getId() == 1
+            label.getOwner().getId() == "1"
     }
 
     def "creating duplicate label (name, color, owner) results in error"() {

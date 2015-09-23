@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface UserRoleDao {
 
+    public UserRole load(Serializable id);
+
     public UserRole get(Serializable id);
 
     public UserRole getRoleByName(String name);
@@ -19,5 +21,7 @@ public interface UserRoleDao {
     public void save(UserRole role);
 
     public void delete(UserRole role);
+
+    public boolean userRoleExists(String name);
 
 }

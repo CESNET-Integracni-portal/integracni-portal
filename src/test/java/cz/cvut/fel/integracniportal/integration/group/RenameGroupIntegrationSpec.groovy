@@ -27,7 +27,7 @@ public class RenameGroupIntegrationSpec extends AbstractIntegrationSpecification
             def group = get(Group, "1")
             group.id == "1"
             group.name == "renamedGroup"
-            group.getOwner().getId() == 1
+            group.getOwner().getId() == "1"
     }
 
     def "renaming group resulting in duplicate name throws exception"() {

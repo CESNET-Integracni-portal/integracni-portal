@@ -25,11 +25,13 @@
     <table name="user_details">
         <column>user_id</column>
         <column>username</column>
+        <column>email</column>
         <column>password</column>
         <column>organizationalunit_unit_id</column>
         <row>
             <value>101</value>
             <value>a</value>
+            <value>a@a</value>
             <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
             <value>1</value>
             <null/>
@@ -38,6 +40,7 @@
         <row>
             <value>102</value>
             <value>b</value>
+            <value>b@v</value>
             <value>$2a$10$FkLUz0Zk1f6r4Q4Vlq5kKuETA/GAKukxLtOgDdkzkAfT648nHL2dy</value>
             <value>2</value>
         </row>

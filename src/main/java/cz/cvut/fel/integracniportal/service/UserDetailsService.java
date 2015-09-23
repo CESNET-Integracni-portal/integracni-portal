@@ -16,7 +16,7 @@ public interface UserDetailsService {
      * @param userId Id of the user.
      * @return UserDetails login credentials.
      */
-    public UserDetails getUserById(long userId);
+    public UserDetails getUserById(String userId);
 
     /**
      * Finds a user in database by his username.
@@ -76,20 +76,20 @@ public interface UserDetailsService {
      * @param newPassword the new password for the user
      * @param oldPassword the old password for check
      */
-    public void changePassword(Long userId, String newPassword, String oldPassword);
+    public void changePassword(String userId, String newPassword, String oldPassword);
 
     /**
      * Updates the user's roles to the given list of roles
      * @param userId id of the user for which to update roles
      * @param roles the list of roles
      */
-    public void updateRoles(Long userId, List<String> roles);
+    public void updateRoles(String userId, List<String> roles);
 
     /**
      * Updates the user's permissions to the given list of permissions
      * @param userId id of the user for which to update permissions
      * @param permissions the list of permissions
      */
-    public void updatePermissions(Long userId, List<String> permissions);
+    public void updatePermissions(String userId, List<String> permissions);
 
 }
