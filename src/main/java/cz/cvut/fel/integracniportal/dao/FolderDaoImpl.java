@@ -22,9 +22,9 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
     }
 
     @Override
-    public Folder getForUser(Long id, UserDetails currentUser) {
+    public Folder getForUser(String id, UserDetails currentUser) {
         return from(folder)
-                .where(folder.folderId.eq(id))
+                .where(folder.folderId.like(id))
                 .singleResult(folder);
 
     }

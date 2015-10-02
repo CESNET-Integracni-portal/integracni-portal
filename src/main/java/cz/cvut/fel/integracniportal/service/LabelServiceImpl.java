@@ -104,8 +104,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void addLabelToFile(String fileId, LabelIdRepresentation representation, UserDetails currentUser) {
+        FileMetadata file = fileMetadataService.getFileMetadataById(fileId);
         Label label = getLabelById(representation.getLabelId());
         if (label.getOwner().getId().equals(currentUser.getId()) == false) {
             throw new InvalidStateException("Could not add label of other user");
@@ -122,8 +122,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void removeLabelFromFile(String fileId, LabelIdRepresentation representation, UserDetails currentUser) {
+        FileMetadata file = fileMetadataService.getFileMetadataById(fileId);
         List<Label> labels = file.getLabels();
         if (labels == null) {
             throw new NotFoundException("label.onFile.notFound.id", representation.getLabelId());
@@ -142,7 +142,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
+    public void addLabelToFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         Label label = getLabelById(representation.getLabelId());
         if (label.getOwner().getId().equals(currentUser.getId()) == false) {
@@ -160,7 +160,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFolder(Long folderId, LabelIdRepresentation representation, UserDetails currentUser) {
+    public void removeLabelFromFolder(String folderId, LabelIdRepresentation representation, UserDetails currentUser) {
         Folder folder = folderService.getFolderById(folderId);
         List<Label> labels = folder.getLabels();
         if (labels == null) {

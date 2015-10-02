@@ -53,7 +53,7 @@ public class FileController extends AbstractController {
     public ResponseEntity getFileMetadata(@PathVariable String spaceId,
                                           @PathVariable String fileId) {
         ensureSpace(spaceId);
-        FileMetadataRepresentation representation = fileMetadataService.getFileMetadataRepresentationByUuid(fileId);
+        FileMetadataRepresentation representation = fileMetadataService.getFileMetadataRepresentationById(fileId);
         return new ResponseEntity(representation, HttpStatus.OK);
     }
 
@@ -221,7 +221,7 @@ public class FileController extends AbstractController {
                                 HttpServletResponse response) throws IOException {
         ensureSpace(spaceId);
 
-        FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileId);
+        FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(fileId);
         InputStream fileStream = fileMetadataService.getFileAsInputStream(fileId);
 
         response.setContentType(fileMetadata.getMimetype());

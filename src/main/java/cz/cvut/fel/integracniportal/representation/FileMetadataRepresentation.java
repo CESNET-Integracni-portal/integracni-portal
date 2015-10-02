@@ -16,7 +16,7 @@ public class FileMetadataRepresentation {
 
     private String type = "file";
 
-    private String uuid;
+    private String id;
 
     private String filename;
 
@@ -38,7 +38,7 @@ public class FileMetadataRepresentation {
     }
 
     public FileMetadataRepresentation(FileMetadata fileMetadata) {
-        uuid = fileMetadata.getUuid();
+        id = fileMetadata.getId();
         filename = fileMetadata.getFilename();
         mimetype = fileMetadata.getMimetype();
         filesize = fileMetadata.getFilesize();
@@ -58,12 +58,28 @@ public class FileMetadataRepresentation {
         changedOn = fileMetadata.getChangedOn();
     }
 
+    /**
+     * @deprecated use getId() instead.
+     * @return
+     */
     public String getUuid() {
-        return uuid;
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    /**
+     * @deprecated use setId() instead.
+     * @param id
+     */
+    public void setUuid(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFilename() {

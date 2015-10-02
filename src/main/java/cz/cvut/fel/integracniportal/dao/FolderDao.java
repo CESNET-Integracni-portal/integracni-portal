@@ -13,7 +13,7 @@ public interface FolderDao {
 
     Folder get(Serializable id);
 
-    Folder getForUser(Long id, UserDetails currentUser);
+    Folder getForUser(String id, UserDetails currentUser);
 
     void update(Folder folder);
 

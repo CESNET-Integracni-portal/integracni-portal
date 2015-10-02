@@ -48,13 +48,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     @Transactional(readOnly = true)
-    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid) {
-        return fileMetadataDao.getByUUID(fileMetadataUuid);
+    public FileMetadata getFileMetadataById(String fileId) {
+        return fileMetadataDao.getByID(fileId);
     }
 
     @Override
-    public FileMetadataRepresentation getFileMetadataRepresentationByUuid(String fileId) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
+    public FileMetadataRepresentation getFileMetadataRepresentationById(String fileId) {
+        FileMetadata fileMetadata = getFileMetadataById(fileId);
         return new FileMetadataRepresentation(fileMetadata);
     }
 
@@ -103,7 +103,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
+    public FileMetadata uploadFileToFolder(String parentFolderId, MultipartFile file) {
         FileMetadata fileMetadata = new FileMetadata();
 
         Folder parent = folderService.getFolderById(parentFolderId);
@@ -127,8 +127,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void updateFile(String fileuuid, MultipartFile file) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
+    public void updateFile(String fileId, MultipartFile file) {
+        FileMetadata fileMetadata = getFileMetadataById(fileId);
         try {
             getFileApi(fileMetadata.getSpace()).putFile(fileMetadata, file.getInputStream());
             setFileMetadata(fileMetadata, file);
@@ -140,7 +140,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void renameFile(String fileId, String name) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
+        FileMetadata fileMetadata = getFileMetadataById(fileId);
         fileMetadata.setFilename(name);
         updateFileMetadata(fileMetadata);
 
@@ -149,8 +149,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void moveFile(String fileId, Long parentId) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
+    public void moveFile(String fileId, String parentId) {
+        FileMetadata file = getFileMetadataById(fileId);
         Folder parent = folderService.getFolderById(parentId);
 
         if (file.getParent() != null && file.getParent().equals(parent)) {
@@ -164,8 +164,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void deleteFile(String uuid) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
+    public void deleteFile(String id) {
+        FileMetadata fileMetadata = getFileMetadataById(id);
         deleteFile(fileMetadata, true);
     }
 
@@ -178,8 +178,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public InputStream getFileAsInputStream(String fileuuid) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
+    public InputStream getFileAsInputStream(String id) {
+        FileMetadata fileMetadata = getFileMetadataById(id);
         String space = fileMetadata.getSpace();
 
         return getFileApi(space).getFile(fileMetadata);
@@ -187,7 +187,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void moveFileOnline(String fileId) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
+        FileMetadata fileMetadata = getFileMetadataById(fileId);
         if (fileMetadata.isOnline()) {
             return;
         }
@@ -197,7 +197,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void moveFileOffline(String fileId) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
+        FileMetadata fileMetadata = getFileMetadataById(fileId);
         if (fileMetadata.isOnline() == false) {
             return;
         }
@@ -213,19 +213,19 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void favoriteFile(String fileId, UserDetails currentUser) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
+        FileMetadata file = getFileMetadataById(fileId);
         // TODO
     }
 
     @Override
     public void unfavoriteFile(String fileId, UserDetails currentUser) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
+        FileMetadata file = getFileMetadataById(fileId);
         // TODO
     }
 
     @Override
     public void shareFile(String fileId, List<Long> userIds, UserDetails currentUser) {
-        FileMetadata file = getFileMetadataByUuid(fileId);
+        FileMetadata file = getFileMetadataById(fileId);
         // TODO
     }
 

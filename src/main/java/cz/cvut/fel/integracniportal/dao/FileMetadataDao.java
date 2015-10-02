@@ -13,10 +13,10 @@ public interface FileMetadataDao {
     /**
      * Finds a file metadata in database by its uuid.
      *
-     * @param fileMetadataUuid Uuid of the file.
+     * @param fileMetadataId Uuid of the file.
      * @return FileMetadata metadata.
      */
-    public FileMetadata getByUUID(String fileMetadataUuid);
+    public FileMetadata getByID(String fileMetadataId);
 
     /**
      * Finds all files in database.

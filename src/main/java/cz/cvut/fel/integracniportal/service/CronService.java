@@ -24,9 +24,9 @@ public class CronService {
         try {
             for (FileMetadata fileMetadata : fileMetadataList) {
                 try {
-                    archiveFileMetadataService.deleteFile(fileMetadata.getUuid());
+                    archiveFileMetadataService.deleteFile(fileMetadata.getId());
                 } catch (FileAccessException e) {
-                    logger.error("Unable to delete old archived file '" + fileMetadata.getFilename() + "' (UUID " + fileMetadata.getUuid() + "): file not found.");
+                    logger.error("Unable to delete old archived file '" + fileMetadata.getFilename() + "' (UUID " + fileMetadata.getId() + "): file not found.");
                 }
             }
         } catch (Error e) {

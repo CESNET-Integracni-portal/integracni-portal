@@ -35,7 +35,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Folder getFolderById(long id) {
+    public Folder getFolderById(String id) {
         Folder folder = folderDao.get(id);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
@@ -45,7 +45,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public FolderRepresentation getFolderRepresentationById(long id, UserDetails currentUser) {
+    public FolderRepresentation getFolderRepresentationById(String id, UserDetails currentUser) {
         Folder folder = folderDao.getForUser(id, currentUser);
         if (folder == null) {
             throw new NotFoundException("cesnet.folder.notFound", id);
@@ -97,7 +97,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Folder createSubFolder(String folderName, Long parentId, UserDetails owner) {
+    public Folder createSubFolder(String folderName, String parentId, UserDetails owner) {
         Folder parent = getFolderById(parentId);
         return createSubFolder(folderName, parent, owner);
     }
@@ -118,7 +118,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Folder renameFolder(Long folderId, String newName) {
+    public Folder renameFolder(String folderId, String newName) {
         Folder folder = getFolderById(folderId);
 
         getFileApi(folder.getSpace()).renameFolder(folder, newName);
@@ -130,7 +130,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void removeFolder(Long folderId) {
+    public void removeFolder(String folderId) {
         Folder folder = getFolderById(folderId);
         removeFolder(folder, true);
     }
@@ -155,7 +155,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolder(Long folderId, Long parentId) {
+    public void moveFolder(String folderId, String parentId) {
         Folder folder = getFolderById(folderId);
         Folder parent = getFolderById(parentId);
 
@@ -174,7 +174,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolderOnline(Long folderId) {
+    public void moveFolderOnline(String folderId) {
         Folder folder = getFolderById(folderId);
         if (folder.isOnline()) {
             return;
@@ -185,7 +185,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public void moveFolderOffline(Long folderId) {
+    public void moveFolderOffline(String folderId) {
         Folder folder = getFolderById(folderId);
         if (folder.isOnline() == false) {
             return;
@@ -196,19 +196,19 @@ public class FolderServiceImpl implements FolderService {
 
 
     @Override
-    public void favoriteFolder(Long folderId, UserDetails currentUser) {
+    public void favoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }
 
     @Override
-    public void unfavoriteFolder(Long folderId, UserDetails currentUser) {
+    public void unfavoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }
 
     @Override
-    public void shareFolder(Long folderId, List<Long> userIds, UserDetails currentUser) {
+    public void shareFolder(String folderId, List<Long> userIds, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
         // TODO
     }

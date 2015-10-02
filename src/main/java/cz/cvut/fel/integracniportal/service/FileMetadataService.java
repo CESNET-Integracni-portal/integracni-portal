@@ -24,10 +24,10 @@ public interface FileMetadataService {
     /**
      * Finds a file metadata in database by its uuid.
      *
-     * @param fileMetadataUuid Uuid of the file.
+     * @param fileId Uuid of the file.
      * @return FileMetadata metadata.
      */
-    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid);
+    public FileMetadata getFileMetadataById(String fileId);
 
     /**
      * Returns the file metadata.
@@ -35,7 +35,7 @@ public interface FileMetadataService {
      * @param fileId the ID of file to return the metadata for
      * @return FileMetadata metadata.
      */
-    public FileMetadataRepresentation getFileMetadataRepresentationByUuid(String fileId);
+    public FileMetadataRepresentation getFileMetadataRepresentationById(String fileId);
 
     /**
      * Saves the file metadata into database.
@@ -81,15 +81,15 @@ public interface FileMetadataService {
      * @param file           The file to be uploaded.
      * @return Uuid identifier of the created file.
      */
-    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file);
+    public FileMetadata uploadFileToFolder(String parentFolderId, MultipartFile file);
 
     /**
      * Updates file and its metadata.
      *
-     * @param fileuuid Uuid identifier of the file to be updated.
+     * @param fileId Uuid identifier of the file to be updated.
      * @param file     The file to be updated.
      */
-    public void updateFile(String fileuuid, MultipartFile file);
+    public void updateFile(String fileId, MultipartFile file);
 
     /**
      * Renames file.
@@ -105,19 +105,19 @@ public interface FileMetadataService {
      * @param fileId   the ID of file to move
      * @param parentId the ID of folder to move the file to
      */
-    public void moveFile(String fileId, Long parentId);
+    public void moveFile(String fileId, String parentId);
 
     /**
      * Deletes a file and removes its metadata from database
      *
-     * @param uuid The uuid identifier of the file to be deleted.
+     * @param id The uuid identifier of the file to be deleted.
      */
-    public void deleteFile(String uuid);
+    public void deleteFile(String id);
 
     /**
      * Deletes a file and removes its metadata from database
      *
-     * @param fileMetadata File to be deleted.
+     * @param fileMetadata         File to be deleted.
      * @param removeFromRepository true if file is to be removed from file repository
      */
     void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository);
@@ -125,9 +125,9 @@ public interface FileMetadataService {
     /**
      * Returns the file contents as input stream.
      *
-     * @param fileuuid The uuid identifier of the file to be deleted.
+     * @param fileId The uuid identifier of the file to be deleted.
      */
-    public InputStream getFileAsInputStream(String fileuuid);
+    public InputStream getFileAsInputStream(String fileId);
 
     /**
      * Moves the file to online state.

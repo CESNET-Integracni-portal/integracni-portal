@@ -9,12 +9,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_details")
-public class UserDetails extends AbstractEntity<Long> {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "user_id")
-    private Long userId;
+@PrimaryKeyJoinColumn(name = "user_details_id", referencedColumnName = "user_id")
+public class UserDetails extends AbstractUser {
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -34,16 +30,6 @@ public class UserDetails extends AbstractEntity<Long> {
 
     @OneToMany
     private List<Label> labels;
-
-    @Override
-    public Long getId() {
-        return userId;
-    }
-
-    @Override
-    public void setId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getUsername() {
         return username;

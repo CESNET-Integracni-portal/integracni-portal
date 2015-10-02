@@ -4,9 +4,9 @@ defaultAdmin.username=admin
 defaultAdmin.password=admin
 
 db.driverClassName=org.postgresql.Driver
-db.dataSource.connectionUrl=jdbc:postgresql://localhost:5433/integracni-portal
-db.dataSource.username=Eldar
-db.dataSource.password=portal
+db.dataSource.connectionUrl=jdbc:postgresql://localhost:5432/integracni-portal
+db.dataSource.username=
+db.dataSource.password=
 
 db.hibernate.data.dialect=org.hibernate.dialect.PostgreSQLDialect
 db.hibernate.data.show_sql=false

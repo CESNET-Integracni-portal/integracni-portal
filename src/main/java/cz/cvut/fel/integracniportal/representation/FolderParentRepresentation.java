@@ -7,13 +7,13 @@ package cz.cvut.fel.integracniportal.representation;
  */
 public class FolderParentRepresentation {
 
-    private Long parentId;
+    private String parentId;
 
-    public Long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 

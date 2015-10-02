@@ -1,0 +1,4 @@
+ssh.server=
+ssh.port=22
+ssh.user=
+ssh.password=

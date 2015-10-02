@@ -10,12 +10,8 @@ import java.util.Set;
 @Table(name = "user_group", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "owner"})
 })
-public class Group extends AbstractEntity<Long> {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "group_id")
-    private Long groupId;
+@PrimaryKeyJoinColumn(name = "group_id", referencedColumnName = "user_id")
+public class Group extends AbstractUser {
 
     @Column(nullable = false)
     private String name;
@@ -29,17 +25,6 @@ public class Group extends AbstractEntity<Long> {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<UserDetails> members;
-
-
-    @Override
-    public Long getId() {
-        return groupId;
-    }
-
-    @Override
-    public void setId(Long id) {
-        groupId = id;
-    }
 
     public String getName() {
         return name;
