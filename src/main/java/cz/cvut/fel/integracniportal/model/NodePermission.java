@@ -27,4 +27,7 @@ public enum NodePermission {
         return this.name;
     }
 
+    public String getName() {
+        return name;
+    }
 }

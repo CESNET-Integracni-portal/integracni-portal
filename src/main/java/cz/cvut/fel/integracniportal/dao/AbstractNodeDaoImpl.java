@@ -4,6 +4,8 @@ import cz.cvut.fel.integracniportal.model.AbstractNode;
 import cz.cvut.fel.integracniportal.model.QAbstractNode;
 import org.springframework.stereotype.Repository;
 
+import static cz.cvut.fel.integracniportal.model.QAbstractNode.abstractNode;
+
 /**
  * @author Eldar Iosip
  */
@@ -16,12 +18,9 @@ public class AbstractNodeDaoImpl extends GenericHibernateDao<AbstractNode> imple
 
     @Override
     public AbstractNode getAclParentFor(String nodeId) {
-        return null;
-        /*
         return from(abstractNode)
                 .where(abstractNode.nodeId.eq(nodeId))
                 .uniqueResult(abstractNode);
-                */
     }
 
     @Override

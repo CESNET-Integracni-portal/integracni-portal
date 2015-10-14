@@ -20,7 +20,6 @@ public abstract class AbstractNode extends AbstractEntity<String> {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "node_id", unique = true)
-
     private String nodeId;
 
     @Column(name = "name", nullable = false)
@@ -49,12 +48,12 @@ public abstract class AbstractNode extends AbstractEntity<String> {
             uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "node_id"})})
     private List<Label> labels;
 
-    @OneToMany(mappedBy = "owner")
-    private List<AclPermission> acl;
-
     @ManyToOne
     @JoinColumn(name = "acl_parent_id")
     private AbstractNode aclParent;
+
+    @OneToMany(mappedBy = "owner")
+    private List<AclPermission> acl;
 
     public String getId() {
         return nodeId;
@@ -120,20 +119,20 @@ public abstract class AbstractNode extends AbstractEntity<String> {
         this.labels = labels;
     }
 
-    public List<AclPermission> getAcl() {
-        return acl;
-    }
-
-    public void setAcl(List<AclPermission> acl) {
-        this.acl = acl;
-    }
-
     public AbstractNode getAclParent() {
         return aclParent;
     }
 
     public void setAclParent(AbstractNode aclParent) {
         this.aclParent = aclParent;
+    }
+
+    public List<AclPermission> getAcl() {
+        return acl;
+    }
+
+    public void setAcl(List<AclPermission> acl) {
+        this.acl = acl;
     }
 
     public abstract void getFileNode(List<FileMetadata> context);

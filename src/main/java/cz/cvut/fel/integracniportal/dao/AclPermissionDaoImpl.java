@@ -3,7 +3,7 @@ package cz.cvut.fel.integracniportal.dao;
 import cz.cvut.fel.integracniportal.model.AbstractNode;
 import cz.cvut.fel.integracniportal.model.AbstractUser;
 import cz.cvut.fel.integracniportal.model.AclPermission;
-import cz.cvut.fel.integracniportal.model.FileMetadata;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;

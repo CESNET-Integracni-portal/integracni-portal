@@ -9,9 +9,7 @@ import java.util.List;
  *
  * @author Eldar Iosip
  */
-@Entity
-@Table(name = "user_node")
-@Inheritance(strategy = InheritanceType.JOINED)
+@MappedSuperclass
 public abstract class AbstractUser extends AbstractEntity<Long> {
 
     @Id
