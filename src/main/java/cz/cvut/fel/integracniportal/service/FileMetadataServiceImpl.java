@@ -1,7 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
-import cz.cvut.fel.integracniportal.exceptions.FileIOException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -9,10 +8,8 @@ import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -80,62 +77,48 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public FileMetadata uploadFileToRoot(String space, MultipartFile file) {
-        FileMetadata fileMetadata = new FileMetadata();
-
-        UserDetails currentUser = userDetailsService.getCurrentUser();
-
-        setFileMetadata(fileMetadata, file);
-
-        fileMetadata.setParent(null);
-        fileMetadata.setOwner(currentUser);
-        fileMetadata.setSpace(space);
-
-        createFileMetadata(fileMetadata);
-
-        try {
-            getFileApi(space).putFile(fileMetadata, file.getInputStream());
-
-            return fileMetadata;
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+    public FileMetadata uploadFileToRoot(String space, FileUpload fileUpload) {
+        return upload(space, null, fileUpload);
     }
 
     @Override
-    public FileMetadata uploadFileToFolder(Long parentFolderId, MultipartFile file) {
+    public FileMetadata uploadFileToFolder(Long parentFolderId, FileUpload fileUpload) {
+        Folder parent = folderService.getFolderById(parentFolderId);
+        return upload(parent.getSpace(), parent, fileUpload);
+    }
+
+    private FileMetadata upload(String space, Folder parent, FileUpload fileUpload) {
         FileMetadata fileMetadata = new FileMetadata();
 
-        Folder parent = folderService.getFolderById(parentFolderId);
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
-        setFileMetadata(fileMetadata, file);
-
+        fileMetadata.setFilename(fileUpload.getFileName());
+        fileMetadata.setMimetype(fileUpload.getContentType());
         fileMetadata.setParent(parent);
         fileMetadata.setOwner(currentUser);
-        fileMetadata.setSpace(parent.getSpace());
+        fileMetadata.setSpace(space);
+        fileMetadata.setFilesize(0L);
 
         createFileMetadata(fileMetadata);
 
-        try {
-            getFileApi(parent.getSpace()).putFile(fileMetadata, file.getInputStream());
+        getFileApi(space).putFile(fileMetadata, fileUpload.getInputStream());
 
-            return fileMetadata;
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+        fileMetadata.setFilesize(fileUpload.getByteReadCount());
+        updateFileMetadata(fileMetadata);
+
+        return fileMetadata;
     }
 
     @Override
-    public void updateFile(String fileuuid, MultipartFile file) {
+    public void updateFile(String fileuuid, FileUpload fileUpload) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
-        try {
-            getFileApi(fileMetadata.getSpace()).putFile(fileMetadata, file.getInputStream());
-            setFileMetadata(fileMetadata, file);
-            updateFileMetadata(fileMetadata);
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+
+        getFileApi(fileMetadata.getSpace()).putFile(fileMetadata, fileUpload.getInputStream());
+
+        fileMetadata.setFilesize(fileUpload.getByteReadCount());
+        fileMetadata.setMimetype(fileUpload.getContentType());
+
+        updateFileMetadata(fileMetadata);
     }
 
     @Override
@@ -173,16 +156,16 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     public void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository) {
         removeFileMetadata(fileMetadata);
         if (removeFromRepository) {
-            getFileApi(fileMetadata.getSpace()).moveFileToBin(fileMetadata);
+            getFileApi(fileMetadata.getSpace()).deleteFile(fileMetadata);
         }
     }
 
     @Override
-    public InputStream getFileAsInputStream(String fileuuid) {
+    public void copyFileToOutputStream(String fileuuid, OutputStream outputStream) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
         String space = fileMetadata.getSpace();
 
-        return getFileApi(space).getFile(fileMetadata);
+        getFileApi(space).getFile(fileMetadata, outputStream);
     }
 
     @Override
@@ -203,12 +186,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         }
         fileMetadata.setOnline(false);
         getFileApi(fileMetadata.getSpace()).moveFileOffline(fileMetadata);
-    }
-
-    private void setFileMetadata(FileMetadata fileMetadata, MultipartFile file) {
-        fileMetadata.setFilename(file.getOriginalFilename());
-        fileMetadata.setMimetype(file.getContentType());
-        fileMetadata.setFilesize(file.getSize());
     }
 
     @Override

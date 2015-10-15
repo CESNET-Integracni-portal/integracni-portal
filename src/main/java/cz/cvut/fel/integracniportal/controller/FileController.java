@@ -2,22 +2,20 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.representation.*;
-import cz.cvut.fel.integracniportal.service.FileMetadataService;
-import cz.cvut.fel.integracniportal.service.LabelService;
-import cz.cvut.fel.integracniportal.service.SpaceService;
-import cz.cvut.fel.integracniportal.service.UserDetailsService;
-import org.apache.commons.io.IOUtils;
+import cz.cvut.fel.integracniportal.service.*;
+import cz.cvut.fel.integracniportal.utils.UploadUtils;
+import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -222,12 +220,15 @@ public class FileController extends AbstractController {
         ensureSpace(spaceId);
 
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileId);
-        InputStream fileStream = fileMetadataService.getFileAsInputStream(fileId);
 
         response.setContentType(fileMetadata.getMimetype());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getFilename() + "\"");
-        IOUtils.copy(fileStream, response.getOutputStream());
 
+        ServletOutputStream outputStream = response.getOutputStream();
+
+        fileMetadataService.copyFileToOutputStream(fileId, outputStream);
+
+        outputStream.flush();
         response.flushBuffer();
     }
 
@@ -242,10 +243,12 @@ public class FileController extends AbstractController {
     @ResponseBody
     public ResponseEntity updateFileContent(@PathVariable String spaceId,
                                             @PathVariable String fileId,
-                                            @RequestParam MultipartFile file) {
+                                            HttpServletRequest request) throws IOException, FileUploadException {
         ensureSpace(spaceId);
 
-        fileMetadataService.updateFile(fileId, file);
+        FileUpload fileUpload = UploadUtils.handleFileUpload(request);
+
+        fileMetadataService.updateFile(fileId, fileUpload);
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 

@@ -23,10 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class SftpChannel {
 
@@ -53,14 +52,14 @@ public class SftpChannel {
         sftpChannel.cd(path);
     }
 
-    public InputStream getFile(String filename) throws SftpException, IOException {
+    public void getFile(String filename, OutputStream outputStream) throws SftpException, IOException {
         InputStream inputStream = sftpChannel.get(filename);
-        ByteArrayOutputStream clonedStream = new ByteArrayOutputStream();
-        IOUtils.copy(inputStream, clonedStream);
-        clonedStream.flush();
-        InputStream result = new ByteArrayInputStream(clonedStream.toByteArray());
+
+        IOUtils.copyLarge(inputStream, outputStream);
+
+        outputStream.flush();
+
         sftpChannel.disconnect();
-        return result;
     }
 
     public void mkdir(String path) throws SftpException {

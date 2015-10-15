@@ -4,6 +4,11 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener
 import com.github.springtestdbunit.annotation.DbUnitConfiguration
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao
 import cz.cvut.fel.integracniportal.model.UserDetails
+import org.apache.commons.httpclient.methods.PostMethod
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource
+import org.apache.commons.httpclient.methods.multipart.FilePart
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity
+import org.apache.commons.httpclient.methods.multipart.Part
 import org.apache.commons.io.IOUtils
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -26,6 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.RequestBuilder
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.web.context.WebApplicationContext
@@ -109,6 +115,20 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         return mockMvc.perform(
                 delete(fromApi(urlTemplate))
         )
+    }
+
+    public RequestBuilder upload(String url, String fileName, byte[] fileContents, String contentType, String charset = "utf-8") {
+        Part[] parts = [
+                new FilePart("file", new ByteArrayPartSource(fileName, fileContents), contentType, charset)
+        ]
+        def multipartRequestEntity = new MultipartRequestEntity(parts, new PostMethod().getParams());
+
+        ByteArrayOutputStream requestContent = new ByteArrayOutputStream();
+        multipartRequestEntity.writeRequest(requestContent);
+
+        return fileUpload(fromApi(url))
+                .content(requestContent.toByteArray())
+                .contentType(MediaType.valueOf(multipartRequestEntity.getContentType()))
     }
 
 	public static String fromApi(String urlTemplate) {

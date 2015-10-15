@@ -5,12 +5,10 @@ import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
 import org.junit.Test
 import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 
 import static org.hamcrest.CoreMatchers.notNullValue
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -31,7 +29,8 @@ public class FolderController_uploadFile_Test extends AbstractIntegrationTestCas
 
     @Test
     void "should upload a file and return meta data"() {
-        mockMvc.perform(fileUpload(fromApi("space/cesnet/folder/1001/file")).file(createFile()))
+
+        mockMvc.perform(uploadFile("space/cesnet/folder/1001/file"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath('$.uuid', notNullValue()))
                 .andExpect(jsonPath('$.filename').value(FILE_NAME))
@@ -41,18 +40,18 @@ public class FolderController_uploadFile_Test extends AbstractIntegrationTestCas
 
     @Test
     void "should return 404 error for non-existing folder"() {
-        mockMvc.perform(fileUpload(fromApi("space/cesnet/folder/666/file")).file(createFile()))
+        mockMvc.perform(uploadFile("space/cesnet/folder/666/file"))
                 .andExpect(status().isNotFound())
     }
 
     @Test
     void "should return 404 error for non-existing space"() {
-        mockMvc.perform(fileUpload(fromApi("space/xxx/folder/1001/file")).file(createFile()))
+        mockMvc.perform(uploadFile("space/xxx/folder/1001/file"))
                 .andExpect(status().isNotFound())
     }
 
-    def createFile() {
-        return new MockMultipartFile("file", FILE_NAME, MIME_TYPE, FILE_CONTENTS.getBytes())
+    def uploadFile(url) {
+        return upload(url, FILE_NAME, FILE_CONTENTS.getBytes(), MIME_TYPE)
     }
 
 }

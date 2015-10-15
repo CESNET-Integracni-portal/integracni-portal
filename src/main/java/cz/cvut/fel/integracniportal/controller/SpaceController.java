@@ -4,10 +4,9 @@ import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.*;
-import cz.cvut.fel.integracniportal.service.FileMetadataService;
-import cz.cvut.fel.integracniportal.service.FolderService;
-import cz.cvut.fel.integracniportal.service.SpaceService;
-import cz.cvut.fel.integracniportal.service.UserDetailsService;
+import cz.cvut.fel.integracniportal.service.*;
+import cz.cvut.fel.integracniportal.utils.UploadUtils;
+import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -87,11 +87,12 @@ public class SpaceController extends AbstractController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file", method = POST)
-    public ResponseEntity<FolderRepresentation> uploadFile(
-            @PathVariable String spaceId,
-            @RequestParam MultipartFile file) {
+    public ResponseEntity<FolderRepresentation> uploadFile(@PathVariable String spaceId,
+                                                           HttpServletRequest request) throws IOException, FileUploadException {
 
-        FileMetadata fileMetadata = fileMetadataService.uploadFileToRoot(spaceId, file);
+        FileUpload fileUpload = UploadUtils.handleFileUpload(request);
+
+        FileMetadata fileMetadata = fileMetadataService.uploadFileToRoot(spaceId, fileUpload);
         return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
