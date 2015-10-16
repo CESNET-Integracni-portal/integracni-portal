@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Provider;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,9 +46,14 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
     }
 
     @Override
+    public String getType() {
+        return "cesnet";
+    }
+
+    @Override
     public void createFolder(FolderDefinition folder) {
-        String path = getUserHomeFolder(folder.getOwner()) + "/" + folder.getPath();
-        createFolderPath(path.split("/", -1));
+        String path = getUserHomeFolder(folder.getOwner());
+        createFolderPath(toArray(path));
     }
 
     private void createFolderPath(String[] folderPath) {
@@ -84,17 +90,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     @Override
     public void moveFolder(FolderDefinition from, FolderDefinition to) {
-        SftpChannel sftpChannel = null;
-        try {
-            sftpChannel = sftpChannelChannelProvider.get();
-            sftpChannel.renameFolder(getHomeFolderPath(from), getBinFolderPath(to));
-        } catch (SftpException e) {
-            throw new ServiceAccessException("Could not move folder", e);
-        } finally {
-            if (sftpChannel != null) {
-                sftpChannel.returnToPool();
-            }
-        }
+
     }
 
     @Override
@@ -116,17 +112,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     @Override
     public void renameFolder(String newName, FolderDefinition folder) {
-        SftpChannel sftpChannel = null;
-        try {
-            sftpChannel = sftpChannelChannelProvider.get();
-            sftpChannel.renameFolder(getHomeFolderPath(folder), newName);
-        } catch (SftpException e) {
-            throw new ServiceAccessException("Could not rename folder", e);
-        } finally {
-            if (sftpChannel != null) {
-                sftpChannel.returnToPool();
-            }
-        }
+
     }
 
     @Override
@@ -134,7 +120,11 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         SftpChannel sftpChannel = null;
         try {
             sftpChannel = sftpChannelChannelProvider.get();
-            sftpChannel.cd(getHomeFolderPath(file.getFolder()));
+
+            String path = getUserHomeFolder(file.getOwner());
+            createFolderPath(toArray(path));
+            sftpChannel.cd(path);
+
             sftpChannel.uploadFile(stream, file.getId());
         } catch (SftpException e) {
             throw new ServiceAccessException("Could not upload file", e);
@@ -146,12 +136,12 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
     }
 
     @Override
-    public InputStream getFile(FileDefinition file) {
+    public void getFile(FileDefinition file, OutputStream outputStream) {
         SftpChannel sftpChannel = null;
         try {
             sftpChannel = sftpChannelChannelProvider.get();
-            sftpChannel.cd(getHomeFolderPath(file.getFolder()));
-            return sftpChannel.getFile(file.getId());
+            sftpChannel.cd(getUserHomeFolder(file.getOwner()));
+            sftpChannel.getFile(file.getId(), outputStream);
         } catch (Exception e) {
             throw new FileAccessException("Could not get file", e);
         } finally {
@@ -179,12 +169,23 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     @Override
     public void moveFile(FileDefinition file, FolderDefinition to) {
+        // no code - files are in one folder anyway
+    }
+
+    @Override
+    public void renameFile(String newName, FileDefinition file) {
+        // no code - file names are IDs
+    }
+
+    @Override
+    public void deleteFile(FileDefinition file) {
         SftpChannel sftpChannel = null;
         try {
             sftpChannel = sftpChannelChannelProvider.get();
-            sftpChannel.moveFile(getHomeFolderPath(file.getFolder()) + "/" + file.getId(), getHomeFolderPath(to) + "/" + file.getId());
+            sftpChannel.cd(getUserHomeFolder(file.getOwner()));
+            sftpChannel.deleteFile(file.getId());
         } catch (Exception e) {
-            throw new ServiceAccessException("Could not move file", e);
+            throw new FileAccessException("Could not get file", e);
         } finally {
             if (sftpChannel != null) {
                 sftpChannel.returnToPool();
@@ -193,8 +194,8 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
     }
 
     @Override
-    public void renameFile(String newName, FileDefinition file) {
-        // no code - file names are IDs
+    public void deleteFolder(FolderDefinition folderDef) {
+        // no code - files are in one folder anyway
     }
 
     @Override
@@ -301,8 +302,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         return dateFormat.parse(date);
     }
 
-    @Override
-    public String getType() {
-        return "cesnet";
+    private String[] toArray(String path) {
+        return path.split("/", -1);
     }
 }

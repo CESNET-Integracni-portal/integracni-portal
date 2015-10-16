@@ -42,6 +42,11 @@ public class NodeNameUpdater {
         moveToRoot(event, event.getRootOwner());
     }
 
+    @EventHandler
+    public void handle(NodeDeletedEvent event) {
+        deleteNodeName(event);
+    }
+
     private void createNodeName(NodeCreatedEvent event) {
         NodeName nodeName = new NodeName();
         nodeName.setId(event.getId().getId());
@@ -80,6 +85,11 @@ public class NodeNameUpdater {
         nodeName.setUserId(rootOwner.getId());
 
         nodeNameDao.save(nodeName);
+    }
+
+    private void deleteNodeName(NodeDeletedEvent event) {
+        NodeName nodeName = nodeNameDao.load(event.getId().getId());
+        nodeNameDao.delete(nodeName);
     }
 
 }

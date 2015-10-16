@@ -3,10 +3,7 @@ package cz.cvut.fel.integracniportal.query.node;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
-import cz.cvut.fel.integracniportal.domain.node.events.FileCreatedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FileMovedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FileMovedToRootEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FileRenamedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.*;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -75,6 +72,21 @@ public class FileUpdater {
     public void moveFileToRoot(FileMovedToRootEvent event) {
         FileMetadata file = fileDao.load(event.getId().getId());
         file.setParent(null);
+        fileDao.update(file);
+    }
+
+    @EventHandler
+    public void deleteFile(FileDeletedEvent event) {
+        FileMetadata file = fileDao.load(event.getId().getId());
+        fileDao.delete(file);
+    }
+
+    @EventHandler
+    public void changeSize(FileSizeChangedEvent event) {
+        FileMetadata file = fileDao.load(event.getId().getId());
+
+        file.setFilesize(event.getNewSize());
+
         fileDao.update(file);
     }
 

@@ -40,9 +40,9 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
 
     @Test
     void "should return user role with id 101"() {
-        UserRole userRole = userRoleService.getRoleById(101);
+        UserRole userRole = userRoleService.getRoleById("101");
         assertNotNull(userRole);
-        assertEquals(101, userRole.getId());
+        assertEquals("101", userRole.getId());
         assertEquals("externists", userRole.getName());
     }
 
@@ -50,7 +50,7 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
     void "should return user role with name 'externists'"() {
         UserRole userRole = userRoleService.getRoleByName("externists");
         assertNotNull(userRole);
-        assertEquals(101, userRole.getId());
+        assertEquals("101", userRole.getId());
         assertEquals("externists", userRole.getName());
     }
 
@@ -74,7 +74,7 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
     void "should return list of all user roles"() {
         List<UserRole> userRoleList = userRoleService.getAllRoles();
         assertEquals(2, userRoleList.size());
-        assertEquals(101, userRoleList.get(0).getId());
+        assertEquals("101", userRoleList.get(0).getId());
         assertEquals("externists", userRoleList.get(0).getName());
         assertEquals(1, userRoleList.get(0).getPermissions().size());
         Permission permission = (Permission) userRoleList.get(0).getPermissions().toArray()[0];
@@ -107,7 +107,7 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
         // Check that the user role exists prior to testing
         UserRole userRole = userRoleService.getRoleByName("externists");
         assertNotNull(userRole);
-        assertEquals(101, userRole.getId());
+        assertEquals("101", userRole.getId());
         assertEquals("externists", userRole.getName());
         assertEquals("Can edit externists.", userRole.getDescription());
 
@@ -124,7 +124,7 @@ public class UserRoleService_Test extends AbstractIntegrationTestCase {
 
         // Check that the role has been changed
         UserRole userRoleUpdated = userRoleService.getRoleByName("changedRole");
-        assertEquals(101, userRoleUpdated.getId());
+        assertEquals("101", userRoleUpdated.getId());
         assertEquals("changedRole", userRoleUpdated.getName());
         assertEquals("New description.", userRoleUpdated.getDescription());
         assertEquals(1, userRoleUpdated.getPermissions().size());

@@ -54,9 +54,9 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
 
     @Test
     void "should return user with id 101"() {
-        UserDetails userDetails = userDetailsService.getUserById(101);
+        UserDetails userDetails = userDetailsService.getUserById("101");
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertEquals(userDetails.getUsername(), "a");
     }
 
@@ -64,7 +64,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
     void "should return user with username 'a'"() {
         UserDetails userDetails = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertEquals(userDetails.getUsername(), "a");
     }
 
@@ -92,7 +92,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
 
         UserDetails userDetails = userDetailsService.getCurrentUser();
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertEquals(userDetails.getUsername(), "a");
     }
 
@@ -100,9 +100,9 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
     void "should return list of all users"() {
         List<UserDetails> userDetailsList = userDetailsService.getAllUsers();
         assertEquals(userDetailsList.size(), 2);
-        assertEquals(userDetailsList.get(0).getId(), 101);
+        assertEquals(userDetailsList.get(0).getId(), "101");
         assertEquals(userDetailsList.get(0).getUsername(), "a");
-        assertEquals(userDetailsList.get(1).getId(), 102);
+        assertEquals(userDetailsList.get(1).getId(), "102");
         assertEquals(userDetailsList.get(1).getUsername(), "b");
     }
 
@@ -110,7 +110,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
     void "should return list of users in organizational unit 1"() {
         List<UserDetails> usersInUnit = userDetailsService.getAllUsersInOrganizationalUnit("1");
         assertEquals(usersInUnit.size(), 1);
-        assertEquals(usersInUnit.get(0).getId(), 101);
+        assertEquals(usersInUnit.get(0).getId(), "101");
         assertEquals(usersInUnit.get(0).getUsername(), "a");
     }
 
@@ -149,7 +149,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         userDetails.setPassword(passwordEncoder.encode("myOldPassword"))
         userDetailsService.saveUser(userDetails)
 
-        userDetailsService.changePassword(userDetails.getId(), "myNewPassword", "myOldPassword")
+        userDetailsService.changePassword(token, userDetails.getId(), "myNewPassword", "myOldPassword")
 
         UserDetails userDetailsUpdated = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetailsUpdated)
@@ -165,7 +165,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         userDetailsService.saveUser(userDetails)
 
         try {
-            userDetailsService.changePassword(userDetails.getId(), "myNewPassword", "wrongOldPassword")
+            userDetailsService.changePassword(token, userDetails.getId(), "myNewPassword", "wrongOldPassword")
             fail("should have thrown exception")
         } catch (IllegalOperationException e) {
             // ok
@@ -181,7 +181,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         // Check that the user exists prior to testing
         UserDetails userDetails = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertTrue(userDetails.getUserRoles().size() == 1);
 
         userDetailsService.updateRoles(userDetails.getId(), ["externists", "foo"]);
@@ -196,7 +196,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         // Check that the user exists prior to testing
         UserDetails userDetails = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertTrue(userDetails.getPermissions().size() == 0);
 
         userDetailsService.updatePermissions(userDetails.getId(), ["externists", "password"]);
@@ -211,7 +211,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
         // Check that the user exists prior to testing
         UserDetails userDetails = userDetailsService.getUserByUsername("a");
         assertNotNull(userDetails);
-        assertEquals(userDetails.getId(), 101);
+        assertEquals(userDetails.getId(), "101");
         assertEquals(userDetails.getUsername(), "a");
 
         // Remove the user
@@ -219,7 +219,7 @@ public class UserDetailsService_Test extends AbstractIntegrationTestCase {
 
         // Check that the user no longer exists
         try {
-            userDetailsService.getUserById(101);
+            userDetailsService.getUserById("101");
             fail("User 'a' with id 101 still exists after being removed.");
         } catch (NotFoundException e) {
             // OK

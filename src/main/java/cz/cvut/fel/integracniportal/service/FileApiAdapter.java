@@ -7,6 +7,7 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class FileApiAdapter {
         fileRepository.createFolder(mapFolder(folder, null));
     }
 
-
     public void moveFileToBin(FileMetadata fileMetadata) {
         if ((fileRepository instanceof BinFileRepository) == false) {
             throw new IllegalStateException("Repository doesn't support bin");
@@ -49,12 +49,20 @@ public class FileApiAdapter {
         ((BinFileRepository) fileRepository).moveFolderToBin(folderDef);
     }
 
+    public void deleteFile(FileMetadata fileMetadata) {
+        fileRepository.deleteFile(mapFile(fileMetadata));
+    }
+
+    public void deleteFolder(Folder folder) {
+        fileRepository.deleteFolder(mapFolder(folder, null));
+    }
+
     public FileDefinition getFileDefinition(FileMetadata fileMetadata) {
         return fileRepository.getFileMetadata(mapFile(fileMetadata));
     }
 
-    public InputStream getFile(FileMetadata fileMetadata) {
-        return fileRepository.getFile(mapFile(fileMetadata));
+    public void getFile(FileMetadata fileMetadata, OutputStream outputStream) {
+        fileRepository.getFile(mapFile(fileMetadata), outputStream);
     }
 
     public void renameFolder(Folder folder, String newName) {

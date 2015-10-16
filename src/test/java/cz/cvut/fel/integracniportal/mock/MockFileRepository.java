@@ -4,8 +4,12 @@ import cz.cvut.fel.integracniportal.api.BinFileRepository;
 import cz.cvut.fel.integracniportal.api.FileDefinition;
 import cz.cvut.fel.integracniportal.api.FileRepository;
 import cz.cvut.fel.integracniportal.api.FolderDefinition;
+import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Mock class for {@link cz.cvut.fel.integracniportal.api.FileRepository} used in tests. As we do not test this class
@@ -41,12 +45,15 @@ public class MockFileRepository implements FileRepository, BinFileRepository {
 
     @Override
     public void putFile(FileDefinition file, InputStream stream) {
-
+        try {
+            IOUtils.toString(stream);
+        } catch (IOException e) {
+            new ServiceAccessException("Eh");
+        }
     }
 
     @Override
-    public InputStream getFile(FileDefinition file) {
-        return null;
+    public void getFile(FileDefinition file, OutputStream outputStream) {
     }
 
     @Override
@@ -62,6 +69,16 @@ public class MockFileRepository implements FileRepository, BinFileRepository {
     @Override
     public FileDefinition getFileMetadata(FileDefinition file) {
         return null;
+    }
+
+    @Override
+    public void deleteFile(FileDefinition file) {
+
+    }
+
+    @Override
+    public void deleteFolder(FolderDefinition folderDef) {
+
     }
 
     @Override

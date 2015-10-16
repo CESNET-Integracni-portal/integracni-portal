@@ -1,8 +1,6 @@
 package cz.cvut.fel.integracniportal.domain.node;
 
-import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
-import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand;
-import cz.cvut.fel.integracniportal.command.node.RenameFolderCommand;
+import cz.cvut.fel.integracniportal.command.node.*;
 import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.Repository;
@@ -34,6 +32,16 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
         moveFolder(command);
     }
 
+    @CommandHandler
+    public void handle(DeleteFolderCommand command) {
+        deleteFolder(command);
+    }
+
+    @CommandHandler
+    public void handle(DeleteFolderInternalCommand command) {
+        deleteFolderInternal(command);
+    }
+
     private void createFolder(CreateFolderCommand command) {
         Folder folder = new Folder(
                 command.getId(),
@@ -42,21 +50,21 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
                 command.getOwner(),
                 command.getSpace());
 
-        checkUniqueName(folder.getName(), folder.getParentFolder(), folder, command);
+        checkUniqueName(folder.getName(), folder.getParentFolder(), folder.getSpace(), command);
 
         repository.add(folder);
     }
 
     private void renameFolder(RenameFolderCommand command) {
-        Folder folderAggregate = repository.load(command.getId());
+        Folder folder = repository.load(command.getId());
 
-        if (folderAggregate.getName().equals(command.getNewName())) {
+        if (folder.getName().equals(command.getNewName())) {
             return;
         }
 
-        checkUniqueName(command.getNewName(), folderAggregate.getParentFolder(), folderAggregate, command);
+        checkUniqueName(command.getNewName(), folder.getParentFolder(), folder.getSpace(), command);
 
-        folderAggregate.renameFolder(command.getNewName());
+        folder.renameFolder(command.getNewName());
     }
 
     private void moveFolder(MoveFolderCommand command) {
@@ -72,9 +80,21 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
             return;
         }
 
-        checkUniqueName(folder.getName(), command.getNewParent(), folder, command);
+        checkUniqueName(folder.getName(), command.getNewParent(), folder.getSpace(), command);
 
         folder.moveFolder(command.getNewParent(), command.getSentBy());
+    }
+
+    private void deleteFolder(DeleteFolderCommand command) {
+        Folder folder = repository.load(command.getId());
+
+        folder.recursivelyDelete();
+    }
+
+    private void deleteFolderInternal(DeleteFolderInternalCommand command) {
+        Folder folder = repository.load(command.getId());
+
+        folder.delete();
     }
 
     public void setRepository(Repository<Folder> repository) {

@@ -9,6 +9,7 @@ import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId
 import cz.cvut.fel.integracniportal.model.UserDetails
+import cz.cvut.fel.integracniportal.service.FileUpload
 import org.apache.commons.io.IOUtils
 import org.axonframework.commandhandling.gateway.CommandGateway
 import org.hibernate.Session
@@ -186,15 +187,13 @@ abstract class AbstractIntegrationSpecification extends Specification {
     }
 
     public void createFile(String id, String name, String parentId, String ownerId = "1", String space = "cesnet",
-                           long size = 1, String mimetype = "application/json") {
+                           String mimetype = "application/json", String content = "{}") {
         dispatch(new CreateFileCommand(
                 FileId.of(id),
-                name,
+                new FileUpload(name, mimetype, IOUtils.toInputStream(content)),
                 parentId == null ? null : FolderId.of(parentId),
                 UserId.of(ownerId),
                 space,
-                size,
-                mimetype,
                 Optional.empty()
         ))
     }

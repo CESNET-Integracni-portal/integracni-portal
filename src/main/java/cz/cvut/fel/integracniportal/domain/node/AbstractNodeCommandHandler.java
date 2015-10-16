@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractNodeCommandHandler {
 
     @Autowired
-    private NodeNameDao nodeNameDao;
+    protected NodeNameDao nodeNameDao;
 
-    protected void checkUniqueName(String name, FolderId parentFolder, AbstractNodeAggregateRoot folder, UserAwareCommand command) {
+    protected void checkUniqueName(String name, FolderId parentFolder, String space, UserAwareCommand command) {
         boolean exists;
 
         if (parentFolder == null) {
-            exists = nodeNameDao.nameInRootExists(name, command.getSentBy(), folder.getSpace());
+            exists = nodeNameDao.nameInRootExists(name, command.getSentBy(), space);
         } else {
             exists = nodeNameDao.nameExists(name, parentFolder);
         }

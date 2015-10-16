@@ -27,7 +27,7 @@
 
     <!-- Load controllers -->
     <context:annotation-config/>
-    <context:component-scan base-package="cz.cvut.fel.integracniportal.controller.**"/>
+    <context:component-scan base-package="cz.cvut.fel.integracniportal.controller.**, cz.cvut.fel.integracniportal.mvc.**"/>
 
     <!-- Load messages from messages.properties file -->
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">

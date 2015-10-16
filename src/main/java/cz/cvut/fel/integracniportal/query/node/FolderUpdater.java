@@ -2,10 +2,7 @@ package cz.cvut.fel.integracniportal.query.node;
 
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderCreatedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedToRootEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderRenamedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.*;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import org.axonframework.eventhandling.annotation.EventHandler;
@@ -68,6 +65,13 @@ public class FolderUpdater {
         folder.setParent(null);
 
         folderDao.update(folder);
+    }
+
+    @EventHandler
+    public void deleteFolder(FolderDeletedEvent event) {
+        Folder folder = folderDao.load(event.getId().getId());
+
+        folderDao.delete(folder);
     }
 
 }

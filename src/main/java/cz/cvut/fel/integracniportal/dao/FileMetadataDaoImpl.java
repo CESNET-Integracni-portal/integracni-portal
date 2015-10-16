@@ -55,6 +55,7 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     @Override
     public List<FileMetadata> getFilesForDeletion() {
         return from(fileMetadata)
+                .where(fileMetadata.deleted)
                 .where(fileMetadata.deletedOn.isNotNull())
                 .where(fileMetadata.deletedOn.lt(new Date()))
                 .list(fileMetadata);

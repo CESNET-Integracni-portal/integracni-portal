@@ -60,6 +60,16 @@ public class File extends AbstractNodeAggregateRoot {
         apply(event);
     }
 
+    public void delete() {
+        if (!isDeleted()) {
+            apply(new FileDeletedEvent(id));
+        }
+    }
+
+    public void setSize(long newSize) {
+        apply(new FileSizeChangedEvent(id, newSize, this.size));
+    }
+
     public void moveFileOffline() {
         if (fileState.equals(FileState.ONLINE) == false) {
             throw new IllegalStateException("Could not move file offline, it's not online");
@@ -88,4 +98,13 @@ public class File extends AbstractNodeAggregateRoot {
         fileState = event.getFileState();
     }
 
+    @EventSourcingHandler
+    public void onSizeChanged(FileSizeChangedEvent event) {
+        size = event.getNewSize();
+    }
+
+    @EventSourcingHandler
+    public void onFileDeleted(FileDeletedEvent event) {
+        markDeleted();
+    }
 }

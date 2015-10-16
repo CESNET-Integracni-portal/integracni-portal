@@ -5,9 +5,8 @@ import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -72,7 +71,7 @@ public interface FileMetadataService {
      * @param file  The file to be uploaded.
      * @return Uuid identifier of the created file.
      */
-    public FileMetadata uploadFileToRoot(String space, MultipartFile file);
+    public FileMetadata uploadFileToRoot(String space, FileUpload file);
 
     /**
      * Uploads a file and stores its metadata in database.
@@ -80,15 +79,15 @@ public interface FileMetadataService {
      * @param spaceId
      * @param file           The file to be uploaded.  @return Uuid identifier of the created file.
      */
-    public FileMetadata uploadFileToFolder(String parentFolderId, String spaceId, MultipartFile file);
+    public FileMetadata uploadFileToFolder(String parentFolderId, String spaceId, FileUpload file);
 
     /**
      * Updates file and its metadata.
      *
-     * @param fileuuid Uuid identifier of the file to be updated.
-     * @param file     The file to be updated.
+     * @param fileuuid   Uuid identifier of the file to be updated.
+     * @param fileUpload The file to be updated.
      */
-    public void updateFile(String fileuuid, MultipartFile file);
+    public void updateFile(String fileuuid, FileUpload fileUpload);
 
     /**
      * Renames file.
@@ -126,7 +125,7 @@ public interface FileMetadataService {
      *
      * @param fileuuid The uuid identifier of the file to be deleted.
      */
-    public InputStream getFileAsInputStream(String fileuuid);
+    public void copyFileToOutputStream(String fileuuid, OutputStream outputStream);
 
     /**
      * Moves the file to online state.

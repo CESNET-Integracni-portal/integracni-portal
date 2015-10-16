@@ -5,16 +5,19 @@ import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.*;
+import cz.cvut.fel.integracniportal.utils.UploadUtils;
+import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * @author Radek Jezdik
@@ -75,7 +78,6 @@ public class FolderController extends AbstractController {
     /**
      * Upload a file.
      *
-     * @param file File to be uploaded.
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -83,9 +85,12 @@ public class FolderController extends AbstractController {
     @ResponseBody
     public ResponseEntity uploadFile(@PathVariable String spaceId,
                                      @PathVariable String folderId,
-                                     @RequestParam MultipartFile file) {
+                                     HttpServletRequest request) throws IOException, FileUploadException {
         ensureSpace(spaceId);
-        FileMetadata fileMetadata = fileMetadataService.uploadFileToFolder(folderId, spaceId, file);
+
+        FileUpload fileUpload = UploadUtils.handleFileUpload(request);
+
+        FileMetadata fileMetadata = fileMetadataService.uploadFileToFolder(folderId, spaceId, fileUpload);
         return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
@@ -124,16 +129,16 @@ public class FolderController extends AbstractController {
     }
 
     /**
-     * Moves the folder to bin.
+     * Deletes the folder.
      *
-     * @param folderId the ID of the folder to be move to trash
+     * @param folderId the ID of the folder to delete
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/trash", method = POST)
-    public ResponseEntity moveFolderToBin(@PathVariable String spaceId,
-                                          @PathVariable String folderId) {
+    @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}", method = DELETE)
+    public ResponseEntity deleteFolder(@PathVariable String spaceId,
+                                       @PathVariable String folderId) {
         ensureSpace(spaceId);
-        folderService.removeFolder(folderId);
+        folderService.deleteFolder(folderId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

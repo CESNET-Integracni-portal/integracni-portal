@@ -1,14 +1,11 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.command.node.CreateFileCommand;
-import cz.cvut.fel.integracniportal.command.node.MoveFileCommand;
-import cz.cvut.fel.integracniportal.command.node.RenameFileCommand;
+import cz.cvut.fel.integracniportal.command.node.*;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileState;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
-import cz.cvut.fel.integracniportal.exceptions.FileIOException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -18,10 +15,8 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,12 +88,12 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public FileMetadata uploadFileToRoot(String space, MultipartFile file) {
+    public FileMetadata uploadFileToRoot(String space, FileUpload file) {
         return uploadFile(null, space, file);
     }
 
     @Override
-    public FileMetadata uploadFileToFolder(String parentFolderId, String space, MultipartFile file) {
+    public FileMetadata uploadFileToFolder(String parentFolderId, String space, FileUpload file) {
         Folder folder = folderService.getFolderById(parentFolderId);
 
         if (folder.getSpace().equals(space) == false) {
@@ -110,43 +105,29 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         return uploadFile(folderId, space, file);
     }
 
-    public FileMetadata uploadFile(FolderId folderId, String space, MultipartFile file) {
+    private FileMetadata uploadFile(FolderId folderId, String space, FileUpload file) {
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
         String id = UUID.randomUUID().toString();
 
         gateway.sendAndWait(new CreateFileCommand(
                 FileId.of(id),
-                file.getOriginalFilename(),
+                file,
                 folderId,
                 UserId.of(currentUser.getId()),
                 space,
-                file.getSize(),
-                file.getContentType(),
                 Optional.of(FileState.ONLINE)
         ));
 
-        FileMetadata fileMetadata = fileMetadataDao.getByUUID(id);
-
-        try {
-            getFileApi(space).putFile(fileMetadata, file.getInputStream());
-
-            return fileMetadata;
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+        return fileMetadataDao.getByUUID(id);
     }
 
     @Override
-    public void updateFile(String fileuuid, MultipartFile file) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
-        try {
-            getFileApi(fileMetadata.getSpace()).putFile(fileMetadata, file.getInputStream());
-            setFileMetadata(fileMetadata, file);
-            updateFileMetadata(fileMetadata);
-        } catch (IOException e) {
-            throw new FileIOException("Could not read uploaded file", e, "cesnet.service.unavailable");
-        }
+    public void updateFile(String fileId, FileUpload fileUpload) {
+        gateway.sendAndWait(new UpdateFileContentsCommand(
+                FileId.of(fileId),
+                fileUpload
+        ));
     }
 
     @Override
@@ -155,9 +136,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
                 FileId.of(fileId),
                 name
         ));
-
-//        // TODO: bug #6 (calling api with already renamed file metadata)
-//        getFileApi(fileMetadata.getSpace()).renameFile(fileMetadata, name);
     }
 
     @Override
@@ -166,29 +144,29 @@ public class FileMetadataServiceImpl implements FileMetadataService {
                 FileId.of(fileId),
                 FolderId.of(parentId)
         ));
-//        getFileApi(file.getSpace()).moveFile(file, parent);
     }
 
     @Override
     public void deleteFile(String uuid) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(uuid);
-        deleteFile(fileMetadata, true);
+        gateway.sendAndWait(new DeleteFileCommand(
+                FileId.of(uuid)
+        ));
     }
 
     @Override
     public void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository) {
         removeFileMetadata(fileMetadata);
         if (removeFromRepository) {
-            getFileApi(fileMetadata.getSpace()).moveFileToBin(fileMetadata);
+            getFileApi(fileMetadata.getSpace()).deleteFile(fileMetadata);
         }
     }
 
     @Override
-    public InputStream getFileAsInputStream(String fileuuid) {
+    public void copyFileToOutputStream(String fileuuid, OutputStream outputStream) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
         String space = fileMetadata.getSpace();
 
-        return getFileApi(space).getFile(fileMetadata);
+        getFileApi(space).getFile(fileMetadata, outputStream);
     }
 
     @Override
@@ -209,12 +187,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         }
         fileMetadata.setOnline(false);
         getFileApi(fileMetadata.getSpace()).moveFileOffline(fileMetadata);
-    }
-
-    private void setFileMetadata(FileMetadata fileMetadata, MultipartFile file) {
-        fileMetadata.setName(file.getOriginalFilename());
-        fileMetadata.setMimetype(file.getContentType());
-        fileMetadata.setFilesize(file.getSize());
     }
 
     @Override

@@ -1,10 +1,12 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
+import cz.cvut.fel.integracniportal.command.node.DeleteFolderCommand;
+import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand;
+import cz.cvut.fel.integracniportal.command.node.RenameFolderCommand;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
-import cz.cvut.fel.integracniportal.exceptions.InvalidStateException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
@@ -25,9 +27,6 @@ import java.util.UUID;
 @Service
 @Transactional
 public class FolderServiceImpl implements FolderService {
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Autowired
     private FolderDao folderDao;
@@ -71,29 +70,16 @@ public class FolderServiceImpl implements FolderService {
     public TopLevelFolderRepresentation getTopLevelFolder(String spaceId, UserDetails owner) {
         List<Folder> topLevelFolders = getTopLevelFolders(spaceId, owner);
         List<FileMetadata> topLevelFiles = fileMetadataService.getTopLevelFiles(spaceId, owner);
-        TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(topLevelFolders, topLevelFiles, owner);
-        return representation;
+
+        return new TopLevelFolderRepresentation(topLevelFolders, topLevelFiles, owner);
     }
 
     @Override
     public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<String> labelIds, UserDetails owner) {
         List<Folder> folders = folderDao.getFoldersByLabels(spaceId, labelIds, owner);
         List<FileMetadata> files = fileMetadataService.getFilesByLabels(spaceId, labelIds, owner);
-        TopLevelFolderRepresentation representation = new TopLevelFolderRepresentation(folders, files, owner);
-        return representation;
-    }
 
-    @Override
-    public Folder createFolder(Folder folder, UserDetails owner) {
-
-        folder.setOwner(owner);
-
-        folderDao.createFolder(folder);
-
-        FileApiAdapter fileApi = getFileApi(folder.getSpace());
-        fileApi.createFolder(folder);
-
-        return folder;
+        return new TopLevelFolderRepresentation(folders, files, owner);
     }
 
     @Override
@@ -123,74 +109,28 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Folder createSubFolder(String folderName, Folder parent, UserDetails owner) {
-        String space = parent.getSpace();
-
-        Folder newFolder = new Folder();
-        newFolder.setName(folderName);
-        newFolder.setParent(parent);
-        newFolder.setSpace(space);
-        newFolder.setOwner(owner);
-
-        createFolder(newFolder, owner);
-
-        return newFolder;
-    }
-
-    @Override
     public Folder renameFolder(String folderId, String newName) {
-        Folder folder = getFolderById(folderId);
+        commandGateway.sendAndWait(new RenameFolderCommand(
+                FolderId.of(folderId),
+                newName
+        ));
 
-        getFileApi(folder.getSpace()).renameFolder(folder, newName);
-
-        folder.setName(newName);
-        folderDao.update(folder);
-
-        return folder;
+        return folderDao.get(folderId);
     }
 
     @Override
-    public void removeFolder(String folderId) {
-        Folder folder = getFolderById(folderId);
-        removeFolder(folder, true);
-    }
-
-    private void removeFolder(Folder folder, boolean removeFromRepository) {
-
-        for(Folder subFolder : folder.getFolders()) {
-            removeFolder(subFolder, false);
-        }
-        for (FileMetadata fileMetadata : folder.getFiles()) {
-            fileMetadataService.deleteFile(fileMetadata, false);
-        }
-        if (removeFromRepository) {
-            getFileApi(folder.getSpace()).moveFolderToBin(folder);
-        }
-        folderDao.delete(folder);
-    }
-
-    @Override
-    public void updateFolder(Folder folder) {
-        folderDao.update(folder);
+    public void deleteFolder(String folderId) {
+        commandGateway.sendAndWait(new DeleteFolderCommand(
+                FolderId.of(folderId)
+        ));
     }
 
     @Override
     public void moveFolder(String folderId, String parentId) {
-        Folder folder = getFolderById(folderId);
-        Folder parent = getFolderById(parentId);
-
-        if (folder.equals(parent)) {
-            throw new InvalidStateException("Can not move folder to itself");
-        }
-
-        if (folder.getParent() != null && folder.getParent().equals(parent)) {
-            return; // same parent, folder not moved
-        }
-
-        folder.setParent(parent);
-
-        updateFolder(folder);
-        getFileApi(folder.getSpace()).moveFolder(folder, parent);
+        commandGateway.sendAndWait(new MoveFolderCommand(
+                FolderId.of(folderId),
+                FolderId.of(parentId)
+        ));
     }
 
     @Override

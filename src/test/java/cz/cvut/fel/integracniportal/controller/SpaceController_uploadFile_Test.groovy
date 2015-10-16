@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
- * Test for {@link SpaceController#uploadFile(java.lang.String, org.springframework.web.multipart.MultipartFile)}
+ * Test for {@link cz.cvut.fel.integracniportal.controller.SpaceController#uploadFile(String)}
  *
  * @author Radek Jezdik
  */

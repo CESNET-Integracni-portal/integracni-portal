@@ -50,13 +50,6 @@ public interface FolderService {
     public TopLevelFolderRepresentation getTopLevelFolderByLabels(String spaceId, List<String> labelIds, UserDetails owner);
 
     /**
-     * Creates new folder in database.
-     *
-     * @param folder Folder which is to be created in the database.
-     */
-    public Folder createFolder(Folder folder, UserDetails owner);
-
-    /**
      * Creates new top level folder in database.
      *
      * @param folderName Name of the folder to be created.
@@ -72,14 +65,6 @@ public interface FolderService {
     public Folder createSubFolder(String folderName, String parentId, UserDetails owner);
 
     /**
-     * Creates new folder in database.
-     *
-     * @param folderName Name of the folder to be created.
-     * @param parent     Parent folder in which to create the new one.
-     */
-    public Folder createSubFolder(String folderName, Folder parent, UserDetails owner);
-
-    /**
      * Updates existing folder in the database.
      *  @param folderId Id of the folder which is to be updated in the database.
      * @param newName  the new name of the folder
@@ -87,18 +72,10 @@ public interface FolderService {
     public Folder renameFolder(String folderId, String newName);
 
     /**
-     * Removes a folder from the database.
-     *
-     * @param folderId Id of the folder to be removed from the database.
+     * Deletes the folder from the database.
+     * @param folderId
      */
-    public void removeFolder(String folderId);
-
-    /**
-     * Updates the given folder entity.
-     *
-     * @param folder the folder entity to update
-     */
-    public void updateFolder(Folder folder);
+    public void deleteFolder(String folderId);
 
     /**
      * Moves the folder under different parent folder.

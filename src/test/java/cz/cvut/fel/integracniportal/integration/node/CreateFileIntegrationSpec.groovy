@@ -19,11 +19,14 @@ public class CreateFileIntegrationSpec extends AbstractIntegrationSpecification 
 
     def "should create a file in root"() {
         when:
-            createFile("1", "foo", null)
-            def file = dao.getByUUID("1")
+            createFile("1", "foo", null, "1", "cesnet", "application/json", "{}")
 
         then:
+            def file = dao.getByUUID("1")
             file.getName() == "foo"
+            file.getFilesize() == 2
+            file.getMimetype() == "application/json"
+            file.getOwner().getId() == "1"
             file.getParent() == null
     }
 
@@ -35,7 +38,12 @@ public class CreateFileIntegrationSpec extends AbstractIntegrationSpecification 
             createFile("2", "foo", "1")
 
         then:
-            dao.getByUUID("2").getParent().id == "1"
+            def file = dao.getByUUID("2")
+            file.getName() == "foo"
+            file.getFilesize() == 2
+            file.getMimetype() == "application/json"
+            file.getOwner().getId() == "1"
+            file.getParent().id == "1"
     }
 
     def "should not create a duplicate file in a folder"() {

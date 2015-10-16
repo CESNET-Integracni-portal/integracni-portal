@@ -72,6 +72,7 @@ public interface UserDetailsService {
 
     /**
      * Changes the user's password
+     * @param token
      * @param userId id of the user for which to change the password
      * @param newPassword the new password for the user
      * @param oldPassword the old password for check

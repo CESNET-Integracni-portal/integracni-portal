@@ -1,9 +1,6 @@
 package cz.cvut.fel.integracniportal.domain.node;
 
-import cz.cvut.fel.integracniportal.domain.node.events.FolderCreatedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderMovedToRootEvent;
-import cz.cvut.fel.integracniportal.domain.node.events.FolderRenamedEvent;
+import cz.cvut.fel.integracniportal.domain.node.events.*;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import lombok.Getter;
@@ -52,6 +49,18 @@ public class Folder extends AbstractNodeAggregateRoot {
         apply(event);
     }
 
+    public void recursivelyDelete() {
+        if (!isDeleted()) {
+            apply(new FolderDeletionStartedEvent(id));
+        }
+    }
+
+    public void delete() {
+        if (!isDeleted()) {
+            apply(new FolderDeletedEvent(id));
+        }
+    }
+
     @EventSourcingHandler
     public void onFolderCreated(FolderCreatedEvent event) {
         id = event.getId();
@@ -60,4 +69,10 @@ public class Folder extends AbstractNodeAggregateRoot {
         owner = event.getOwner();
         space = event.getSpace();
     }
+
+    @EventSourcingHandler
+    public void onDelete(FolderDeletedEvent event) {
+        markDeleted();
+    }
+
 }
