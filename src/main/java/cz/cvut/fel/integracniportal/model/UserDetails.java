@@ -9,6 +9,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_details")
+@PrimaryKeyJoinColumn(name = "user_id")
 public class UserDetails extends AbstractUser {
 
     @Column(unique = true, nullable = false)

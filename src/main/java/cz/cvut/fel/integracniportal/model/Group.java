@@ -10,6 +10,7 @@ import java.util.Set;
 @Table(name = "user_group", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "owner"})
 })
+@PrimaryKeyJoinColumn(name = "user_id")
 public class Group extends AbstractUser {
 
     @Column(nullable = false)

@@ -1,9 +1,11 @@
 package cz.cvut.fel.integracniportal.dao;
 
-import cz.cvut.fel.integracniportal.model.AbstractNode;
-import cz.cvut.fel.integracniportal.model.AbstractUser;
 import cz.cvut.fel.integracniportal.model.AclPermission;
+import cz.cvut.fel.integracniportal.model.NodePermission;
+import cz.cvut.fel.integracniportal.representation.AbstractUserRepresentation;
+import cz.cvut.fel.integracniportal.representation.NodePermissionRepresentation;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,9 +15,15 @@ import java.util.Set;
  */
 public interface AclPermissionDao {
 
-    Set<AclPermission> getPermissionsForUserNode(AbstractUser user, AbstractNode node);
+    AclPermission getByNodeAndUser(String nodeId, Long userId);
 
-    void setPermissionsForUserNode(AbstractUser user, AbstractNode node, Set<AclPermission> permissions);
+    AclPermission hasPermissionTo(String nodeId, Long userId, NodePermission nodePermission);
+
+    void setPermissionsByNodeAndUser(
+            List<NodePermissionRepresentation> nodePermissions,
+            String nodeId,
+            AbstractUserRepresentation user
+    );
 
     void save(AclPermission permission);
 

@@ -28,18 +28,14 @@ public class AclPermission extends AbstractEntity<Long> {
 
     @ManyToOne
     @JoinColumn(name = "target_user", referencedColumnName = "user_id", nullable = false)
-    private UserDetails targetUser;
-
-    @ManyToOne
-    @JoinColumn(name = "target_user", referencedColumnName = "user_id", nullable = false)
-    private Group targetGroup;
+    private AbstractUser targetUser;
 
     @ManyToOne
     @JoinColumn(name = "node", referencedColumnName = "node_id", nullable = false)
     private AbstractNode node;
 
     public AclPermission() {
-        this.nodePermissions = new ArrayList<>();
+        this.nodePermissions = new ArrayList<NodePermission>();
     }
 
     @Override
@@ -68,20 +64,12 @@ public class AclPermission extends AbstractEntity<Long> {
         this.nodePermissions.add(nodePermission);
     }
 
-    public UserDetails getTargetUser() {
+    public AbstractUser getTargetUser() {
         return targetUser;
     }
 
-    public void setTargetUser(UserDetails targetUser) {
+    public void setTargetUser(AbstractUser targetUser) {
         this.targetUser = targetUser;
-    }
-
-    public Group getTargetGroup() {
-        return targetGroup;
-    }
-
-    public void setTargetGroup(Group targetGroup) {
-        this.targetGroup = targetGroup;
     }
 
     public AbstractNode getNode() {

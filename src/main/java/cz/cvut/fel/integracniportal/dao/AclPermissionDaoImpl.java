@@ -1,12 +1,15 @@
 package cz.cvut.fel.integracniportal.dao;
 
-import cz.cvut.fel.integracniportal.model.AbstractNode;
-import cz.cvut.fel.integracniportal.model.AbstractUser;
-import cz.cvut.fel.integracniportal.model.AclPermission;
+import cz.cvut.fel.integracniportal.model.*;
 
+import cz.cvut.fel.integracniportal.representation.AbstractUserRepresentation;
+import cz.cvut.fel.integracniportal.representation.NodePermissionRepresentation;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import static cz.cvut.fel.integracniportal.model.QAclPermission.aclPermission;
+import static cz.cvut.fel.integracniportal.model.QGroup.group;
+
+import java.util.List;
 
 /**
  * @author Eldar Iosip
@@ -19,26 +22,21 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
     }
 
     @Override
-    public Set<AclPermission> getPermissionsForUserNode(AbstractUser user, AbstractNode node) {
-        return null;
-        /*
+    public AclPermission getByNodeAndUser(String nodeId, Long userId) {
         return from(aclPermission)
-                .where(aclPermission.targetUser.eq(user));
-                */
+                .where(aclPermission.targetUser.id.eq(userId))
+                .singleResult(aclPermission);
     }
 
     @Override
-    public void setPermissionsForUserNode(AbstractUser user, AbstractNode node, Set<AclPermission> permissions) {
-
+    public AclPermission hasPermissionTo(String nodeId, Long userId, NodePermission nodePermission) {
+        //Group[] groups = from(group).where(group.members.contains());
+        return null;
     }
 
     @Override
-    public void save(AclPermission permission) {
+    public void setPermissionsByNodeAndUser(List<NodePermissionRepresentation> nodePermissions, String nodeId, AbstractUserRepresentation user) {
 
     }
 
-    @Override
-    public void delete(AclPermission permission) {
-
-    }
 }

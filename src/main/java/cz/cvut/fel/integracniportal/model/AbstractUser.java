@@ -9,7 +9,9 @@ import java.util.List;
  *
  * @author Eldar Iosip
  */
-@MappedSuperclass
+@Entity
+@Table(name = "PERSON")
+@Inheritance(strategy=InheritanceType.JOINED)
 public abstract class AbstractUser extends AbstractEntity<Long> {
 
     @Id
