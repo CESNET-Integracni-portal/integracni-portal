@@ -37,27 +37,6 @@ public interface FileMetadataService {
     public FileMetadataRepresentation getFileMetadataRepresentationByUuid(String fileId);
 
     /**
-     * Saves the file metadata into database.
-     *
-     * @param fileMetadata FileMetadata metadata which are to be saved.
-     */
-    public void createFileMetadata(FileMetadata fileMetadata);
-
-    /**
-     * Updates the file metadata in database.
-     *
-     * @param fileMetadata FileMetadata metadata which are to be saved.
-     */
-    public void updateFileMetadata(FileMetadata fileMetadata);
-
-    /**
-     * Removes the file metadata from database.
-     *
-     * @param fileMetadata FileMetadata metadata which are to be removed.
-     */
-    public void removeFileMetadata(FileMetadata fileMetadata);
-
-    /**
      * Returns list of files that should be deleted according to their deleteOn field.
      *
      * @return List of files to be deleted.
@@ -111,14 +90,6 @@ public interface FileMetadataService {
      * @param uuid The uuid identifier of the file to be deleted.
      */
     public void deleteFile(String uuid);
-
-    /**
-     * Deletes a file and removes its metadata from database
-     *
-     * @param fileMetadata File to be deleted.
-     * @param removeFromRepository true if file is to be removed from file repository
-     */
-    void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository);
 
     /**
      * Returns the file contents as input stream.

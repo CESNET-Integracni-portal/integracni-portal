@@ -67,21 +67,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void createFileMetadata(FileMetadata fileMetadata) {
-        fileMetadataDao.createFileMetadata(fileMetadata);
-    }
-
-    @Override
-    public void updateFileMetadata(FileMetadata fileMetadata) {
-        fileMetadataDao.update(fileMetadata);
-    }
-
-    @Override
-    public void removeFileMetadata(FileMetadata fileMetadata) {
-        fileMetadataDao.delete(fileMetadata);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<FileMetadata> getOldFilesForDeletion() {
         return fileMetadataDao.getFilesForDeletion();
@@ -151,14 +136,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         gateway.sendAndWait(new DeleteFileCommand(
                 FileId.of(uuid)
         ));
-    }
-
-    @Override
-    public void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository) {
-        removeFileMetadata(fileMetadata);
-        if (removeFromRepository) {
-            getFileApi(fileMetadata.getSpace()).deleteFile(fileMetadata);
-        }
     }
 
     @Override

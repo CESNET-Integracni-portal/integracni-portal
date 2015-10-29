@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Controller
@@ -44,18 +43,14 @@ public class UserRolesController extends AbstractController {
             return new ResponseEntity(resolveErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
 
-        UserRole userRole = new UserRole();
-        userRole.setName(userRoleRepresentation.getName());
-        userRole.setDescription(userRoleRepresentation.getDescription());
-        userRole.setPermissions(new HashSet<Permission>(userRoleRepresentation.getPermissions()));
-        userRoleService.createRole(userRole);
+        UserRole userRole = userRoleService.createRole(userRoleRepresentation);
         return new ResponseEntity(new UserRoleRepresentation(userRole), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.2/role/{roleid}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity getRole(@PathVariable("roleid") Long roleId) {
+    public ResponseEntity getRole(@PathVariable("roleid") String roleId) {
         UserRole userRole = userRoleService.getRoleById(roleId);
         return new ResponseEntity(new UserRoleRepresentation(userRole), HttpStatus.OK);
     }
@@ -63,19 +58,9 @@ public class UserRolesController extends AbstractController {
     @PreAuthorize("hasRole('main_admin')")
     @RequestMapping(value = "/v0.2/role/{roleid}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> updateRole(@PathVariable("roleid") Long roleId,
+    public ResponseEntity<String> updateRole(@PathVariable("roleid") String roleId,
                                              @RequestBody UserRoleRepresentation userRoleRepresentation) {
-        UserRole userRole = userRoleService.getRoleById(roleId);
-        if (userRoleRepresentation.getName() != null) {
-            userRole.setName(userRoleRepresentation.getName());
-        }
-        if (userRoleRepresentation.getDescription() != null) {
-            userRole.setDescription(userRoleRepresentation.getDescription());
-        }
-        if (userRoleRepresentation.getPermissions() != null) {
-            userRole.setPermissions(new HashSet<Permission>(userRoleRepresentation.getPermissions()));
-        }
-        userRoleService.saveRole(userRole);
+        userRoleService.updateRole(roleId, userRoleRepresentation);
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 

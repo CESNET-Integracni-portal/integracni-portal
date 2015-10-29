@@ -57,22 +57,7 @@ public interface UserDetailsService {
     public UserDetails createUser(UserDetailsRepresentation userDetailsResource);
 
     /**
-     * Saves the user into database.
-     *
-     * @param user UserDetails login credentials which are to be saved.
-     */
-    public void saveUser(UserDetails user);
-
-    /**
-     * Removes the user from database.
-     *
-     * @param user UserDetails login credentials which are to be removed.
-     */
-    public void removeUser(UserDetails user);
-
-    /**
      * Changes the user's password
-     * @param token
      * @param userId id of the user for which to change the password
      * @param newPassword the new password for the user
      * @param oldPassword the old password for check

@@ -164,18 +164,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         ));
     }
 
-    @Override
-    @Transactional
-    public void saveUser(UserDetails user) {
-        userDao.save(user);
-    }
-
-    @Override
-    @Transactional
-    public void removeUser(UserDetails user) {
-        userDao.delete(user);
-    }
-
     public void setAuthenticationService(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }

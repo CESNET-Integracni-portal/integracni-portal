@@ -22,7 +22,6 @@ import java.util.UUID;
  *
  */
 @Service
-@Transactional
 public class LabelServiceImpl implements LabelService {
 
     @Autowired
@@ -36,6 +35,7 @@ public class LabelServiceImpl implements LabelService {
         return labelDao.getUserLabels(owner.getId());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Label getLabelById(String labelId) {
         Label label = labelDao.get(labelId);

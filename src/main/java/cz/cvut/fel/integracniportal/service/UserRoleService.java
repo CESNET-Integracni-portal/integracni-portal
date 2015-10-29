@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.model.UserRole;
+import cz.cvut.fel.integracniportal.representation.UserRoleRepresentation;
 
 import java.util.List;
 
@@ -12,10 +13,10 @@ public interface UserRoleService {
     /**
      * Finds a user role in database by its id.
      *
-     * @param id Id of the role.
+     * @param roleId Id of the role.
      * @return The user role.
      */
-    public UserRole getRoleById(long id);
+    public UserRole getRoleById(String roleId);
 
     /**
      * Finds a user role in database by its name.
@@ -37,20 +38,19 @@ public interface UserRoleService {
      *
      * @param role The user role to save to database
      */
-    public void createRole(UserRole role);
+    public UserRole createRole(UserRoleRepresentation role);
 
     /**
-     * Saves the user role into database.
-     *
-     * @param role UserRole to be saved.
+     * The user role representation to update.
+     * @param roleId
+     * @param userRoleRepresentation
      */
-    public void saveRole(UserRole role);
+    public void updateRole(String roleId, UserRoleRepresentation userRoleRepresentation);
 
     /**
      * Removes the user role from database.
      *
-     * @param role UserRole to be removed.
+     * @param roleId UserRole id to be removed.
      */
-    public void deleteRole(UserRole role);
-
+    public void deleteRole(String roleId);
 }

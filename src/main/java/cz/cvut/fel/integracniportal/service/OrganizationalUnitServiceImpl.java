@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class OrganizationalUnitServiceImpl implements OrganizationalUnitService {
 
     @Autowired
@@ -25,11 +24,13 @@ public class OrganizationalUnitServiceImpl implements OrganizationalUnitService 
     @Autowired
     private CommandGateway commandGateway;
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrganizationalUnit> getAllOrganizationalUnits() {
         return organizationalUnitDao.getAllUnits();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrganizationalUnit getOrganizationalUnitById(String id) {
         OrganizationalUnit unit = organizationalUnitDao.getOrgUnitById(id);
@@ -39,6 +40,7 @@ public class OrganizationalUnitServiceImpl implements OrganizationalUnitService 
         return unit;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrganizationalUnit getOrganizationUnitByName(String name) {
         return organizationalUnitDao.getOrgUnitByName(name);
