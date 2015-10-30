@@ -2,9 +2,12 @@ package cz.cvut.fel.integracniportal.model;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * FileMetadata and Folder superclass
@@ -52,8 +55,9 @@ public abstract class AbstractNode extends AbstractEntity<String> {
     @JoinColumn(name = "acl_parent_id")
     private AbstractNode aclParent;
 
-    @OneToMany(mappedBy = "owner")
-    private List<AclPermission> acl;
+    @OneToMany(mappedBy = "node")
+    @MapKey(name="userId")
+    private Map<Long, AclPermission> acl = new HashMap<Long, AclPermission>();
 
     public String getId() {
         return nodeId;
@@ -127,12 +131,19 @@ public abstract class AbstractNode extends AbstractEntity<String> {
         this.aclParent = aclParent;
     }
 
-    public List<AclPermission> getAcl() {
+    public Map<Long, AclPermission> getAcl() {
         return acl;
     }
 
-    public void setAcl(List<AclPermission> acl) {
+    public void setAcl(Map<Long, AclPermission> acl) {
         this.acl = acl;
+    }
+
+    public void addAcl(AbstractUser abstractUser, AclPermission aclPermission) {
+        this.acl.put(abstractUser.getId(), aclPermission);
+        if (aclPermission.getNode() != this) {
+            aclPermission.setNode(this);
+        }
     }
 
     public abstract void getFileNode(List<FileMetadata> context);

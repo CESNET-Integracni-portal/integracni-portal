@@ -11,10 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -62,10 +59,10 @@ public class AclController extends AbstractController {
     public ResponseEntity getNodeAclForCurrentUser(@PathVariable String nodeId) {
         UserDetails currentUser = userService.getCurrentUser();
 
-        List<NodePermission> permissionList = aclPermissionService.getNodeAclForUser(nodeId, currentUser.getId());
+        Set<NodePermission> nodePermissions = aclPermissionService.getNodeAclForUser(nodeId, currentUser.getId());
 
         List<NodePermissionRepresentation> representations = new ArrayList<NodePermissionRepresentation>();
-        for (NodePermission nodePermission : permissionList) {
+        for (NodePermission nodePermission : nodePermissions) {
             representations.add(new NodePermissionRepresentation(nodePermission));
         }
 
@@ -83,7 +80,7 @@ public class AclController extends AbstractController {
     @RequestMapping(value = "/v0.2/acl/node/{nodeId}/user/{userId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getNodeAclForUser(@PathVariable String nodeId, @PathVariable Long userId) {
-        List<NodePermission> nodePermissions = aclPermissionService.getNodeAclForUser(nodeId, userId);
+        Set<NodePermission> nodePermissions = aclPermissionService.getNodeAclForUser(nodeId, userId);
 
         List<NodePermissionRepresentation> representations = new ArrayList<NodePermissionRepresentation>();
         for (NodePermission nodePermission : nodePermissions) {
@@ -101,7 +98,7 @@ public class AclController extends AbstractController {
     @ResponseBody
     public ResponseEntity updateNodeAcl(@PathVariable String nodeId,
                                         @RequestBody List<AclPermissionRepresentation> aclPermissionRepresentations) {
-        aclPermissionService.updateAclNodePermissions(nodeId, aclPermissionRepresentations);
+        aclPermissionService.updateNodePermissions(nodeId, aclPermissionRepresentations);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -14,6 +14,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "acl_permission")
+//, indexes = {
+//        @Index(name = "idx", columnList = "user_id, node_id")
+//})
 public class AclPermission extends AbstractEntity<Long> {
 
     @Id
@@ -27,11 +30,11 @@ public class AclPermission extends AbstractEntity<Long> {
     private List<NodePermission> nodePermissions;
 
     @ManyToOne
-    @JoinColumn(name = "target_user", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private AbstractUser targetUser;
 
     @ManyToOne
-    @JoinColumn(name = "node", referencedColumnName = "node_id", nullable = false)
+    @JoinColumn(name = "node_id")
     private AbstractNode node;
 
     public AclPermission() {
@@ -78,5 +81,9 @@ public class AclPermission extends AbstractEntity<Long> {
 
     public void setNode(AbstractNode node) {
         this.node = node;
+        //O(n)
+        if (!node.getAcl().containsValue(this)) {
+            node.getAcl().put(targetUser.getId(), this);
+        }
     }
 }

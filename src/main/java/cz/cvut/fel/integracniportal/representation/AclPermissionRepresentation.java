@@ -3,11 +3,7 @@ package cz.cvut.fel.integracniportal.representation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.cvut.fel.integracniportal.model.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Representation class for acl permission.
@@ -19,7 +15,7 @@ public class AclPermissionRepresentation {
 
     private Long id;
 
-    private List<NodePermissionRepresentation> nodePermissions;
+    private List<NodePermission> nodePermissions;
 
     private AbstractUserRepresentation targetUser;
 
@@ -30,7 +26,7 @@ public class AclPermissionRepresentation {
         this.id = aclPermission.getId();
 
         for (NodePermission nodePermission : aclPermission.getNodePermissions()) {
-            this.nodePermissions.add(new NodePermissionRepresentation(nodePermission));
+            this.nodePermissions.add(nodePermission);
         }
 
         if (aclPermission.getTargetUser() != null) {
@@ -42,7 +38,7 @@ public class AclPermissionRepresentation {
         return id;
     }
 
-    public List<NodePermissionRepresentation> getNodePermissions() {
+    public List<NodePermission> getNodePermissions() {
         return nodePermissions;
     }
 

@@ -7,17 +7,13 @@ import cz.cvut.fel.integracniportal.model.AclPermission;
 import java.util.Set;
 
 /**
- * Available operations on user's ACL
+ * Node acl list
  *
  * @author Eldar Iosip
  */
 public interface AbstractNodeDao {
 
-    AbstractNode getAclParentFor(String nodeId);
+    AbstractNode getById(String nodeId);
 
-    void setAclParentFor(String nodeId);
-
-    void save(AbstractNode abstractNode);
-
-    void delete(AbstractNode abstractNode);
+    void update(AbstractNode abstractNode);
 }

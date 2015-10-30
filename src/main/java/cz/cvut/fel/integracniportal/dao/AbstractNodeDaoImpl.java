@@ -4,6 +4,8 @@ import cz.cvut.fel.integracniportal.model.AbstractNode;
 import cz.cvut.fel.integracniportal.model.QAbstractNode;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+
 import static cz.cvut.fel.integracniportal.model.QAbstractNode.abstractNode;
 
 /**
@@ -17,24 +19,15 @@ public class AbstractNodeDaoImpl extends GenericHibernateDao<AbstractNode> imple
     }
 
     @Override
-    public AbstractNode getAclParentFor(String nodeId) {
+    public AbstractNode getById(String nodeId) {
         return from(abstractNode)
                 .where(abstractNode.nodeId.eq(nodeId))
                 .uniqueResult(abstractNode);
     }
 
     @Override
-    public void setAclParentFor(String nodeId) {
-
-    }
-
-    @Override
-    public void save(AbstractNode abstractNode) {
-
-    }
-
-    @Override
-    public void delete(AbstractNode abstractNode) {
-
+    public void update(AbstractNode abstractNode) {
+        abstractNode.setChangedOn(new Date());
+        super.update(abstractNode);
     }
 }
