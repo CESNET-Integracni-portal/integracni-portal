@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * Provide operations to manage the AbstractNode permissions.
-
+ *
  * @author Eldar Iosip
  */
 public interface AclPermissionService {
@@ -22,4 +22,8 @@ public interface AclPermissionService {
     public List<NodePermission> getNodeAclForUser(String nodeId, Long userId);
 
     public void updateAclNodePermissions(String nodeId, List<AclPermissionRepresentation> aclPermissionRepresentations);
+
+    public boolean hasPermission(String nodeId, Long userId, NodePermission permission);
+
+    public void setPermission(String nodeId, Long userId, NodePermission permission);
 }

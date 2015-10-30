@@ -17,9 +17,9 @@ public interface AclPermissionDao {
 
     AclPermission getByNodeAndUser(String nodeId, Long userId);
 
-    AclPermission hasPermissionTo(String nodeId, Long userId, NodePermission nodePermission);
+    List<AclPermission> getAllPermissions(String nodeId, Long userId);
 
-    void setPermissionsByNodeAndUser(
+    Long setPermissionsByNodeAndUser(
             List<NodePermissionRepresentation> nodePermissions,
             String nodeId,
             AbstractUserRepresentation user
