@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.plugin.dom.exception.InvalidAccessException;
 
 import javax.xml.soap.Node;
 import java.security.acl.Acl;
@@ -37,9 +38,9 @@ public class AclPermissionServiceImpl implements AclPermissionService {
     }
 
     @Override
-    public Set<NodePermission> getNodeAclForUser(String nodeId, Long userId) {
+    public Set<NodePermission> getAclPermissions(String nodeId, Long userId) {
         Map<Long, AclPermission> permissionMap = aclPermissionDao.getPermissions(nodeId, userId);
-        Set<NodePermission> permissions = new HashSet<NodePermission>();
+        Set<NodePermission> permissions = new HashSet<>();
         for (AclPermission p : permissionMap.values()) {
             permissions.addAll(p.getNodePermissions());
         }
@@ -49,7 +50,7 @@ public class AclPermissionServiceImpl implements AclPermissionService {
     @Override
     public void updateNodePermissions(String nodeId, List<AclPermissionRepresentation> aclPermissionRepresentations) {
         AbstractNode node = abstractNodeDao.getById(nodeId);
-        Map<Long, AclPermission> aclPermissions = node.getAcl();
+        Map<Long, AclPermission> aclPermissions = node.getAclPermissions();
         for (AclPermissionRepresentation aclPermissionRepresentation : aclPermissionRepresentations) {
             Long key = aclPermissionRepresentation.getTargetUser().getId();
             if (!aclPermissions.containsKey(key)) {
@@ -60,33 +61,49 @@ public class AclPermissionServiceImpl implements AclPermissionService {
 
             AclPermission p = aclPermissions.get(key);
             p.setNodePermissions(aclPermissionRepresentation.getNodePermissions());
-
-            aclPermissionDao.update(p);
         }
+        abstractNodeDao.update(node);
     }
 
     @Override
     public boolean hasPermission(String nodeId, Long userId, NodePermission permission) {
-        //TODO: rewrite - could not work like that!
-        /*
         boolean hasGroupPermission = false,
-                hasUserPermission = false;
+                hasUserPermission = false,
+                groupInit = false;
 
-        for (AclPermission aclPermission : aclPermissionDao.getPermissions(nodeId, userId)) {
+        for (AclPermission aclPermission : aclPermissionDao.getPermissions(nodeId, userId).values()) {
             boolean contains = aclPermission.getNodePermissions().contains(permission);
             if (aclPermission.getTargetUser() instanceof Group) {
+                if (!groupInit) {
+                    hasGroupPermission = contains;
+                    groupInit = true;
+                }
                 hasGroupPermission &= contains;
             } else if (aclPermission.getTargetUser() instanceof UserDetails) {
                 hasUserPermission = contains;
             }
         }
         return hasGroupPermission | hasUserPermission;
-        */
-        return false;
     }
 
     @Override
     public void setPermission(String nodeId, Long userId, NodePermission permission) {
+        if (!this.hasPermission(nodeId, userId, NodePermission.EDIT_PERMISSIONS)) {
+            throw new InvalidAccessException("No permission to edit");
+        }
+
+        AbstractNode node = abstractNodeDao.getById(nodeId);
+        Map<Long, AclPermission> aclPermissions = node.getAclPermissions();
+
+        if (aclPermissions.containsKey(userId)) {
+            aclPermissions.get(userId).addNodePermission(permission);
+        } else {
+            AclPermission aclPermission = new AclPermission();
+            aclPermission.addNodePermission(permission);
+            aclPermissions.put(userId, new AclPermission());
+        }
+
+        abstractNodeDao.update(node);
     }
 
     @Override

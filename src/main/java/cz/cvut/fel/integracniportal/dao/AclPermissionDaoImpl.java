@@ -25,7 +25,9 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
 
     @Override
     public Map<Long, AclPermission> getPermissions(String nodeId, Long userId) {
-        //TODO: left join it's acl parent
+        QAbstractNode aclParent = new QAbstractNode("aclParent");
+        QAclPermission aclParentPermission = new QAclPermission("aclPermission");
+
         AbstractNode node = from(abstractNode)
                 .leftJoin(abstractNode.acl, aclPermission)
                 .on(aclPermission.node.id.eq(nodeId).and(
@@ -34,7 +36,18 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
                                                 .from(group)
                                                 .where(group.members.any().id.eq(userId))
                                                 .list(group.id))
-                        )))
+                        )
+                ))
+                .leftJoin(abstractNode.aclParent, aclParent)
+                .leftJoin(aclParent.acl, aclParentPermission)
+                .on(aclParentPermission.node.id.eq(nodeId).and(
+                        aclParentPermission.targetUser.id.eq(userId).or(aclParentPermission.targetUser.id.in(
+                                        new JPASubQuery()
+                                                .from(group)
+                                                .where(group.members.any().id.eq(userId))
+                                                .list(group.id))
+                        )
+                ))
                 .where(abstractNode.id.eq(nodeId))
                 .singleResult(abstractNode);
 
@@ -42,23 +55,6 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
             throw new NullPointerException("Node does not exist.");
         }
 
-        return node.getAcl();
-    }
-
-    @Override
-    public void update(AclPermission aclPermission) {
-        super.update(aclPermission);
-
-        //TODO: in service
-        //TODO: check if user could do this
-        //TODO: create AclPermission object if not exists
-        //TODO: or update with new permissions
-        /*AclPermission p = new AclPermission();
-        p.setNode();
-        BooleanExpression permissionNotExists = new JPASubQuery().from(aclPermission).where(aclPermission.node.id.eq(nodeId).and(aclPermission.targetUser.id.eq(user.getId()))).notExists();
-        SimpleSubQuery<String> setModuleName = new JPASubQuery()
-                .where(permissionNotExists).unique(Expressions.constant(newName));
-        return session.insert(modules).set(modules.name, setModuleName).
-                executeWithKey(modules.id);*/
+        return node.getAclPermissions();
     }
 }

@@ -18,29 +18,43 @@ import java.util.Set;
  */
 public interface AclPermissionService {
 
+    /**
+     * Return all possible ENUM values for AclPermission objects.
+     *
+     * @return NodePermission[]
+     */
     public NodePermission[] getAllPermissionTypes();
 
-    public Set<NodePermission> getNodeAclForUser(String nodeId, Long userId);
+    /**
+     * Return the set of permissions allowed to the user or group (AbstractUser).
+     */
+    public Set<NodePermission> getAclPermissions(String nodeId, Long userId);
 
+    /**
+     * Update the list of AclPermission object for particular Abstract Node.
+     */
     public void updateNodePermissions(String nodeId, List<AclPermissionRepresentation> aclPermissionRepresentations);
 
     /**
      * Return whether user or group has the requested permission.
-     *
+     * <p>
      * User permissions are more valuable than group ones.
-     *
-     * @param nodeId
-     * @param userId
-     * @param permission
-     * @return
+     * At least one group should have permitted access to the node,
+     * otherwise the user's permission should be used.
+     * <p>
+     * If group has a permission, but user is not defined, than automatically user is permitted.
      */
     public boolean hasPermission(String nodeId, Long userId, NodePermission permission);
 
+    /**
+     * Add permission for selected node and user.
+     * <p>
+     * If the AclPermission object does not exist, create it. Otherwise update existing one.
+     */
     public void setPermission(String nodeId, Long userId, NodePermission permission);
 
     /**
      * Inherit parent ACL Permission from it's parent
-     * @param nodeId
      */
     public void inheritParentAcl(String nodeId);
 }

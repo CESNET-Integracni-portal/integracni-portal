@@ -59,7 +59,7 @@ public class AclController extends AbstractController {
     public ResponseEntity getNodeAclForCurrentUser(@PathVariable String nodeId) {
         UserDetails currentUser = userService.getCurrentUser();
 
-        Set<NodePermission> nodePermissions = aclPermissionService.getNodeAclForUser(nodeId, currentUser.getId());
+        Set<NodePermission> nodePermissions = aclPermissionService.getAclPermissions(nodeId, currentUser.getId());
 
         List<NodePermissionRepresentation> representations = new ArrayList<NodePermissionRepresentation>();
         for (NodePermission nodePermission : nodePermissions) {
@@ -80,7 +80,7 @@ public class AclController extends AbstractController {
     @RequestMapping(value = "/v0.2/acl/node/{nodeId}/user/{userId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getNodeAclForUser(@PathVariable String nodeId, @PathVariable Long userId) {
-        Set<NodePermission> nodePermissions = aclPermissionService.getNodeAclForUser(nodeId, userId);
+        Set<NodePermission> nodePermissions = aclPermissionService.getAclPermissions(nodeId, userId);
 
         List<NodePermissionRepresentation> representations = new ArrayList<NodePermissionRepresentation>();
         for (NodePermission nodePermission : nodePermissions) {

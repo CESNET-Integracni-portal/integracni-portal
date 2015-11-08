@@ -56,8 +56,8 @@ public abstract class AbstractNode extends AbstractEntity<String> {
     private AbstractNode aclParent;
 
     @OneToMany(mappedBy = "node")
-    @MapKey(name="userId")
-    private Map<Long, AclPermission> acl = new HashMap<Long, AclPermission>();
+    @MapKey(name = "target_id")
+    private Map<Long, AclPermission> aclPermissions = new HashMap<>();
 
     public String getId() {
         return nodeId;
@@ -131,19 +131,24 @@ public abstract class AbstractNode extends AbstractEntity<String> {
         this.aclParent = aclParent;
     }
 
-    public Map<Long, AclPermission> getAcl() {
-        return acl;
+    public Map<Long, AclPermission> getAclPermissions() {
+        return aclPermissions;
     }
 
-    public void setAcl(Map<Long, AclPermission> acl) {
-        this.acl = acl;
+    public void setAclPermissions(Map<Long, AclPermission> aclPermissions) {
+        this.aclPermissions = aclPermissions;
     }
 
-    public void addAcl(AbstractUser abstractUser, AclPermission aclPermission) {
-        this.acl.put(abstractUser.getId(), aclPermission);
+    public void putAclPermission(Long userId, AclPermission aclPermission) {
+        aclPermission.setNode(this);
+        this.aclPermissions.put(userId, aclPermission);
+    }
+
+    public void addAclPermission(AbstractUser abstractUser, AclPermission aclPermission) {
         if (aclPermission.getNode() != this) {
             aclPermission.setNode(this);
         }
+        this.aclPermissions.put(abstractUser.getId(), aclPermission);
     }
 
     public abstract void getFileNode(List<FileMetadata> context);

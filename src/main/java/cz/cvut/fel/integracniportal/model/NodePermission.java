@@ -13,7 +13,8 @@ public enum NodePermission {
     EDIT("edit"),
     SHARE("share"),
     DOWNLOAD("download"),
-    UPLOAD("upload");
+    UPLOAD("upload"),
+    EDIT_PERMISSIONS("edit.permissions");
 
     private String name;
 

@@ -7,8 +7,7 @@ import java.util.List;
 /**
  * Permission object.
  * <p>
- * It's holding the user's allowed actions,
- * which modify the FSNode state
+ * Holds the user's allowed actions, provided to modify the AbstractNode state
  *
  * @author Eldar Iosip
  */
@@ -20,25 +19,25 @@ import java.util.List;
 public class AclPermission extends AbstractEntity<Long> {
 
     @Id
-    @Column(name = "acl_id", unique = true)
+    @Column(name = "acl_permission_id", unique = true)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long aclId;
 
-    @Column(name = "node_permissions")
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private List<NodePermission> nodePermissions;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "target_id")
     private AbstractUser targetUser;
 
     @ManyToOne
     @JoinColumn(name = "node_id")
     private AbstractNode node;
 
+    @Column(name = "node_permissions")
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private List<NodePermission> nodePermissions;
+
     public AclPermission() {
-        this.nodePermissions = new ArrayList<NodePermission>();
+        this.nodePermissions = new ArrayList<>();
     }
 
     @Override
@@ -49,22 +48,6 @@ public class AclPermission extends AbstractEntity<Long> {
     @Override
     public void setId(Long aclId) {
         this.aclId = aclId;
-    }
-
-    public List<NodePermission> getNodePermissions() {
-        return nodePermissions;
-    }
-
-    public void setNodePermissions(List<NodePermission> nodePermissions) {
-        this.nodePermissions = nodePermissions;
-    }
-
-    public boolean hasNodePermission(NodePermission nodePermission) {
-        return this.nodePermissions.contains(nodePermission);
-    }
-
-    public void addNodePermission(NodePermission nodePermission) {
-        this.nodePermissions.add(nodePermission);
     }
 
     public AbstractUser getTargetUser() {
@@ -80,10 +63,27 @@ public class AclPermission extends AbstractEntity<Long> {
     }
 
     public void setNode(AbstractNode node) {
+        if (!node.getAclPermissions().containsValue(this)) {
+            node.putAclPermission(targetUser.getId(), this);
+        }
         this.node = node;
-        //O(n)
-        if (!node.getAcl().containsValue(this)) {
-            node.getAcl().put(targetUser.getId(), this);
+    }
+
+    public List<NodePermission> getNodePermissions() {
+        return nodePermissions;
+    }
+
+    public void setNodePermissions(List<NodePermission> nodePermissions) {
+        this.nodePermissions = nodePermissions;
+    }
+
+    public boolean hasNodePermission(NodePermission nodePermission) {
+        return this.nodePermissions.contains(nodePermission);
+    }
+
+    public void addNodePermission(NodePermission nodePermission) {
+        if (!this.hasNodePermission(nodePermission)) {
+            this.nodePermissions.add(nodePermission);
         }
     }
 }
