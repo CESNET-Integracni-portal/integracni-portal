@@ -10,6 +10,7 @@ import static cz.cvut.fel.integracniportal.model.QAclPermission.aclPermission;
 import static cz.cvut.fel.integracniportal.model.QGroup.group;
 import static cz.cvut.fel.integracniportal.model.QAbstractNode.abstractNode;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,29 +33,35 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
                 .leftJoin(abstractNode.acl, aclPermission)
                 .on(aclPermission.node.id.eq(nodeId).and(
                         aclPermission.targetUser.id.eq(userId).or(aclPermission.targetUser.id.in(
-                                        new JPASubQuery()
-                                                .from(group)
-                                                .where(group.members.any().id.eq(userId))
-                                                .list(group.id))
+                                new JPASubQuery()
+                                        .from(group)
+                                        .where(group.members.any().id.eq(userId))
+                                        .list(group.id))
                         )
                 ))
                 .leftJoin(abstractNode.aclParent, aclParent)
                 .leftJoin(aclParent.acl, aclParentPermission)
                 .on(aclParentPermission.node.id.eq(nodeId).and(
                         aclParentPermission.targetUser.id.eq(userId).or(aclParentPermission.targetUser.id.in(
-                                        new JPASubQuery()
-                                                .from(group)
-                                                .where(group.members.any().id.eq(userId))
-                                                .list(group.id))
+                                new JPASubQuery()
+                                        .from(group)
+                                        .where(group.members.any().id.eq(userId))
+                                        .list(group.id))
                         )
                 ))
                 .where(abstractNode.id.eq(nodeId))
                 .singleResult(abstractNode);
 
         if (node == null) {
+            //TODO: custom exception
             throw new NullPointerException("Node does not exist.");
         }
 
         return node.getAclPermissions();
+    }
+
+    @Override
+    public void createAclPermission(AclPermission aclPermission) {
+        save(aclPermission);
     }
 }

@@ -1,19 +1,16 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.dao.AbstractNodeDao;
 import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
+import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.*;
-import cz.cvut.fel.integracniportal.representation.AbstractUserRepresentation;
 import cz.cvut.fel.integracniportal.representation.AclPermissionRepresentation;
 import cz.cvut.fel.integracniportal.representation.NodePermissionRepresentation;
-import org.apache.log4j.Logger;
+import cz.cvut.fel.integracniportal.representation.NodeRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sun.plugin.dom.exception.InvalidAccessException;
 
-import javax.xml.soap.Node;
-import java.security.acl.Acl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +24,39 @@ import java.util.Set;
 public class AclPermissionServiceImpl implements AclPermissionService {
 
     @Autowired
-    private AbstractNodeDao abstractNodeDao;
+    private AclPermissionDao aclPermissionDao;
 
     @Autowired
-    private AclPermissionDao aclPermissionDao;
+    private AbstractNodeService abstractNodeService;
+
+    @Override
+    @Transactional(readOnly = true)
+    public AclPermission getAclPermissionByUser(AbstractNode node, UserDetails user) {
+        if (node.getAclPermissions().containsKey(user.getId())) {
+            return node.getAclPermissions().get(user.getId());
+        } else {
+            AclPermission aclPermission = new AclPermission();
+            aclPermission.setNode(node);
+            aclPermission.setTargetUser(user);
+            return aclPermission;
+        }
+    }
+
+    @Override
+    public AclPermission createPermission(NodeRepresentation nodeRepresentation, UserDetails user, List<NodePermissionRepresentation> nodePermissionRepresentations) {
+        AbstractNode abstractNode = abstractNodeService.getById(nodeRepresentation.getId());
+        AclPermission aclPermission = this.getAclPermissionByUser(abstractNode, user);
+
+        //Hard overwrite permissions
+        aclPermission.getNodePermissions().clear();
+        for (NodePermissionRepresentation nodePermissionRepresentation : nodePermissionRepresentations) {
+            aclPermission.addNodePermission(NodePermission.valueOf(NodePermission.class, nodePermissionRepresentation.getName()));
+        }
+
+        abstractNodeService.saveAbstractNode(abstractNode);
+
+        return aclPermission;
+    }
 
     @Override
     public NodePermission[] getAllPermissionTypes() {
@@ -48,8 +74,8 @@ public class AclPermissionServiceImpl implements AclPermissionService {
     }
 
     @Override
-    public void updateNodePermissions(String nodeId, List<AclPermissionRepresentation> aclPermissionRepresentations) {
-        AbstractNode node = abstractNodeDao.getById(nodeId);
+    public void updateNodePermissions(NodeRepresentation nodeRepresentation, List<AclPermissionRepresentation> aclPermissionRepresentations) {
+        AbstractNode node = abstractNodeService.getById(nodeRepresentation.getId());
         Map<Long, AclPermission> aclPermissions = node.getAclPermissions();
         for (AclPermissionRepresentation aclPermissionRepresentation : aclPermissionRepresentations) {
             Long key = aclPermissionRepresentation.getTargetUser().getId();
@@ -62,16 +88,16 @@ public class AclPermissionServiceImpl implements AclPermissionService {
             AclPermission p = aclPermissions.get(key);
             p.setNodePermissions(aclPermissionRepresentation.getNodePermissions());
         }
-        abstractNodeDao.update(node);
+        abstractNodeService.saveAbstractNode(node);
     }
 
     @Override
-    public boolean hasPermission(String nodeId, Long userId, NodePermission permission) {
+    public boolean hasPermission(NodeRepresentation nodeRepresentation, Long userId, NodePermission permission) {
         boolean hasGroupPermission = false,
                 hasUserPermission = false,
                 groupInit = false;
 
-        for (AclPermission aclPermission : aclPermissionDao.getPermissions(nodeId, userId).values()) {
+        for (AclPermission aclPermission : aclPermissionDao.getPermissions(nodeRepresentation.getId(), userId).values()) {
             boolean contains = aclPermission.getNodePermissions().contains(permission);
             if (aclPermission.getTargetUser() instanceof Group) {
                 if (!groupInit) {
@@ -87,12 +113,12 @@ public class AclPermissionServiceImpl implements AclPermissionService {
     }
 
     @Override
-    public void setPermission(String nodeId, Long userId, NodePermission permission) {
-        if (!this.hasPermission(nodeId, userId, NodePermission.EDIT_PERMISSIONS)) {
+    public void setPermission(NodeRepresentation nodeRepresentation, Long userId, NodePermission permission) {
+        if (!this.hasPermission(nodeRepresentation, userId, NodePermission.EDIT_PERMISSIONS)) {
             throw new InvalidAccessException("No permission to edit");
         }
 
-        AbstractNode node = abstractNodeDao.getById(nodeId);
+        AbstractNode node = abstractNodeService.getById(nodeRepresentation.getId());
         Map<Long, AclPermission> aclPermissions = node.getAclPermissions();
 
         if (aclPermissions.containsKey(userId)) {
@@ -103,12 +129,12 @@ public class AclPermissionServiceImpl implements AclPermissionService {
             aclPermissions.put(userId, new AclPermission());
         }
 
-        abstractNodeDao.update(node);
+        abstractNodeService.saveAbstractNode(node);
     }
 
     @Override
-    public void inheritParentAcl(String nodeId) {
-        AbstractNode abstractNode = abstractNodeDao.getById(nodeId);
+    public void inheritParentAcl(NodeRepresentation nodeRepresentation) {
+        AbstractNode abstractNode = abstractNodeService.getById(nodeRepresentation.getId());
         AbstractNode aclParent = abstractNode.getParent().getAclParent();
 
         abstractNode.setAclParent(aclParent == null ? abstractNode.getParent() : aclParent);

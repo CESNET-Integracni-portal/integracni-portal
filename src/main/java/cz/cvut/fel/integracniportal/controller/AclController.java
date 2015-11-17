@@ -96,9 +96,9 @@ public class AclController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/acl/bulk/update/{nodeId}", method = POST, consumes = "application/json")
     @ResponseBody
-    public ResponseEntity updateNodeAcl(@PathVariable String nodeId,
+    public ResponseEntity updateNodeAcl(@PathVariable NodeRepresentation nodeRepresentation,
                                         @RequestBody List<AclPermissionRepresentation> aclPermissionRepresentations) {
-        aclPermissionService.updateNodePermissions(nodeId, aclPermissionRepresentations);
+        aclPermissionService.updateNodePermissions(nodeRepresentation, aclPermissionRepresentations);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

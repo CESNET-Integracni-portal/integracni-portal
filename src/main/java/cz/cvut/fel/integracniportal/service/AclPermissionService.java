@@ -1,14 +1,14 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.model.AbstractNode;
 import cz.cvut.fel.integracniportal.model.AclPermission;
 import cz.cvut.fel.integracniportal.model.NodePermission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.representation.AbstractUserRepresentation;
 import cz.cvut.fel.integracniportal.representation.AclPermissionRepresentation;
 import cz.cvut.fel.integracniportal.representation.NodePermissionRepresentation;
+import cz.cvut.fel.integracniportal.representation.NodeRepresentation;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,6 +17,18 @@ import java.util.Set;
  * @author Eldar Iosip
  */
 public interface AclPermissionService {
+
+    public AclPermission getAclPermissionByUser(AbstractNode node, UserDetails user);
+
+    /**
+     * @param nodeRepresentation
+     * @param user
+     * @param nodePermissionRepresentations
+     * @return
+     */
+    public AclPermission createPermission(NodeRepresentation nodeRepresentation,
+                                          UserDetails user,
+                                          List<NodePermissionRepresentation> nodePermissionRepresentations);
 
     /**
      * Return all possible ENUM values for AclPermission objects.
@@ -33,7 +45,7 @@ public interface AclPermissionService {
     /**
      * Update the list of AclPermission object for particular Abstract Node.
      */
-    public void updateNodePermissions(String nodeId, List<AclPermissionRepresentation> aclPermissionRepresentations);
+    public void updateNodePermissions(NodeRepresentation nodeRepresentation, List<AclPermissionRepresentation> aclPermissionRepresentations);
 
     /**
      * Return whether user or group has the requested permission.
@@ -44,17 +56,17 @@ public interface AclPermissionService {
      * <p>
      * If group has a permission, but user is not defined, than automatically user is permitted.
      */
-    public boolean hasPermission(String nodeId, Long userId, NodePermission permission);
+    public boolean hasPermission(NodeRepresentation nodeRepresentation, Long userId, NodePermission permission);
 
     /**
      * Add permission for selected node and user.
      * <p>
      * If the AclPermission object does not exist, create it. Otherwise update existing one.
      */
-    public void setPermission(String nodeId, Long userId, NodePermission permission);
+    public void setPermission(NodeRepresentation nodeRepresentation, Long userId, NodePermission permission);
 
     /**
      * Inherit parent ACL Permission from it's parent
      */
-    public void inheritParentAcl(String nodeId);
+    public void inheritParentAcl(NodeRepresentation nodeRepresentation);
 }
