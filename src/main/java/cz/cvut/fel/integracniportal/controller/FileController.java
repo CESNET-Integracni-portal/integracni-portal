@@ -252,6 +252,28 @@ public class FileController extends AbstractController {
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * TODO: update doc
+     *
+     * @param spaceId
+     * @param fileId
+     * @param userId
+     * @param nodePermissionRepresentation
+     * @return
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/acl/{userId}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateAclPermissions(@PathVariable String spaceId,
+                                               @PathVariable String fileId,
+                                               @PathVariable Long userId,
+                                               @RequestBody NodePermissionRepresentation nodePermissionRepresentation) {
+        ensureSpace(spaceId);
+
+        fileMetadataService.updateNodePermissions(fileId, userId, nodePermissionRepresentation.getPermissions());
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    }
+
     private void ensureSpace(String space) {
         spaceService.getOfType(space); // throws exception if space doesn't exist
     }

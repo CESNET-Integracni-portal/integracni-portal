@@ -2,12 +2,15 @@ package cz.cvut.fel.integracniportal.service;
 
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
+import cz.cvut.fel.integracniportal.model.Label;
+import cz.cvut.fel.integracniportal.model.NodePermission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service for FileMetadata metadata.
@@ -67,8 +70,8 @@ public interface FileMetadataService {
     /**
      * Uploads a file into root space folder and stores its metadata in database.
      *
-     * @param fileUpload  The file to be uploaded.
-     * @param space space name to upload the file to
+     * @param fileUpload The file to be uploaded.
+     * @param space      space name to upload the file to
      * @return Uuid identifier of the created file.
      */
     public FileMetadata uploadFileToRoot(String space, FileUpload fileUpload);
@@ -77,7 +80,7 @@ public interface FileMetadataService {
      * Uploads a file and stores its metadata in database.
      *
      * @param parentFolderId Id of the folder to which the file should be uploaded.
-     * @param fileUpload           The file to be uploaded.
+     * @param fileUpload     The file to be uploaded.
      * @return Uuid identifier of the created file.
      */
     public FileMetadata uploadFileToFolder(Long parentFolderId, FileUpload fileUpload);
@@ -85,8 +88,8 @@ public interface FileMetadataService {
     /**
      * Updates file and its metadata.
      *
-     * @param fileuuid Uuid identifier of the file to be updated.
-     * @param fileUpload     The file to be updated.
+     * @param fileuuid   Uuid identifier of the file to be updated.
+     * @param fileUpload The file to be updated.
      */
     public void updateFile(String fileuuid, FileUpload fileUpload);
 
@@ -116,7 +119,7 @@ public interface FileMetadataService {
     /**
      * Deletes a file and removes its metadata from database
      *
-     * @param fileMetadata File to be deleted.
+     * @param fileMetadata         File to be deleted.
      * @param removeFromRepository true if file is to be removed from file repository
      */
     void deleteFile(FileMetadata fileMetadata, boolean removeFromRepository);
@@ -124,7 +127,7 @@ public interface FileMetadataService {
     /**
      * Copies the file contents to the given output stream.
      *
-     * @param fileuuid The uuid identifier of the file to be deleted
+     * @param fileuuid     The uuid identifier of the file to be deleted
      * @param outputStream The output stream to copy the file contents to
      */
     void copyFileToOutputStream(String fileuuid, OutputStream outputStream);
@@ -167,5 +170,16 @@ public interface FileMetadataService {
      * @param currentUser the user who is sharing the file to the other users
      */
     public void shareFile(String fileId, List<Long> userIds, UserDetails currentUser);
+
+    public void saveFileMetadata(FileMetadata fileMetadata);
+
+    /**
+     * TODO: write about
+     *
+     * @param fileuuid
+     * @param userId
+     * @param permissions
+     */
+    public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions);
 
 }

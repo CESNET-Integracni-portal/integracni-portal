@@ -72,7 +72,8 @@ public interface UserDetailsService {
 
     /**
      * Changes the user's password
-     * @param userId id of the user for which to change the password
+     *
+     * @param userId      id of the user for which to change the password
      * @param newPassword the new password for the user
      * @param oldPassword the old password for check
      */
@@ -80,14 +81,16 @@ public interface UserDetailsService {
 
     /**
      * Updates the user's roles to the given list of roles
+     *
      * @param userId id of the user for which to update roles
-     * @param roles the list of roles
+     * @param roles  the list of roles
      */
     public void updateRoles(Long userId, List<String> roles);
 
     /**
      * Updates the user's permissions to the given list of permissions
-     * @param userId id of the user for which to update permissions
+     *
+     * @param userId      id of the user for which to update permissions
      * @param permissions the list of permissions
      */
     public void updatePermissions(Long userId, List<String> permissions);

@@ -1,10 +1,8 @@
 package cz.cvut.fel.integracniportal.controller;
 
+import cz.cvut.fel.integracniportal.model.NodePermission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
-import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserPasswordRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserPermissionsRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserRolesRepresentation;
+import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
 import cz.cvut.fel.integracniportal.validator.UserDetailsResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
