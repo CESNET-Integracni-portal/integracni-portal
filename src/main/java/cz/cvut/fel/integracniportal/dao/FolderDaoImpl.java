@@ -24,7 +24,7 @@ public class FolderDaoImpl extends GenericHibernateDao<Folder> implements Folder
     @Override
     public Folder getForUser(Long id, UserDetails currentUser) {
         return from(folder)
-                .where(folder.folderId.eq(id))
+                .where(folder.nodeId.eq(id))
                 .singleResult(folder);
 
     }

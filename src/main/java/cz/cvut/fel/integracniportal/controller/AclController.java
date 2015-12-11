@@ -38,8 +38,8 @@ public class AclController extends AbstractController {
     /**
      * Update ACL for selected user in space with node.
      *
-     * @param fileId                       File identifier
-     * @param userId                       Target user identifier
+     * @param fileId                                File identifier
+     * @param userId                                Target user identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
      * @return ResponseEntity
      */
@@ -57,8 +57,8 @@ public class AclController extends AbstractController {
     /**
      * Update ACL for selected user in space with node.
      *
-     * @param folderId                     Folder identifier
-     * @param userId                       Target user identifier
+     * @param folderId                              Folder identifier
+     * @param userId                                Target user identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
      * @return ResponseEntity
      */
@@ -69,6 +69,44 @@ public class AclController extends AbstractController {
                                                  @PathVariable Long userId,
                                                  @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
         aclService.updateFolderNodePermissions(folderId, userId, accessControlPermissionRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Update ACL for selected user in space with node.
+     *
+     * @param fileId                                File identifier
+     * @param groupId                               Target group identifier
+     * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/file/{fileId}/group/{groupId}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateGroupAclForFile(@PathVariable String fileId,
+                                                @PathVariable Long groupId,
+                                                @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
+        aclService.updateGroupNodePermissions(fileId, groupId, accessControlPermissionRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Update ACL for selected user in space with node.
+     *
+     * @param folderId                              Folder identifier
+     * @param groupId                               Target group identifier
+     * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/folder/{folderId}/group/{groupId}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateGroupAclForFolder(@PathVariable Long folderId,
+                                                  @PathVariable Long groupId,
+                                                  @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
+        aclService.updateGroupFolderNodePermissions(folderId, groupId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

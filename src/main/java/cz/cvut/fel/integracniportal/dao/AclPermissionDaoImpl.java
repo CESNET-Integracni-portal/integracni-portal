@@ -27,7 +27,7 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AccessControlEntry
     public AccessControlEntry getByTargetUserAndFolder(Long userId, Long folderId) {
         return from(accessControlEntry)
                 .where(accessControlEntry.targetUser.userId.eq(userId))
-                .where(accessControlEntry.targetFolder.folderId.eq(folderId))
+                .where(accessControlEntry.targetFolder.nodeId.eq(folderId))
                 .uniqueResult(accessControlEntry);
     }
 }

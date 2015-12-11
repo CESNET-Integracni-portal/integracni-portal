@@ -31,7 +31,7 @@ public class FileMetadata extends AbstractEntity<String> {
     private Long filesize;
 
     @ManyToOne
-    @JoinColumn(name = "parent", referencedColumnName = "folder_id")
+    @JoinColumn(name = "parent", referencedColumnName = "node_id")
     private Folder parent;
 
     @Column(name = "created_on", nullable = false)

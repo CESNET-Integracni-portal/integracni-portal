@@ -29,11 +29,15 @@ public class AccessControlEntry extends AbstractEntity<Long> {
     private UserDetails targetUser;
 
     @ManyToOne
+    @JoinColumn(name = "target_group_id", referencedColumnName = "group_id")
+    private Group targetGroup;
+
+    @ManyToOne
     @JoinColumn(name = "file_id")
     private FileMetadata targetFile;
 
     @ManyToOne
-    @JoinColumn(name = "folder_id")
+    @JoinColumn(name = "node_id")
     private Folder targetFolder;
 
     @Column(name = "node_permissions")
@@ -69,6 +73,14 @@ public class AccessControlEntry extends AbstractEntity<Long> {
 
     public void setTargetUser(UserDetails targetUser) {
         this.targetUser = targetUser;
+    }
+
+    public Group getTargetGroup() {
+        return targetGroup;
+    }
+
+    public void setTargetGroup(Group targetGroup) {
+        this.targetGroup = targetGroup;
     }
 
     public FileMetadata getTargetFile() {

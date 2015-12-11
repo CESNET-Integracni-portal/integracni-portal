@@ -35,7 +35,6 @@ public class AclServiceImpl implements AclService {
 
     @Override
     public void updateNodePermissions(String fileuuid, Long userId, AccessControlPermission[] permissions) {
-
         AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileuuid);
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
 
@@ -88,5 +87,15 @@ public class AclServiceImpl implements AclService {
         }
 
         aclPermissionDao.save(accessControlEntry);
+    }
+
+    @Override
+    public void updateGroupNodePermissions(String fileuuid, Long groupId, AccessControlPermission[] permissions) {
+
+    }
+
+    @Override
+    public void updateGroupFolderNodePermissions(Long folderId, Long groupId, AccessControlPermission[] permissions) {
+
     }
 }
