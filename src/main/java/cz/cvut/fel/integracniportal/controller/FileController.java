@@ -228,7 +228,7 @@ public class FileController extends AbstractController {
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileId);
 
         response.setContentType(fileMetadata.getMimetype());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getFilename() + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getName() + "\"");
 
         ServletOutputStream outputStream = response.getOutputStream();
 

@@ -33,7 +33,7 @@ public class FolderController_uploadFile_Test extends AbstractIntegrationTestCas
         mockMvc.perform(uploadFile("space/cesnet/folder/1001/file"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath('$.uuid', notNullValue()))
-                .andExpect(jsonPath('$.filename').value(FILE_NAME))
+                .andExpect(jsonPath('$.name').value(FILE_NAME))
                 .andExpect(jsonPath('$.mimetype').value(MIME_TYPE))
                 .andExpect(jsonPath('$.filesize').value(FILE_CONTENTS.getBytes().length))
     }

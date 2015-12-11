@@ -75,7 +75,7 @@
 
     <table name="resource_file">
         <column>uuid</column>
-        <column>filename</column>
+        <column>name</column>
         <column>filesize</column>
         <column>mimetype</column>
         <column>created_on</column>

@@ -117,9 +117,9 @@ public abstract class AbstractIntegrationTestCase extends AbstractJUnit4Springoc
         )
     }
 
-    public RequestBuilder upload(String url, String fileName, byte[] fileContents, String contentType, String charset = "utf-8") {
+    public RequestBuilder upload(String url, String name, byte[] fileContents, String contentType, String charset = "utf-8") {
         Part[] parts = [
-                new FilePart("file", new ByteArrayPartSource(fileName, fileContents), contentType, charset)
+                new FilePart("file", new ByteArrayPartSource(name, fileContents), contentType, charset)
         ]
         def multipartRequestEntity = new MultipartRequestEntity(parts, new PostMethod().getParams());
 

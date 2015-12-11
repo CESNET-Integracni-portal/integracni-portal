@@ -103,7 +103,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
-        fileMetadata.setFilename(fileUpload.getFileName());
+        fileMetadata.setName(fileUpload.getFileName());
         fileMetadata.setMimetype(fileUpload.getContentType());
         fileMetadata.setParent(parent);
         fileMetadata.setOwner(currentUser);
@@ -135,7 +135,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void renameFile(String fileId, String name) {
         FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
-        fileMetadata.setFilename(name);
+        fileMetadata.setName(name);
         updateFileMetadata(fileMetadata);
 
         // TODO: bug #6 (calling api with already renamed file metadata)

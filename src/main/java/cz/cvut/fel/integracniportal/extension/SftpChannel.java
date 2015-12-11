@@ -52,8 +52,8 @@ public class SftpChannel {
         sftpChannel.cd(path);
     }
 
-    public void getFile(String filename, OutputStream outputStream) throws SftpException, IOException {
-        InputStream inputStream = sftpChannel.get(filename);
+    public void getFile(String name, OutputStream outputStream) throws SftpException, IOException {
+        InputStream inputStream = sftpChannel.get(name);
 
         IOUtils.copyLarge(inputStream, outputStream);
 
@@ -70,16 +70,16 @@ public class SftpChannel {
         sftpChannel.rename(oldPath, newPath);
     }
 
-    public void deleteFile(String filename) throws SftpException {
-        sftpChannel.rm(filename);
+    public void deleteFile(String name) throws SftpException {
+        sftpChannel.rm(name);
     }
 
     public void deleteFolder(String path) throws SftpException {
         sftpChannel.rmdir(path);
     }
 
-    public void uploadFile(InputStream fileStream, String filename) throws SftpException {
-        sftpChannel.put(fileStream, filename);
+    public void uploadFile(InputStream fileStream, String name) throws SftpException {
+        sftpChannel.put(fileStream, name);
     }
 
     public void renameFile(String oldPath, String newPath) throws SftpException {

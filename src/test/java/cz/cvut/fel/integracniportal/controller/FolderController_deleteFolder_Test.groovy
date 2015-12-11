@@ -42,7 +42,7 @@ public class FolderController_deleteFolder_Test extends AbstractIntegrationTestC
         def folder2 = folderService.createSubFolder("a", folder1, userDetailsService.getCurrentUser())
         def folder3 = folderService.createSubFolder("a", folder2, userDetailsService.getCurrentUser())
 
-        FileMetadata fileMetadata = new FileMetadata(parent: folder3, owner: userDetailsService.getCurrentUser(), filename: "asd", space: 'cesnet', filesize: 4, mimetype: "application/json")
+        FileMetadata fileMetadata = new FileMetadata(parent: folder3, owner: userDetailsService.getCurrentUser(), name: "asd", space: 'cesnet', filesize: 4, mimetype: "application/json")
         fileMetadataService.createFileMetadata(fileMetadata)
 
         folderService.removeFolder(folder1.getId())

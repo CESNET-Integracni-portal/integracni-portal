@@ -9,7 +9,7 @@ import java.util.*;
  * Entity for file metadata.
  */
 @Entity
-@Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "filename"}))
+@Table(name = "resource_file", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "name"}))
 public class FileMetadata extends AbstractEntity<String> {
 
     @Id
@@ -21,8 +21,8 @@ public class FileMetadata extends AbstractEntity<String> {
     @Column(name = "space")
     private String space;
 
-    @Column(name = "filename", nullable = false)
-    private String filename;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "mimetype", nullable = false)
     private String mimetype;
@@ -99,12 +99,12 @@ public class FileMetadata extends AbstractEntity<String> {
         this.space = space;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getName() {
+        return name;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getMimetype() {
