@@ -1,15 +1,21 @@
 package cz.cvut.fel.integracniportal.service;
 
+import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.model.*;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.EntityManagerProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.io.OutputStream;
 import java.security.acl.Acl;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,6 +24,8 @@ import java.util.Set;
 @Service
 @Transactional
 public class FileMetadataServiceImpl implements FileMetadataService {
+
+    private static final Logger logger = Logger.getLogger(FileMetadataServiceImpl.class);
 
     @Autowired
     private FileMetadataDao fileMetadataDao;
@@ -30,6 +38,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Autowired
     private SpaceServiceImpl fileRepositoryService;
+
+    @Autowired
+    private AclService aclService;
 
     @Override
     @Transactional(readOnly = true)
@@ -211,29 +222,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         fileMetadataDao.save(fileMetadata);
     }
 
-    @Override
-    public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
-        //Check if userId can set permissions(EDIT_PERM is allowed)
-
-        AclPermission aclPermission = null;
-        if (fileMetadata.getAclPermissions().containsKey(userId)) {
-            //User already has any permissions for this node
-            aclPermission = fileMetadata.getAclPermissions().get(userId);
-        } else {
-            //Create new AclPermission object and add into map
-            aclPermission = new AclPermission();
-            fileMetadata.putAclPermission(userId, aclPermission);
-        }
-
-        aclPermission.getNodePermissions().clear();
-
-        for (NodePermission permission : permissions) {
-            aclPermission.getNodePermissions().add(permission);
-        }
-
-        saveFileMetadata(fileMetadata);
-    }
 
     private FileApiAdapter getFileApi(String type) {
         return new FileApiAdapter(fileRepositoryService.getOfType(type));

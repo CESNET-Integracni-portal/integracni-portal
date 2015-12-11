@@ -9,9 +9,7 @@ import java.util.Map;
  */
 public interface AclPermissionDao {
 
-    Map<Long, AclPermission> getPermissions(String fileMetadataUuid, Long userId);
+    void save(AclPermission aclPermission);
 
-    void update(AclPermission aclPermission);
-
-    void createAclPermission(AclPermission aclPermission);
+    AclPermission getByTargetUserAndFile(Long userId, String fileMetadataUuid);
 }

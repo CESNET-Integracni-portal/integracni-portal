@@ -1,0 +1,10 @@
+{
+  "permissions": [
+    "READ",
+    "EDIT",
+    "SHARE",
+    "DOWNLOAD",
+    "UPLOAD",
+    "EDIT_PERMISSIONS"
+  ]
+}

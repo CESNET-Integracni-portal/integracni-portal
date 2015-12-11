@@ -27,11 +27,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesMocks(classMode = DirtiesMocks.ClassMode.AFTER_EACH_TEST_METHOD)
 @DatabaseSetup("classpath:fileMetadata.xml")
 @Transactional
-public class AclController_getPermissions_Test extends AbstractIntegrationTestCase {
+public class AclController_Test extends AbstractIntegrationTestCase {
 
     @Test
     void "should return available node permissions with read at first"() {
         apiGet("acl/permission").andExpect(status().isOk())
                 .andExpect(jsonPath('permissions.$[0]').value("READ"))
+    }
+
+    @Test
+    void "should update acl with read at first"() {
+        def json = getResourceAsString("permissions.json");
+
+        apiPost("acl/space/cesnet/file/1001/user/1", json)
+                .andExpect(status().isNoContent())
     }
 }

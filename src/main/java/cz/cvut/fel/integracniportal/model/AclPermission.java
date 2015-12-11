@@ -25,7 +25,7 @@ public class AclPermission extends AbstractEntity<Long> {
     private UserDetails owner;
 
     @ManyToOne
-    @JoinColumn(name = "target_user_id")
+    @JoinColumn(name = "target_user_id", referencedColumnName = "user_id")
     private UserDetails targetUser;
 
     @ManyToOne

@@ -23,9 +23,9 @@ public class AclController extends AbstractController {
     private AclService aclService;
 
     /**
-     * TODO: add doc
+     * Return all the available NodePermission instances.
      */
-    //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/acl/permission", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getPermissions() {
@@ -35,6 +35,27 @@ public class AclController extends AbstractController {
         representation.setPermissions(nodePermissions);
 
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
+    }
+
+    /**
+     * Update ACL for selected user in space with node.
+     *
+     * @param spaceId                      Space type
+     * @param fileId                       File identifier
+     * @param userId                       Target user identifier
+     * @param nodePermissionRepresentation Object containing the array of NodePermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/space/{spaceId}/file/{fileId}/user/{userId}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateAclPermissions(@PathVariable String spaceId,
+                                               @PathVariable String fileId,
+                                               @PathVariable Long userId,
+                                               @RequestBody NodePermissionRepresentation nodePermissionRepresentation) {
+        aclService.updateNodePermissions(fileId, userId, nodePermissionRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
 }

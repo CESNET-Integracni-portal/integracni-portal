@@ -173,13 +173,4 @@ public interface FileMetadataService {
 
     public void saveFileMetadata(FileMetadata fileMetadata);
 
-    /**
-     * TODO: write about
-     *
-     * @param fileuuid
-     * @param userId
-     * @param permissions
-     */
-    public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions);
-
 }

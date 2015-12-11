@@ -3,10 +3,7 @@ package cz.cvut.fel.integracniportal.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Entity for file metadata.
@@ -70,11 +67,10 @@ public class FileMetadata extends AbstractEntity<String> {
     private Folder aclParent;
 
     @OneToMany(mappedBy = "targetFile")
-    @MapKey(name = "targetUser")
-    private Map<Long, AclPermission> aclPermissions;
+    private List<AclPermission> aclPermissions;
 
     public FileMetadata() {
-        this.aclPermissions = new HashMap<Long, AclPermission>();
+        this.aclPermissions = new ArrayList<AclPermission>();
     }
 
     @Override
@@ -207,25 +203,20 @@ public class FileMetadata extends AbstractEntity<String> {
         this.aclParent = aclParent;
     }
 
-    public Map<Long, AclPermission> getAclPermissions() {
+    public List<AclPermission> getAclPermissions() {
         return aclPermissions;
     }
 
-    public void setAclPermissions(Map<Long, AclPermission> aclPermissions) {
+    public void setAclPermissions(List<AclPermission> aclPermissions) {
         this.aclPermissions = aclPermissions;
     }
 
 
-    public void putAclPermission(Long userId, AclPermission aclPermission) {
-        aclPermission.setTargetFile(this);
-        this.aclPermissions.put(userId, aclPermission);
-    }
-
-    public void addAclPermission(UserDetails user, AclPermission aclPermission) {
+    public void addAclPermission(AclPermission aclPermission) {
         if (aclPermission.getTargetFile() != this) {
             aclPermission.setTargetFile(this);
         }
-        this.aclPermissions.put(user.getId(), aclPermission);
+        this.aclPermissions.add(aclPermission);
     }
 
 }

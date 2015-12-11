@@ -63,9 +63,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * TODO admin není v db
-     * FIXME admin není v db
-     *
      * @return
      */
     @Override
@@ -75,14 +72,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (loggedUser == null) {
             return null;
         }
-
-        UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
-
-        if (specialUserDetails != null) {
-            return specialUserDetails;
-        } else {
-            return getUserByUsername(loggedUser.getUsername());
-        }
+        return getUserByUsername(loggedUser.getUsername());
     }
 
     private UserDetails resolveSpecialUser(User loggedUser) {

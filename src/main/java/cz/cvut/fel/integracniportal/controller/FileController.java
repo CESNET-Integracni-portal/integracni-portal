@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.*;
 import cz.cvut.fel.integracniportal.utils.UploadUtils;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/rest")
 public class FileController extends AbstractController {
 
+    private static final Logger logger = Logger.getLogger(FileController.class);
+
+
     @Autowired
     private UserDetailsService userService;
 
+    @Autowired
+    private AclService aclService;
 
     @Autowired
     private SpaceService spaceService;
@@ -235,7 +241,7 @@ public class FileController extends AbstractController {
     /**
      * Upload a file.
      *
-     * @param file File to be uploaded
+     * @param fileId File to be uploaded
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -249,28 +255,6 @@ public class FileController extends AbstractController {
         FileUpload fileUpload = UploadUtils.handleFileUpload(request);
 
         fileMetadataService.updateFile(fileId, fileUpload);
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * TODO: update doc
-     *
-     * @param spaceId
-     * @param fileId
-     * @param userId
-     * @param nodePermissionRepresentation
-     * @return
-     */
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/acl/{userId}", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity updateAclPermissions(@PathVariable String spaceId,
-                                               @PathVariable String fileId,
-                                               @PathVariable Long userId,
-                                               @RequestBody NodePermissionRepresentation nodePermissionRepresentation) {
-        ensureSpace(spaceId);
-
-        fileMetadataService.updateNodePermissions(fileId, userId, nodePermissionRepresentation.getPermissions());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 

@@ -1,7 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
-import cz.cvut.fel.integracniportal.model.AclPermission;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.QFileMetadata;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -9,10 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static cz.cvut.fel.integracniportal.model.QFileMetadata.fileMetadata;
 import static cz.cvut.fel.integracniportal.model.QLabel.label;
+import static cz.cvut.fel.integracniportal.model.QAclPermission.aclPermission;
 
 /**
  * Hibernate implementation of the FileMetadataDao interface.
