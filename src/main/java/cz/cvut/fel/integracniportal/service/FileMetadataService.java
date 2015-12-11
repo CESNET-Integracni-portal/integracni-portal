@@ -2,15 +2,12 @@ package cz.cvut.fel.integracniportal.service;
 
 
 import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.model.Label;
-import cz.cvut.fel.integracniportal.model.NodePermission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Service for FileMetadata metadata.

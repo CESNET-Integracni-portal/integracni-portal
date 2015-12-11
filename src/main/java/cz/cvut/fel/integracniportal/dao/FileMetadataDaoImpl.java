@@ -11,7 +11,6 @@ import java.util.List;
 
 import static cz.cvut.fel.integracniportal.model.QFileMetadata.fileMetadata;
 import static cz.cvut.fel.integracniportal.model.QLabel.label;
-import static cz.cvut.fel.integracniportal.model.QAclPermission.aclPermission;
 
 /**
  * Hibernate implementation of the FileMetadataDao interface.

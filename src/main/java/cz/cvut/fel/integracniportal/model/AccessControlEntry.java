@@ -1,19 +1,19 @@
 package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * Holds the Set of NodePermission objects, describing available actions for targetUser on targetNode.
+ * Access Control Entry.
+ * <p>
+ * Holds the Set of AccessControlPermission objects, describing available actions for targetUser on targetNode.
  *
  * @author Eldar Iosip
  */
 @Entity
-@Table(name = "acl_permission")
-public class AclPermission extends AbstractEntity<Long> {
+@Table(name = "access_control_entry")
+public class AccessControlEntry extends AbstractEntity<Long> {
 
     @Id
     @Column(name = "permission_id", unique = true)
@@ -39,10 +39,10 @@ public class AclPermission extends AbstractEntity<Long> {
     @Column(name = "node_permissions")
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private Set<NodePermission> nodePermissions;
+    private Set<AccessControlPermission> accessControlPermissions;
 
-    public AclPermission() {
-        this.nodePermissions = new HashSet<NodePermission>();
+    public AccessControlEntry() {
+        this.accessControlPermissions = new HashSet<AccessControlPermission>();
     }
 
     @Override
@@ -87,12 +87,12 @@ public class AclPermission extends AbstractEntity<Long> {
         this.targetFolder = targetFolder;
     }
 
-    public Set<NodePermission> getNodePermissions() {
-        return nodePermissions;
+    public Set<AccessControlPermission> getAccessControlPermissions() {
+        return accessControlPermissions;
     }
 
-    public void setNodePermissions(Set<NodePermission> nodePermissions) {
-        this.nodePermissions = nodePermissions;
+    public void setAccessControlPermissions(Set<AccessControlPermission> accessControlPermissions) {
+        this.accessControlPermissions = accessControlPermissions;
     }
 
 }

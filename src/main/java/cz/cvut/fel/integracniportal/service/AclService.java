@@ -1,9 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.model.AclPermission;
-import cz.cvut.fel.integracniportal.model.NodePermission;
-import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
+import cz.cvut.fel.integracniportal.model.AccessControlPermission;
 
 /**
  * @author Eldar Iosip
@@ -11,14 +8,14 @@ import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 public interface AclService {
 
     /**
-     * Return all the available NodePermission objects.
+     * Return all the available AccessControlPermission objects.
      *
-     * @return NodePermission[]
+     * @return AccessControlPermission[]
      */
-    public NodePermission[] getNodePermissionTypes();
+    public AccessControlPermission[] getNodePermissionTypes();
 
-    public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions);
+    public void updateNodePermissions(String fileuuid, Long userId, AccessControlPermission[] permissions);
 
-    public void updateFolderNodePermissions(Long folderId, Long userId, NodePermission[] permissions);
+    public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions);
 
 }

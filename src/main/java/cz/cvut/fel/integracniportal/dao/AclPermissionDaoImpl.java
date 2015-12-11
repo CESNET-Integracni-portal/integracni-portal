@@ -1,33 +1,33 @@
 package cz.cvut.fel.integracniportal.dao;
 
-import cz.cvut.fel.integracniportal.model.AclPermission;
+import cz.cvut.fel.integracniportal.model.AccessControlEntry;
 import org.springframework.stereotype.Repository;
 
-import static cz.cvut.fel.integracniportal.model.QAclPermission.aclPermission;
+import static cz.cvut.fel.integracniportal.model.QAccessControlEntry.accessControlEntry;
 
 /**
  * @author Eldar Iosip
  */
 @Repository
-public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> implements AclPermissionDao {
+public class AclPermissionDaoImpl extends GenericHibernateDao<AccessControlEntry> implements AclPermissionDao {
 
     public AclPermissionDaoImpl() {
-        super(AclPermission.class);
+        super(AccessControlEntry.class);
     }
 
     @Override
-    public AclPermission getByTargetUserAndFile(Long userId, String fileMetadataUuid) {
-        return from(aclPermission)
-                .where(aclPermission.targetUser.userId.eq(userId))
-                .where(aclPermission.targetFile.uuid.eq(fileMetadataUuid))
-                .uniqueResult(aclPermission);
+    public AccessControlEntry getByTargetUserAndFile(Long userId, String fileMetadataUuid) {
+        return from(accessControlEntry)
+                .where(accessControlEntry.targetUser.userId.eq(userId))
+                .where(accessControlEntry.targetFile.uuid.eq(fileMetadataUuid))
+                .uniqueResult(accessControlEntry);
     }
 
     @Override
-    public AclPermission getByTargetUserAndFolder(Long userId, Long folderId) {
-        return from(aclPermission)
-                .where(aclPermission.targetUser.userId.eq(userId))
-                .where(aclPermission.targetFolder.folderId.eq(folderId))
-                .uniqueResult(aclPermission);
+    public AccessControlEntry getByTargetUserAndFolder(Long userId, Long folderId) {
+        return from(accessControlEntry)
+                .where(accessControlEntry.targetUser.userId.eq(userId))
+                .where(accessControlEntry.targetFolder.folderId.eq(folderId))
+                .uniqueResult(accessControlEntry);
     }
 }

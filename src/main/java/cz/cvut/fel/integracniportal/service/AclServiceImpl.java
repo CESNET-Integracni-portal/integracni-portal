@@ -1,19 +1,11 @@
 package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
-import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.model.*;
-import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Eldar Iosip
@@ -37,64 +29,64 @@ public class AclServiceImpl implements AclService {
     private AclPermissionDao aclPermissionDao;
 
     @Override
-    public NodePermission[] getNodePermissionTypes() {
-        return NodePermission.values();
+    public AccessControlPermission[] getNodePermissionTypes() {
+        return AccessControlPermission.values();
     }
 
     @Override
-    public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions) {
+    public void updateNodePermissions(String fileuuid, Long userId, AccessControlPermission[] permissions) {
 
-        AclPermission aclPermission = aclPermissionDao.getByTargetUserAndFile(userId, fileuuid);
+        AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileuuid);
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
 
-        if (aclPermission == null) {
-            aclPermission = new AclPermission();
+        if (accessControlEntry == null) {
+            accessControlEntry = new AccessControlEntry();
 
             UserDetails currentUser = userDetailsService.getCurrentUser();
             UserDetails targetUser = userDetailsService.getUserById(userId);
 
-            aclPermission.setTargetFile(fileMetadata);
-            aclPermission.setOwner(currentUser);
-            aclPermission.setTargetUser(targetUser);
+            accessControlEntry.setTargetFile(fileMetadata);
+            accessControlEntry.setOwner(currentUser);
+            accessControlEntry.setTargetUser(targetUser);
         }
 
 
         //TODO: Check if userId can set permissions(EDIT_PERM is allowed)
 
-        aclPermission.getNodePermissions().clear();
-        for (NodePermission permission : permissions) {
+        accessControlEntry.getAccessControlPermissions().clear();
+        for (AccessControlPermission permission : permissions) {
             logger.info("Adding permission: " + permission.getName());
-            aclPermission.getNodePermissions().add(permission);
+            accessControlEntry.getAccessControlPermissions().add(permission);
         }
 
-        aclPermissionDao.save(aclPermission);
+        aclPermissionDao.save(accessControlEntry);
     }
 
     @Override
-    public void updateFolderNodePermissions(Long folderId, Long userId, NodePermission[] permissions) {
-        AclPermission aclPermission = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
+    public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions) {
+        AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
         Folder folder = folderService.getFolderById(folderId);
 
-        if (aclPermission == null) {
-            aclPermission = new AclPermission();
+        if (accessControlEntry == null) {
+            accessControlEntry = new AccessControlEntry();
 
             UserDetails currentUser = userDetailsService.getCurrentUser();
             UserDetails targetUser = userDetailsService.getUserById(userId);
 
-            aclPermission.setTargetFolder(folder);
-            aclPermission.setOwner(currentUser);
-            aclPermission.setTargetUser(targetUser);
+            accessControlEntry.setTargetFolder(folder);
+            accessControlEntry.setOwner(currentUser);
+            accessControlEntry.setTargetUser(targetUser);
         }
 
 
         //TODO: Check if userId can set permissions(EDIT_PERM is allowed)
 
-        aclPermission.getNodePermissions().clear();
-        for (NodePermission permission : permissions) {
+        accessControlEntry.getAccessControlPermissions().clear();
+        for (AccessControlPermission permission : permissions) {
             logger.info("Adding permission: " + permission.getName());
-            aclPermission.getNodePermissions().add(permission);
+            accessControlEntry.getAccessControlPermissions().add(permission);
         }
 
-        aclPermissionDao.save(aclPermission);
+        aclPermissionDao.save(accessControlEntry);
     }
 }

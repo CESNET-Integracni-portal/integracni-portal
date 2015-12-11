@@ -1,6 +1,5 @@
 package cz.cvut.fel.integracniportal.controller;
 
-import cz.cvut.fel.integracniportal.model.NodePermission;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;

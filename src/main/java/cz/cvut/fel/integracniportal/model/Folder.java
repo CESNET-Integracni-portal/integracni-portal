@@ -62,7 +62,7 @@ public class Folder extends AbstractEntity<Long> {
     private Folder aclParent;
 
     @OneToMany(mappedBy = "targetFolder")
-    private List<AclPermission> aclPermissions;
+    private List<AccessControlEntry> acEntries;
 
     @Override
     public Long getId() {
@@ -170,11 +170,11 @@ public class Folder extends AbstractEntity<Long> {
         this.aclParent = aclParent;
     }
 
-    public List<AclPermission> getAclPermissions() {
-        return aclPermissions;
+    public List<AccessControlEntry> getAcEntries() {
+        return acEntries;
     }
 
-    public void setAclPermissions(List<AclPermission> aclPermissions) {
-        this.aclPermissions = aclPermissions;
+    public void setAcEntries(List<AccessControlEntry> acEntries) {
+        this.acEntries = acEntries;
     }
 }

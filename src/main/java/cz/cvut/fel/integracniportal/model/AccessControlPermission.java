@@ -7,7 +7,7 @@ import cz.cvut.fel.integracniportal.exceptions.PermissionNotFoundException;
 /**
  * @author Eldar Iosip
  */
-public enum NodePermission {
+public enum AccessControlPermission {
 
     READ("READ"),
     EDIT("EDIT"),
@@ -18,7 +18,7 @@ public enum NodePermission {
 
     private String name;
 
-    NodePermission(String name) {
+    AccessControlPermission(String name) {
         this.name = name;
     }
 
@@ -36,10 +36,10 @@ public enum NodePermission {
      * TODO: add doc
      */
     @JsonCreator
-    public static NodePermission create(String name) throws PermissionNotFoundException {
-        NodePermission permission;
+    public static AccessControlPermission create(String name) throws PermissionNotFoundException {
+        AccessControlPermission permission;
         try {
-            permission = NodePermission.valueOf(name);
+            permission = AccessControlPermission.valueOf(name);
         } catch (IllegalArgumentException e) {
             throw new PermissionNotFoundException("permission.notFound", name);
         }

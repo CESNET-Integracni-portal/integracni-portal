@@ -67,10 +67,10 @@ public class FileMetadata extends AbstractEntity<String> {
     private Folder aclParent;
 
     @OneToMany(mappedBy = "targetFile")
-    private List<AclPermission> aclPermissions;
+    private List<AccessControlEntry> acEntries;
 
     public FileMetadata() {
-        this.aclPermissions = new ArrayList<AclPermission>();
+        this.acEntries = new ArrayList<AccessControlEntry>();
     }
 
     @Override
@@ -203,20 +203,20 @@ public class FileMetadata extends AbstractEntity<String> {
         this.aclParent = aclParent;
     }
 
-    public List<AclPermission> getAclPermissions() {
-        return aclPermissions;
+    public List<AccessControlEntry> getAcEntries() {
+        return acEntries;
     }
 
-    public void setAclPermissions(List<AclPermission> aclPermissions) {
-        this.aclPermissions = aclPermissions;
+    public void setAcEntries(List<AccessControlEntry> acEntries) {
+        this.acEntries = acEntries;
     }
 
 
-    public void addAclPermission(AclPermission aclPermission) {
-        if (aclPermission.getTargetFile() != this) {
-            aclPermission.setTargetFile(this);
+    public void addAclPermission(AccessControlEntry accessControlEntry) {
+        if (accessControlEntry.getTargetFile() != this) {
+            accessControlEntry.setTargetFile(this);
         }
-        this.aclPermissions.add(aclPermission);
+        this.acEntries.add(accessControlEntry);
     }
 
 }
