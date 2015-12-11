@@ -42,7 +42,7 @@ public class Node extends AbstractEntity<Long> {
     private boolean online = true;
 
     @ManyToMany
-    @JoinTable(name = "resource_folder_label", joinColumns = {@JoinColumn(name = "node_id")},
+    @JoinTable(name = "resource_node_label", joinColumns = {@JoinColumn(name = "node_id")},
             inverseJoinColumns = {@JoinColumn(name = "label_id")},
             uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "node_id"})})
     private List<Label> labels;
