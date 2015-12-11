@@ -39,7 +39,15 @@ public class AclController_Test extends AbstractIntegrationTestCase {
     void "should update acl with read at first"() {
         def json = getResourceAsString("permissions.json");
 
-        apiPost("acl/space/cesnet/file/1001/user/1", json)
+        apiPost("acl/file/1001/user/1", json)
+                .andExpect(status().isNoContent())
+    }
+
+    @Test
+    void "should update acl with read at first on folder"() {
+        def json = getResourceAsString("permissions.json");
+
+        apiPost("acl/folder/1001/user/1", json)
                 .andExpect(status().isNoContent())
     }
 }

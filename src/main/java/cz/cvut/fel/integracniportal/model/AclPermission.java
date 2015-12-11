@@ -32,6 +32,10 @@ public class AclPermission extends AbstractEntity<Long> {
     @JoinColumn(name = "file_id")
     private FileMetadata targetFile;
 
+    @ManyToOne
+    @JoinColumn(name = "folder_id")
+    private Folder targetFolder;
+
     @Column(name = "node_permissions")
     @ElementCollection
     @Enumerated(EnumType.STRING)
@@ -73,6 +77,14 @@ public class AclPermission extends AbstractEntity<Long> {
 
     public void setTargetFile(FileMetadata targetFile) {
         this.targetFile = targetFile;
+    }
+
+    public Folder getTargetFolder() {
+        return targetFolder;
+    }
+
+    public void setTargetFolder(Folder targetFolder) {
+        this.targetFolder = targetFolder;
     }
 
     public Set<NodePermission> getNodePermissions() {

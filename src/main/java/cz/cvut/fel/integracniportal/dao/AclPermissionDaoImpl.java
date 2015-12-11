@@ -22,4 +22,12 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AclPermission> imp
                 .where(aclPermission.targetFile.uuid.eq(fileMetadataUuid))
                 .uniqueResult(aclPermission);
     }
+
+    @Override
+    public AclPermission getByTargetUserAndFolder(Long userId, Long folderId) {
+        return from(aclPermission)
+                .where(aclPermission.targetUser.userId.eq(userId))
+                .where(aclPermission.targetFolder.folderId.eq(folderId))
+                .uniqueResult(aclPermission);
+    }
 }

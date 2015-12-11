@@ -19,4 +19,6 @@ public interface AclService {
 
     public void updateNodePermissions(String fileuuid, Long userId, NodePermission[] permissions);
 
+    public void updateFolderNodePermissions(Long folderId, Long userId, NodePermission[] permissions);
+
 }

@@ -40,20 +40,37 @@ public class AclController extends AbstractController {
     /**
      * Update ACL for selected user in space with node.
      *
-     * @param spaceId                      Space type
      * @param fileId                       File identifier
      * @param userId                       Target user identifier
      * @param nodePermissionRepresentation Object containing the array of NodePermission instances
      * @return ResponseEntity
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/acl/space/{spaceId}/file/{fileId}/user/{userId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/v0.2/acl/file/{fileId}/user/{userId}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity updateAclPermissions(@PathVariable String spaceId,
-                                               @PathVariable String fileId,
+    public ResponseEntity updateUserAclForFile(@PathVariable String fileId,
                                                @PathVariable Long userId,
                                                @RequestBody NodePermissionRepresentation nodePermissionRepresentation) {
         aclService.updateNodePermissions(fileId, userId, nodePermissionRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Update ACL for selected user in space with node.
+     *
+     * @param folderId                     Folder identifier
+     * @param userId                       Target user identifier
+     * @param nodePermissionRepresentation Object containing the array of NodePermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/folder/{folderId}/user/{userId}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateUserAclForFolder(@PathVariable Long folderId,
+                                                 @PathVariable Long userId,
+                                                 @RequestBody NodePermissionRepresentation nodePermissionRepresentation) {
+        aclService.updateFolderNodePermissions(folderId, userId, nodePermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

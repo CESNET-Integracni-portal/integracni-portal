@@ -2,10 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
-import cz.cvut.fel.integracniportal.model.AclPermission;
-import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.model.NodePermission;
-import cz.cvut.fel.integracniportal.model.UserDetails;
+import cz.cvut.fel.integracniportal.model.*;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
 import org.apache.log4j.Logger;
@@ -29,6 +26,9 @@ public class AclServiceImpl implements AclService {
 
     @Autowired
     private FileMetadataService fileMetadataService;
+
+    @Autowired
+    private FolderService folderService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -68,9 +68,33 @@ public class AclServiceImpl implements AclService {
         }
 
         aclPermissionDao.save(aclPermission);
+    }
 
-        /*
-        saveFileMetadata(fileMetadata);
-        */
+    @Override
+    public void updateFolderNodePermissions(Long folderId, Long userId, NodePermission[] permissions) {
+        AclPermission aclPermission = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
+        Folder folder = folderService.getFolderById(folderId);
+
+        if (aclPermission == null) {
+            aclPermission = new AclPermission();
+
+            UserDetails currentUser = userDetailsService.getCurrentUser();
+            UserDetails targetUser = userDetailsService.getUserById(userId);
+
+            aclPermission.setTargetFolder(folder);
+            aclPermission.setOwner(currentUser);
+            aclPermission.setTargetUser(targetUser);
+        }
+
+
+        //TODO: Check if userId can set permissions(EDIT_PERM is allowed)
+
+        aclPermission.getNodePermissions().clear();
+        for (NodePermission permission : permissions) {
+            logger.info("Adding permission: " + permission.getName());
+            aclPermission.getNodePermissions().add(permission);
+        }
+
+        aclPermissionDao.save(aclPermission);
     }
 }

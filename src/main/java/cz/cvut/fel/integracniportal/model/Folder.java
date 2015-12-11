@@ -57,6 +57,13 @@ public class Folder extends AbstractEntity<Long> {
             uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "folder_id"})})
     private List<Label> labels;
 
+    @ManyToOne
+    @JoinColumn(name = "acl_parent_id")
+    private Folder aclParent;
+
+    @OneToMany(mappedBy = "targetFolder")
+    private List<AclPermission> aclPermissions;
+
     @Override
     public Long getId() {
         return folderId;
@@ -153,5 +160,21 @@ public class Folder extends AbstractEntity<Long> {
 
     public void setLabels(List<Label> labels) {
         this.labels = labels;
+    }
+
+    public Folder getAclParent() {
+        return aclParent;
+    }
+
+    public void setAclParent(Folder aclParent) {
+        this.aclParent = aclParent;
+    }
+
+    public List<AclPermission> getAclPermissions() {
+        return aclPermissions;
+    }
+
+    public void setAclPermissions(List<AclPermission> aclPermissions) {
+        this.aclPermissions = aclPermissions;
     }
 }
