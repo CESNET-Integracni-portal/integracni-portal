@@ -27,7 +27,7 @@ public class AclController extends AbstractController {
     @RequestMapping(value = "/v0.2/acl/permission", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getPermissions() {
-        AccessControlPermission[] accessControlPermissions = aclService.getNodePermissionTypes();
+        AccessControlPermission[] accessControlPermissions = aclService.getAccessControlPermissionTypes();
 
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
         representation.setPermissions(accessControlPermissions);
@@ -36,9 +36,7 @@ public class AclController extends AbstractController {
     }
 
     /**
-     * Update ACL for selected user in space with node.
-     *
-     * @param fileId                                File identifier
+     * @param fileId                                FileMetadata identifier
      * @param userId                                Target user identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
      * @return ResponseEntity
@@ -46,33 +44,29 @@ public class AclController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/acl/file/{fileId}/user/{userId}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity updateUserAclForFile(@PathVariable Long fileId,
-                                               @PathVariable Long userId,
-                                               @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodePermissions(fileId, userId, accessControlPermissionRepresentation.getPermissions());
+    public ResponseEntity updateUserAclForFileMetadata(@PathVariable Long fileId,
+                                                       @PathVariable Long userId,
+                                                       @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
+        aclService.updateNodeAccessControlPermissions(fileId, userId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Update ACL for selected user in space with node.
-     *
      * @param folderId                              Folder identifier
      * @param userId                                Target user identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
      * @return ResponseEntity
      */
-    /*
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/acl/folder/{folderId}/user/{userId}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity updateUserAclForFolder(@PathVariable Long folderId,
                                                  @PathVariable Long userId,
                                                  @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateFolderNodePermissions(folderId, userId, accessControlPermissionRepresentation.getPermissions());
+        aclService.updateNodeAccessControlPermissions(folderId, userId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-    */
 
 }

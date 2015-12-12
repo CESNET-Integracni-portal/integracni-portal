@@ -9,9 +9,9 @@ import static cz.cvut.fel.integracniportal.model.QAccessControlEntry.accessContr
  * @author Eldar Iosip
  */
 @Repository
-public class AclPermissionDaoImpl extends GenericHibernateDao<AccessControlEntry> implements AclPermissionDao {
+public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControlEntry> implements AccessControlEntryDao {
 
-    public AclPermissionDaoImpl() {
+    public AccessControlEntryDaoImpl() {
         super(AccessControlEntry.class);
     }
 

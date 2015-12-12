@@ -1,22 +1,15 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
 import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.model.*;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.jpa.EntityManagerProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.io.OutputStream;
-import java.security.acl.Acl;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of the {@link FileMetadataService}.

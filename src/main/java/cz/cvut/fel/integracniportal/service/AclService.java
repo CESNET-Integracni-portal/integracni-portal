@@ -12,10 +12,8 @@ public interface AclService {
      *
      * @return AccessControlPermission[]
      */
-    public AccessControlPermission[] getNodePermissionTypes();
+    public AccessControlPermission[] getAccessControlPermissionTypes();
 
-    public void updateNodePermissions(Long fileId, Long userId, AccessControlPermission[] permissions);
-
-    public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions);
+    public void updateNodeAccessControlPermissions(Long nodeId, Long userId, AccessControlPermission[] permissions);
 
 }

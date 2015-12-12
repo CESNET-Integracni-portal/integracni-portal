@@ -5,7 +5,7 @@ import cz.cvut.fel.integracniportal.model.*;
 /**
  * @author Eldar Iosip
  */
-public interface AclPermissionDao {
+public interface AccessControlEntryDao {
 
     void save(AccessControlEntry accessControlEntry);
 

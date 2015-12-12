@@ -1,6 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.dao.AclPermissionDao;
+import cz.cvut.fel.integracniportal.dao.AccessControlEntryDao;
 import cz.cvut.fel.integracniportal.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,15 @@ public class AclServiceImpl implements AclService {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private AclPermissionDao aclPermissionDao;
+    private AccessControlEntryDao accessControlEntryDao;
 
     @Override
-    public AccessControlPermission[] getNodePermissionTypes() {
+    public AccessControlPermission[] getAccessControlPermissionTypes() {
         return AccessControlPermission.values();
     }
 
     @Override
-    public void updateNodePermissions(Long fileId, Long userId, AccessControlPermission[] permissions) {
+    public void updateNodeAccessControlPermissions(Long nodeId, Long userId, AccessControlPermission[] permissions) {
        /* AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileId);
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(fileId);
 
@@ -62,8 +62,8 @@ public class AclServiceImpl implements AclService {
         */
     }
 
-    @Override
-    public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions) {
+    //@Override
+    //public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions) {
         /*AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
         Folder folder = folderService.getFolderById(folderId);
 
@@ -89,6 +89,6 @@ public class AclServiceImpl implements AclService {
 
         aclPermissionDao.save(accessControlEntry);
         */
-    }
+    //  }
 
 }

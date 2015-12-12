@@ -21,7 +21,7 @@ public interface FileMetadataService {
     List<FileMetadata> getFilesByLabels(String spaceId, List<Long> labels, UserDetails owner);
 
     /**
-     * Finds a file metadata in database by its uuid.
+     * Finds a file metadata in database by its id.
      *
      * @param fileMetadataId of the file.
      * @return FileMetadata metadata.

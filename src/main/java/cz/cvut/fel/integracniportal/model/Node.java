@@ -156,7 +156,7 @@ public abstract class Node extends AbstractEntity<Long> {
     public abstract void getFolderNode(List<Folder> context);
 
     /*
-    public void addAclPermission(AccessControlEntry accessControlEntry) {
+    public void addAccessControlEntry(AccessControlEntry accessControlEntry) {
         if (accessControlEntry.getTargetFile() != this) {
             accessControlEntry.setTargetFile(this);
         }
