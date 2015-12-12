@@ -13,26 +13,20 @@ public class Folder extends Node {
 
     @OneToMany(mappedBy = "parent")
     @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.DELETE})
-    private List<Node> folders;
-
-    @OneToMany(mappedBy = "parent")
-    private List<Node> files;
+    private List<Node> subnodes;
 
     @Column(name = "online")
     private boolean online = true;
 
     public Folder() {
-        this.folders = new ArrayList<Node>();
-        this.files = new ArrayList<Node>();
+        this.subnodes = new ArrayList<Node>();
     }
 
     public List<Folder> getFolders() {
         List<Folder> folders = new ArrayList<Folder>();
 
-        for (Node node : this.folders) {
-            if (node instanceof Folder) {
-                folders.add((Folder) node);
-            }
+        for (Node node : this.subnodes) {
+            node.getFolderNode(folders);
         }
 
         return folders;
@@ -41,10 +35,8 @@ public class Folder extends Node {
     public List<FileMetadata> getFiles() {
         List<FileMetadata> files = new ArrayList<FileMetadata>();
 
-        for (Node node : this.files) {
-            if (node instanceof FileMetadata) {
-                files.add((FileMetadata) node);
-            }
+        for (Node node : this.subnodes) {
+            node.getFileMetadataNode(files);
         }
 
         return files;
@@ -58,5 +50,15 @@ public class Folder extends Node {
     @Override
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    @Override
+    public void getFileMetadataNode(List<FileMetadata> context) {
+        //nothing
+    }
+
+    @Override
+    public void getFolderNode(List<Folder> context) {
+        context.add(this);
     }
 }

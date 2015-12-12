@@ -62,4 +62,14 @@ public class FileMetadata extends Node {
         this.online = online;
     }
 
+    @Override
+    public void getFileMetadataNode(List<FileMetadata> context) {
+        context.add(this);
+    }
+
+    @Override
+    public void getFolderNode(List<Folder> context) {
+        //nothing
+    }
+
 }

@@ -151,6 +151,10 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acEntries = acEntries;
     }
 
+    public abstract void getFileMetadataNode(List<FileMetadata> context);
+
+    public abstract void getFolderNode(List<Folder> context);
+
     /*
     public void addAclPermission(AccessControlEntry accessControlEntry) {
         if (accessControlEntry.getTargetFile() != this) {
