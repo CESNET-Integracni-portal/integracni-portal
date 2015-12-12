@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class FileDefinition {
 
-    private String id;
+    private Long id;
 
     private String name;
 
@@ -21,11 +21,11 @@ public class FileDefinition {
 
     private FolderDefinition folder;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

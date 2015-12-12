@@ -11,12 +11,12 @@ import java.util.Map;
 public interface FileMetadataDao {
 
     /**
-     * Finds a file metadata in database by its uuid.
+     * Finds a file metadata in database by its id.
      *
-     * @param fileMetadataUuid Uuid of the file.
+     * @param fileMetadataId of the file.
      * @return FileMetadata metadata.
      */
-    public FileMetadata getByUUID(String fileMetadataUuid);
+    public FileMetadata getById(Long fileMetadataId);
 
     /**
      * Finds all files in database.

@@ -14,12 +14,8 @@ public interface AclService {
      */
     public AccessControlPermission[] getNodePermissionTypes();
 
-    public void updateNodePermissions(String fileuuid, Long userId, AccessControlPermission[] permissions);
+    public void updateNodePermissions(Long fileId, Long userId, AccessControlPermission[] permissions);
 
     public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions);
-
-    public void updateGroupNodePermissions(String fileuuid, Long groupId, AccessControlPermission[] permissions);
-
-    public void updateGroupFolderNodePermissions(Long folderId, Long groupId, AccessControlPermission[] permissions);
 
 }

@@ -66,7 +66,7 @@ public class FolderController_deleteFolder_Test extends AbstractIntegrationTestC
             // pass
         }
         try {
-            fileMetadataService.getFileMetadataByUuid(fileMetadata.getId())
+            fileMetadataService.getFileMetadataById(fileMetadata.getId())
             fail();
         } catch (Exception e) {
             // pass

@@ -55,9 +55,9 @@ public class FileController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getFileMetadata(@PathVariable String spaceId,
-                                          @PathVariable String fileId) {
+                                          @PathVariable Long fileId) {
         ensureSpace(spaceId);
-        FileMetadataRepresentation representation = fileMetadataService.getFileMetadataRepresentationByUuid(fileId);
+        FileMetadataRepresentation representation = fileMetadataService.getFileMetadataRepresentationById(fileId);
         return new ResponseEntity(representation, HttpStatus.OK);
     }
 
@@ -71,7 +71,7 @@ public class FileController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/nameChange", method = POST)
     @ResponseBody
     public ResponseEntity renameFile(@PathVariable String spaceId,
-                                     @PathVariable String fileId,
+                                     @PathVariable Long fileId,
                                      @RequestBody NameRepresentation representation) {
         ensureSpace(spaceId);
         fileMetadataService.renameFile(fileId, representation.getName());
@@ -88,7 +88,7 @@ public class FileController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/parentChange", method = POST)
     @ResponseBody
     public ResponseEntity moveFile(@PathVariable String spaceId,
-                                   @PathVariable String fileId,
+                                   @PathVariable Long fileId,
                                    @RequestBody FolderParentRepresentation representation) {
         ensureSpace(spaceId);
         fileMetadataService.moveFile(fileId, representation.getParentId());
@@ -103,7 +103,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/trash", method = POST)
     public ResponseEntity moveFileToBin(@PathVariable String spaceId,
-                                        @PathVariable String fileId) {
+                                        @PathVariable Long fileId) {
         ensureSpace(spaceId);
         fileMetadataService.deleteFile(fileId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -117,7 +117,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/online", method = POST)
     public ResponseEntity moveToOnline(@PathVariable String spaceId,
-                                       @PathVariable String fileId) {
+                                       @PathVariable Long fileId) {
         ensureSpace(spaceId);
         fileMetadataService.moveFileOnline(fileId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -131,7 +131,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/offline", method = POST)
     public ResponseEntity moveToOffline(@PathVariable String spaceId,
-                                        @PathVariable String fileId) {
+                                        @PathVariable Long fileId) {
         ensureSpace(spaceId);
         fileMetadataService.moveFileOffline(fileId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -145,7 +145,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/addLabel", method = POST)
     public ResponseEntity addLabel(@PathVariable String spaceId,
-                                   @PathVariable String fileId,
+                                   @PathVariable Long fileId,
                                    @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
         labelService.addLabelToFile(fileId, representation, userService.getCurrentUser());
@@ -160,7 +160,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/removeLabel", method = POST)
     public ResponseEntity removeLabel(@PathVariable String spaceId,
-                                      @PathVariable String fileId,
+                                      @PathVariable Long fileId,
                                       @RequestBody LabelIdRepresentation representation) {
         ensureSpace(spaceId);
         labelService.removeLabelFromFile(fileId, representation, userService.getCurrentUser());
@@ -175,7 +175,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/favorite", method = POST)
     public ResponseEntity favoriteFile(@PathVariable String spaceId,
-                                       @PathVariable String fileId) {
+                                       @PathVariable Long fileId) {
         ensureSpace(spaceId);
         fileMetadataService.favoriteFile(fileId, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -189,7 +189,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/unfavorite", method = POST)
     public ResponseEntity unfavoriteFile(@PathVariable String spaceId,
-                                         @PathVariable String fileId) {
+                                         @PathVariable Long fileId) {
         ensureSpace(spaceId);
         fileMetadataService.unfavoriteFile(fileId, userService.getCurrentUser());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -204,7 +204,7 @@ public class FileController extends AbstractController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/share", method = POST)
     public ResponseEntity shareFile(@PathVariable String spaceId,
-                                    @PathVariable String fileId,
+                                    @PathVariable Long fileId,
                                     @RequestBody ShareRepresentation representation) {
         ensureSpace(spaceId);
         fileMetadataService.shareFile(fileId, representation.getShareWith(), userService.getCurrentUser());
@@ -221,11 +221,11 @@ public class FileController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/contents", method = GET)
     @ResponseBody
     public void getFileContents(@PathVariable String spaceId,
-                                @PathVariable String fileId,
+                                @PathVariable Long fileId,
                                 HttpServletResponse response) throws IOException {
         ensureSpace(spaceId);
 
-        FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileId);
+        FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(fileId);
 
         response.setContentType(fileMetadata.getMimetype());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileMetadata.getName() + "\"");
@@ -248,7 +248,7 @@ public class FileController extends AbstractController {
     @RequestMapping(value = "/v0.2/space/{spaceId}/file/{fileId}/contents", method = POST)
     @ResponseBody
     public ResponseEntity updateFileContent(@PathVariable String spaceId,
-                                            @PathVariable String fileId,
+                                            @PathVariable Long fileId,
                                             HttpServletRequest request) throws IOException, FileUploadException {
         ensureSpace(spaceId);
 

@@ -23,10 +23,10 @@ public interface FileMetadataService {
     /**
      * Finds a file metadata in database by its uuid.
      *
-     * @param fileMetadataUuid Uuid of the file.
+     * @param fileMetadataId of the file.
      * @return FileMetadata metadata.
      */
-    public FileMetadata getFileMetadataByUuid(String fileMetadataUuid);
+    public FileMetadata getFileMetadataById(Long fileMetadataId);
 
     /**
      * Returns the file metadata.
@@ -34,7 +34,7 @@ public interface FileMetadataService {
      * @param fileId the ID of file to return the metadata for
      * @return FileMetadata metadata.
      */
-    public FileMetadataRepresentation getFileMetadataRepresentationByUuid(String fileId);
+    public FileMetadataRepresentation getFileMetadataRepresentationById(Long fileId);
 
     /**
      * Saves the file metadata into database.
@@ -69,7 +69,7 @@ public interface FileMetadataService {
      *
      * @param fileUpload The file to be uploaded.
      * @param space      space name to upload the file to
-     * @return Uuid identifier of the created file.
+     * @return id identifier of the created file.
      */
     public FileMetadata uploadFileToRoot(String space, FileUpload fileUpload);
 
@@ -78,17 +78,17 @@ public interface FileMetadataService {
      *
      * @param parentFolderId Id of the folder to which the file should be uploaded.
      * @param fileUpload     The file to be uploaded.
-     * @return Uuid identifier of the created file.
+     * @return id identifier of the created file.
      */
     public FileMetadata uploadFileToFolder(Long parentFolderId, FileUpload fileUpload);
 
     /**
      * Updates file and its metadata.
      *
-     * @param fileuuid   Uuid identifier of the file to be updated.
+     * @param fileId     Identifier of the file to be updated.
      * @param fileUpload The file to be updated.
      */
-    public void updateFile(String fileuuid, FileUpload fileUpload);
+    public void updateFile(Long fileId, FileUpload fileUpload);
 
     /**
      * Renames file.
@@ -96,7 +96,7 @@ public interface FileMetadataService {
      * @param fileId the ID of file to rename
      * @param name   the new file name
      */
-    public void renameFile(String fileId, String name);
+    public void renameFile(Long fileId, String name);
 
     /**
      * Moves the file to different folder.
@@ -104,14 +104,14 @@ public interface FileMetadataService {
      * @param fileId   the ID of file to move
      * @param parentId the ID of folder to move the file to
      */
-    public void moveFile(String fileId, Long parentId);
+    public void moveFile(Long fileId, Long parentId);
 
     /**
      * Deletes a file and removes its metadata from database
      *
-     * @param uuid The uuid identifier of the file to be deleted.
+     * @param id The identifier of the file to be deleted.
      */
-    public void deleteFile(String uuid);
+    public void deleteFile(Long id);
 
     /**
      * Deletes a file and removes its metadata from database
@@ -124,24 +124,24 @@ public interface FileMetadataService {
     /**
      * Copies the file contents to the given output stream.
      *
-     * @param fileuuid     The uuid identifier of the file to be deleted
+     * @param fileId       The identifier of the file to be deleted
      * @param outputStream The output stream to copy the file contents to
      */
-    void copyFileToOutputStream(String fileuuid, OutputStream outputStream);
+    void copyFileToOutputStream(Long fileId, OutputStream outputStream);
 
     /**
      * Moves the file to online state.
      *
      * @param fileId
      */
-    public void moveFileOnline(String fileId);
+    public void moveFileOnline(Long fileId);
 
     /**
      * Moves the file to offline state.
      *
      * @param fileId
      */
-    public void moveFileOffline(String fileId);
+    public void moveFileOffline(Long fileId);
 
     /**
      * Marks the file as favorite for the given user.
@@ -149,7 +149,7 @@ public interface FileMetadataService {
      * @param fileId      the ID of file to make favorite
      * @param currentUser the user to make the file favorite for
      */
-    public void favoriteFile(String fileId, UserDetails currentUser);
+    public void favoriteFile(Long fileId, UserDetails currentUser);
 
     /**
      * Marks the file as not favorite anymore for the given user.
@@ -157,7 +157,7 @@ public interface FileMetadataService {
      * @param fileId      the ID of file to unmark as favorite
      * @param currentUser the user to make the file not favorite for
      */
-    public void unfavoriteFile(String fileId, UserDetails currentUser);
+    public void unfavoriteFile(Long fileId, UserDetails currentUser);
 
     /**
      * Shares the file with given users
@@ -166,7 +166,7 @@ public interface FileMetadataService {
      * @param userIds     the IDs of users to share the file with
      * @param currentUser the user who is sharing the file to the other users
      */
-    public void shareFile(String fileId, List<Long> userIds, UserDetails currentUser);
+    public void shareFile(Long fileId, List<Long> userIds, UserDetails currentUser);
 
     public void saveFileMetadata(FileMetadata fileMetadata);
 

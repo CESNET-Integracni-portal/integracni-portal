@@ -33,10 +33,6 @@ public class AccessControlEntry extends AbstractEntity<Long> {
     private Group targetGroup;
 
     @ManyToOne
-    @JoinColumn(name = "file_id")
-    private FileMetadata targetFile;
-
-    @ManyToOne
     @JoinColumn(name = "node_id")
     private Folder targetFolder;
 
@@ -83,13 +79,6 @@ public class AccessControlEntry extends AbstractEntity<Long> {
         this.targetGroup = targetGroup;
     }
 
-    public FileMetadata getTargetFile() {
-        return targetFile;
-    }
-
-    public void setTargetFile(FileMetadata targetFile) {
-        this.targetFile = targetFile;
-    }
 
     public Folder getTargetFolder() {
         return targetFolder;

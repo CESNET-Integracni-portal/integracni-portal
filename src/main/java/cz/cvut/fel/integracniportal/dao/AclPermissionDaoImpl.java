@@ -16,11 +16,14 @@ public class AclPermissionDaoImpl extends GenericHibernateDao<AccessControlEntry
     }
 
     @Override
-    public AccessControlEntry getByTargetUserAndFile(Long userId, String fileMetadataUuid) {
+    public AccessControlEntry getByTargetUserAndFile(Long userId, Long fileMetadataId) {
+        /*
         return from(accessControlEntry)
                 .where(accessControlEntry.targetUser.userId.eq(userId))
-                .where(accessControlEntry.targetFile.uuid.eq(fileMetadataUuid))
+                .where(accessControlEntry.targetFile.nodeId.eq(fileMetadataId))
                 .uniqueResult(accessControlEntry);
+                */
+        return null;
     }
 
     @Override

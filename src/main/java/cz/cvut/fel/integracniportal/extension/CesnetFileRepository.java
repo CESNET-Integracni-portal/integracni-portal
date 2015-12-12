@@ -125,7 +125,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
             createFolderPath(toArray(path));
             sftpChannel.cd(path);
 
-            sftpChannel.uploadFile(stream, file.getId());
+            sftpChannel.uploadFile(stream, "" + file.getId());
         } catch (SftpException e) {
             throw new ServiceAccessException("Could not upload file", e);
         } finally {
@@ -141,7 +141,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sftpChannel = sftpChannelChannelProvider.get();
             sftpChannel.cd(getUserHomeFolder(file.getOwner()));
-            sftpChannel.getFile(file.getId(), outputStream);
+            sftpChannel.getFile("" + file.getId(), outputStream);
         } catch (Exception e) {
             throw new FileAccessException("Could not get file", e);
         } finally {
@@ -183,7 +183,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sftpChannel = sftpChannelChannelProvider.get();
             sftpChannel.cd(getUserHomeFolder(file.getOwner()));
-            sftpChannel.deleteFile(file.getId());
+            sftpChannel.deleteFile("" + file.getId());
         } catch (Exception e) {
             throw new FileAccessException("Could not get file", e);
         } finally {

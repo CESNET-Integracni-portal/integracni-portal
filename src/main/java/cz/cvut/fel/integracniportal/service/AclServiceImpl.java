@@ -34,9 +34,9 @@ public class AclServiceImpl implements AclService {
     }
 
     @Override
-    public void updateNodePermissions(String fileuuid, Long userId, AccessControlPermission[] permissions) {
-        AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileuuid);
-        FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileuuid);
+    public void updateNodePermissions(Long fileId, Long userId, AccessControlPermission[] permissions) {
+       /* AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileId);
+        FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(fileId);
 
         if (accessControlEntry == null) {
             accessControlEntry = new AccessControlEntry();
@@ -59,11 +59,12 @@ public class AclServiceImpl implements AclService {
         }
 
         aclPermissionDao.save(accessControlEntry);
+        */
     }
 
     @Override
     public void updateFolderNodePermissions(Long folderId, Long userId, AccessControlPermission[] permissions) {
-        AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
+        /*AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFolder(userId, folderId);
         Folder folder = folderService.getFolderById(folderId);
 
         if (accessControlEntry == null) {
@@ -87,15 +88,7 @@ public class AclServiceImpl implements AclService {
         }
 
         aclPermissionDao.save(accessControlEntry);
+        */
     }
 
-    @Override
-    public void updateGroupNodePermissions(String fileuuid, Long groupId, AccessControlPermission[] permissions) {
-
-    }
-
-    @Override
-    public void updateGroupFolderNodePermissions(Long folderId, Long groupId, AccessControlPermission[] permissions) {
-
-    }
 }

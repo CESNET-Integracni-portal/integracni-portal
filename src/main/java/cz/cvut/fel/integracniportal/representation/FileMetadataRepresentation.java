@@ -16,7 +16,7 @@ public class FileMetadataRepresentation {
 
     private String type = "file";
 
-    private String uuid;
+    private Long id;
 
     private String name;
 
@@ -38,7 +38,7 @@ public class FileMetadataRepresentation {
     }
 
     public FileMetadataRepresentation(FileMetadata fileMetadata) {
-        uuid = fileMetadata.getUuid();
+        id = fileMetadata.getId();
         name = fileMetadata.getName();
         mimetype = fileMetadata.getMimetype();
         filesize = fileMetadata.getFilesize();
@@ -49,7 +49,7 @@ public class FileMetadataRepresentation {
         }
         if (fileMetadata.getLabels() != null) {
             labels = new ArrayList<LabelRepresentation>(fileMetadata.getLabels().size());
-            for (Label label: fileMetadata.getLabels()){
+            for (Label label : fileMetadata.getLabels()) {
                 LabelRepresentation labelResource = new LabelRepresentation(label);
                 labels.add(labelResource);
             }
@@ -58,12 +58,27 @@ public class FileMetadataRepresentation {
         changedOn = fileMetadata.getChangedOn();
     }
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @deprecated
+     */
+    public String getUuid() {
+        return "" + id;
+    }
+
+    /**
+     * @param id
+     * @deprecated
+     */
+    public void setUuid(String id) {
+        this.id = Long.parseLong(id);
     }
 
     public String getName() {

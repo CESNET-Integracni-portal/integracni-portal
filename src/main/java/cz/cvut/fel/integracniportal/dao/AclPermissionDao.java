@@ -9,7 +9,7 @@ public interface AclPermissionDao {
 
     void save(AccessControlEntry accessControlEntry);
 
-    AccessControlEntry getByTargetUserAndFile(Long userId, String fileMetadataUuid);
+    AccessControlEntry getByTargetUserAndFile(Long userId, Long fileMetadataId);
 
     AccessControlEntry getByTargetUserAndFolder(Long userId, Long folderId);
 }

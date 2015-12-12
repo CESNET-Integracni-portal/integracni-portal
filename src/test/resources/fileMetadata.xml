@@ -35,6 +35,8 @@
         <column>deleted</column>
         <column>online</column>
         <column>node_type</column>
+        <column>filesize</column>
+        <column>mimetype</column>
         <row>
             <value>1001</value>
             <value>root1</value>
@@ -71,25 +73,10 @@
             <value>true</value>
             <value>FOLDER</value>
         </row>
-    </table>
 
-    <table name="resource_file">
-        <column>uuid</column>
-        <column>name</column>
-        <column>filesize</column>
-        <column>mimetype</column>
-        <column>created_on</column>
-        <column>changed_on</column>
-        <column>parent</column>
-        <column>owner</column>
-        <column>space</column>
-        <column>deleted</column>
-        <column>online</column>
         <row>
-            <value>1001</value>
+            <value>2001</value>
             <value>a.txt</value>
-            <value>100</value>
-            <value>text/plain</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
             <value>1001</value>
@@ -97,38 +84,41 @@
             <value>cesnet</value>
             <value>false</value>
             <value>true</value>
+            <value>FILE</value>
+            <value>100</value>
+            <value>text/plain</value>
         </row>
         <row>
-            <value>1002</value>
+            <value>2002</value>
             <value>b.html</value>
+            <value>2014-01-01</value>
+            <value>2014-01-01</value>
+            <value>1001</value>
+            <value>1</value>
+            <value>cesnet</value>
+            <value>false</value>
+            <value>true</value>
+            <value>FILE</value>
             <value>100</value>
             <value>text/html</value>
+        </row>
+        <row>
+            <value>2003</value>
+            <value>c.json</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
-            <value>1001</value>
+            <value>1003</value>
             <value>1</value>
             <value>cesnet</value>
             <value>false</value>
             <value>true</value>
-        </row>
-        <row>
-            <value>1003</value>
-            <value>c.json</value>
+            <value>FILE</value>
             <value>100</value>
             <value>application/json</value>
-            <value>2014-01-01</value>
-            <value>2014-01-01</value>
-            <value>1003</value>
-            <value>1</value>
-            <value>cesnet</value>
-            <value>false</value>
-            <value>true</value>
         </row>
         <row>
-            <value>1004</value>
+            <value>2004</value>
             <value>d.txt</value>
-            <value>100</value>
-            <value>text/plain</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
             <value>1002</value>
@@ -136,12 +126,13 @@
             <value>cesnet</value>
             <value>false</value>
             <value>true</value>
-        </row>
-        <row>
-            <value>1005</value>
-            <value>root.txt</value>
+            <value>FILE</value>
             <value>100</value>
             <value>text/plain</value>
+        </row>
+        <row>
+            <value>2005</value>
+            <value>root.txt</value>
             <value>2014-01-01</value>
             <value>2014-01-01</value>
             <null/>
@@ -149,6 +140,9 @@
             <value>cesnet</value>
             <value>false</value>
             <value>true</value>
+            <value>FILE</value>
+            <value>100</value>
+            <value>text/plain</value>
         </row>
     </table>
 </dataset>

@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
 @Inheritance
 @DiscriminatorColumn(name = "node_type")
 @Table(name = "resource_node", uniqueConstraints = @UniqueConstraint(columnNames = {"parent", "name"}))
-public class Node extends AbstractEntity<Long> {
+public abstract class Node extends AbstractEntity<Long> {
 
     @Id
     @Column(name = "node_id", unique = true)
@@ -38,9 +39,6 @@ public class Node extends AbstractEntity<Long> {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "online")
-    private boolean online = true;
-
     @ManyToMany
     @JoinTable(name = "resource_node_label", joinColumns = {@JoinColumn(name = "node_id")},
             inverseJoinColumns = {@JoinColumn(name = "label_id")},
@@ -53,6 +51,11 @@ public class Node extends AbstractEntity<Long> {
 
     @OneToMany(mappedBy = "targetFolder")
     private List<AccessControlEntry> acEntries;
+
+    public Node() {
+        this.labels = new ArrayList<Label>();
+        this.acEntries = new ArrayList<AccessControlEntry>();
+    }
 
     @Override
     public Long getId() {
@@ -120,13 +123,9 @@ public class Node extends AbstractEntity<Long> {
         this.deleted = deleted;
     }
 
-    public boolean isOnline() {
-        return online;
-    }
+    public abstract boolean isOnline();
 
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
+    public abstract void setOnline(boolean online);
 
     public List<Label> getLabels() {
         return labels;
@@ -151,4 +150,13 @@ public class Node extends AbstractEntity<Long> {
     public void setAcEntries(List<AccessControlEntry> acEntries) {
         this.acEntries = acEntries;
     }
+
+    /*
+    public void addAclPermission(AccessControlEntry accessControlEntry) {
+        if (accessControlEntry.getTargetFile() != this) {
+            accessControlEntry.setTargetFile(this);
+        }
+        this.acEntries.add(accessControlEntry);
+    }
+    */
 }

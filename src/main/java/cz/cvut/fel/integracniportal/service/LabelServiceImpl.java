@@ -100,8 +100,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void addLabelToFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void addLabelToFile(Long fileId, LabelIdRepresentation representation, UserDetails currentUser) {
+        FileMetadata file = fileMetadataService.getFileMetadataById(fileId);
         Label label = getLabelById(representation.getLabelId());
         if (label.getOwner().getId().equals(currentUser.getId()) == false) {
             throw new InvalidStateException("Could not add label of other user");
@@ -118,8 +118,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void removeLabelFromFile(String fileUuid, LabelIdRepresentation representation, UserDetails currentUser) {
-        FileMetadata file = fileMetadataService.getFileMetadataByUuid(fileUuid);
+    public void removeLabelFromFile(Long fileId, LabelIdRepresentation representation, UserDetails currentUser) {
+        FileMetadata file = fileMetadataService.getFileMetadataById(fileId);
         List<Label> labels = file.getLabels();
         if (labels == null) {
             throw new NotFoundException("label.onFile.notFound.id", representation.getLabelId());

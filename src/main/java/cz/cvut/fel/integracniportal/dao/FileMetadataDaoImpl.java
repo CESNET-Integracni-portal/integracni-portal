@@ -23,8 +23,8 @@ public class FileMetadataDaoImpl extends GenericHibernateDao<FileMetadata> imple
     }
 
     @Override
-    public FileMetadata getByUUID(String fileMetadataUuid) {
-        FileMetadata fileMetadata = get(fileMetadataUuid);
+    public FileMetadata getById(Long fileMetadataId) {
+        FileMetadata fileMetadata = get(fileMetadataId);
         if (fileMetadata == null) {
             throw new FileNotFoundException();
         }

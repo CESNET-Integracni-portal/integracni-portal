@@ -75,7 +75,7 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
 
     @Test
     void "should return 404 error for non-existing label"() {
-        apiPost("space/cesnet/file/1002/addLabel", '{"labelId": 666}')
+        apiPost("space/cesnet/file/2002/addLabel", '{"labelId": 666}')
                 .andExpect(status().isNotFound())
     }
 
@@ -85,7 +85,7 @@ public class FolderController_addLabel_Test extends AbstractIntegrationTestCase 
 
         def label = labelService.createLabel(new LabelRepresentation(name: "work", color: "red"), user)
 
-        apiPost("space/cesnet/file/1002/addLabel", '{"labelId": ' + label.getId() + '}')
+        apiPost("space/cesnet/file/2002/addLabel", '{"labelId": ' + label.getId() + '}')
                 .andExpect(status().isBadRequest())
     }
 
