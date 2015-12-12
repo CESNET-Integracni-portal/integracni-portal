@@ -33,6 +33,9 @@ public class FolderServiceImpl implements FolderService {
     @Autowired
     private FileMetadataService fileMetadataService;
 
+    @Autowired
+    private AclService aclService;
+
     @Override
     @Transactional(readOnly = true)
     public Folder getFolderById(long id) {
@@ -80,6 +83,7 @@ public class FolderServiceImpl implements FolderService {
         FileApiAdapter fileApi = getFileApi(folder.getSpace());
 
         folder.setOwner(owner);
+        folder.setAcParent(aclService.getAcParent(folder));
 
         folderDao.createFolder(folder);
         fileApi.createFolder(folder);
@@ -111,6 +115,7 @@ public class FolderServiceImpl implements FolderService {
         newFolder.setParent(parent);
         newFolder.setSpace(space);
         newFolder.setOwner(owner);
+        newFolder.setAcParent(aclService.getAcParent(newFolder));
 
         createFolder(newFolder, owner);
 
@@ -137,7 +142,7 @@ public class FolderServiceImpl implements FolderService {
 
     private void removeFolder(Folder folder, boolean removeFromRepository) {
 
-        for(Folder subFolder : folder.getFolders()) {
+        for (Folder subFolder : folder.getFolders()) {
             removeFolder(subFolder, false);
         }
         for (FileMetadata fileMetadata : folder.getFiles()) {

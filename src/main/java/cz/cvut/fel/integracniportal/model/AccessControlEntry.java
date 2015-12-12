@@ -34,7 +34,7 @@ public class AccessControlEntry extends AbstractEntity<Long> {
 
     @ManyToOne
     @JoinColumn(name = "node_id")
-    private Folder targetFolder;
+    private Node targetNode;
 
     @Column(name = "node_permissions")
     @ElementCollection
@@ -79,13 +79,12 @@ public class AccessControlEntry extends AbstractEntity<Long> {
         this.targetGroup = targetGroup;
     }
 
-
-    public Folder getTargetFolder() {
-        return targetFolder;
+    public Node getTargetNode() {
+        return targetNode;
     }
 
-    public void setTargetFolder(Folder targetFolder) {
-        this.targetFolder = targetFolder;
+    public void setTargetNode(Node targetNode) {
+        this.targetNode = targetNode;
     }
 
     public Set<AccessControlPermission> getAccessControlPermissions() {

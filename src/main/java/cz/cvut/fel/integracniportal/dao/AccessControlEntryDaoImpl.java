@@ -30,7 +30,7 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
     public AccessControlEntry getByTargetUserAndFolder(Long userId, Long folderId) {
         return from(accessControlEntry)
                 .where(accessControlEntry.targetUser.userId.eq(userId))
-                .where(accessControlEntry.targetFolder.nodeId.eq(folderId))
+                .where(accessControlEntry.targetNode.nodeId.eq(folderId))
                 .uniqueResult(accessControlEntry);
     }
 }

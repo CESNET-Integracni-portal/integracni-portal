@@ -7,19 +7,19 @@ import java.util.*;
 @DiscriminatorValue("FILE")
 public class FileMetadata extends Node {
 
-    @Column(name = "mimetype", nullable = true)
+    @Column(name = "mimetype")
     private String mimetype;
 
-    @Column(name = "filesize", nullable = true)
+    @Column(name = "filesize")
     private Long filesize;
 
-    @Column(name = "archive_on", nullable = true)
+    @Column(name = "archive_on")
     private Date archiveOn;
 
-    @Column(name = "delete_on", nullable = true)
+    @Column(name = "delete_on")
     private Date deleteOn;
 
-    @Column(name = "online", nullable = true)
+    @Column(name = "online")
     private boolean online;
 
     public String getMimetype() {

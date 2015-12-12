@@ -1,9 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Inheritance
@@ -16,7 +14,7 @@ public abstract class Node extends AbstractEntity<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long nodeId;
 
-    @Column(name = "space")
+    @Column(name = "space", nullable = false)
     private String space;
 
     @Column(name = "name", nullable = false)
@@ -46,14 +44,17 @@ public abstract class Node extends AbstractEntity<Long> {
     private List<Label> labels;
 
     @ManyToOne
-    @JoinColumn(name = "acl_parent_id")
-    private Node aclParent;
+    private Node acParent;
 
-    @OneToMany(mappedBy = "targetFolder")
+    @OneToMany(mappedBy = "acParent")
+    private Set<Node> acSubparents;
+
+    @OneToMany(mappedBy = "targetNode")
     private List<AccessControlEntry> acEntries;
 
     public Node() {
         this.labels = new ArrayList<Label>();
+        this.acSubparents = new HashSet<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
     }
 
@@ -135,12 +136,12 @@ public abstract class Node extends AbstractEntity<Long> {
         this.labels = labels;
     }
 
-    public Node getAclParent() {
-        return aclParent;
+    public Node getAcParent() {
+        return acParent;
     }
 
-    public void setAclParent(Node aclParent) {
-        this.aclParent = aclParent;
+    public void setAcParent(Node acParent) {
+        this.acParent = acParent;
     }
 
     public List<AccessControlEntry> getAcEntries() {
@@ -149,6 +150,14 @@ public abstract class Node extends AbstractEntity<Long> {
 
     public void setAcEntries(List<AccessControlEntry> acEntries) {
         this.acEntries = acEntries;
+    }
+
+    public Set<Node> getAcSubparents() {
+        return acSubparents;
+    }
+
+    public void setAcSubparents(Set<Node> acSubparents) {
+        this.acSubparents = acSubparents;
     }
 
     public abstract void getFileMetadataNode(List<FileMetadata> context);

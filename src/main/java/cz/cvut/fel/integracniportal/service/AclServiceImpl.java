@@ -34,6 +34,26 @@ public class AclServiceImpl implements AclService {
     }
 
     @Override
+    public Node getAcParent(Node node) {
+        //Node is in a space root
+        if (node == null) {
+            throw new IllegalArgumentException("Cannot getAcParent on null node.");
+        }
+
+        //For root Nodes
+        if (node.getParent() == null) {
+            return null;
+        }
+
+        //For inner (1st level) Nodes
+        if (node.getParent().getAcParent() == null) {
+            return node.getParent();
+        }
+
+        return node.getParent().getAcParent();
+    }
+
+    @Override
     public void updateNodeAccessControlPermissions(Long nodeId, Long userId, AccessControlPermission[] permissions) {
        /* AccessControlEntry accessControlEntry = aclPermissionDao.getByTargetUserAndFile(userId, fileId);
         FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(fileId);

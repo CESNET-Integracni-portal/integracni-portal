@@ -102,9 +102,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         fileMetadata.setOwner(currentUser);
         fileMetadata.setSpace(space);
         fileMetadata.setFilesize(0L);
+        fileMetadata.setAcParent(aclService.getAcParent(fileMetadata));
 
         createFileMetadata(fileMetadata);
 
+        //TODO: if the same file is uploaded to the same dir -> error
         getFileApi(space).putFile(fileMetadata, fileUpload.getInputStream());
 
         fileMetadata.setFilesize(fileUpload.getByteReadCount());
@@ -146,6 +148,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
         file.setParent(parent);
 
+        file.getAcEntries().clear();//TODO: may not empty the existing AC Entries
+        file.setAcParent(aclService.getAcParent(file));
+
         updateFileMetadata(file);
         getFileApi(file.getSpace()).moveFile(file, parent);
     }
@@ -185,7 +190,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void moveFileOffline(Long fileId) {
         FileMetadata fileMetadata = getFileMetadataById(fileId);
-        if (fileMetadata.isOnline() == false) {
+        if (!fileMetadata.isOnline()) {
             return;
         }
         fileMetadata.setOnline(false);
