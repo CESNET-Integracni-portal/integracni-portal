@@ -71,13 +71,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return null;
         }
 
-        UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
+        //UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
 
-        if (specialUserDetails != null) {
-            return specialUserDetails;
-        } else {
+//        if (specialUserDetails != null) {
+//            return specialUserDetails;
+//        } else {
             return getUserByUsername(loggedUser.getUsername());
-        }
+//        }
     }
 
     private UserDetails resolveSpecialUser(User loggedUser) {
