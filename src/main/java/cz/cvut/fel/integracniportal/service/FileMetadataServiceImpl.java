@@ -140,7 +140,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void moveFile(Long fileId, Long parentId) {
         FileMetadata file = getFileMetadataById(fileId);
-        Folder parent = folderService.getFolderById(parentId);
+
+        Folder parent = (parentId == null) ? null : folderService.getFolderById(parentId);
 
         if (file.getParent() != null && file.getParent().equals(parent)) {
             return; // same parent, file not moved

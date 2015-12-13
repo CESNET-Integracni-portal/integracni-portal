@@ -44,6 +44,7 @@ public abstract class Node extends AbstractEntity<Long> {
     private List<Label> labels;
 
     @ManyToOne
+    @JoinColumn(name = "ac_parent_folder_id")
     private Node acParent;
 
     @OneToMany(mappedBy = "acParent")
