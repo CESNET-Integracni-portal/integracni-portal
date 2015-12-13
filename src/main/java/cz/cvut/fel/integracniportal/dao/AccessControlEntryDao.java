@@ -1,6 +1,8 @@
 package cz.cvut.fel.integracniportal.dao;
 
-import cz.cvut.fel.integracniportal.model.*;
+import cz.cvut.fel.integracniportal.model.AccessControlEntry;
+
+import java.util.List;
 
 /**
  * @author Eldar Iosip
@@ -9,7 +11,9 @@ public interface AccessControlEntryDao {
 
     void save(AccessControlEntry accessControlEntry);
 
-    AccessControlEntry getByTargetUserAndFile(Long userId, Long fileMetadataId);
+    void delete(AccessControlEntry accessControlEntry);
 
-    AccessControlEntry getByTargetUserAndFolder(Long userId, Long folderId);
+    List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId);
+
+    AccessControlEntry getByTargetGroupAndNode(Long userId, Long nodeId);
 }

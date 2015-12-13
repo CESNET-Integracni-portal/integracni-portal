@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface GroupService {
 
+    public Group getGroupById(Long groupId);
+
     public List<Group> getUserGroups(UserDetails owner);
 
     public Group createUserGroup(UserDetails owner, GroupRepresentation group);

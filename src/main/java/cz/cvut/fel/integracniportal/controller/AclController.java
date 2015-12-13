@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * @author Eldar Iosip
  */
@@ -36,6 +38,24 @@ public class AclController extends AbstractController {
     }
 
     /**
+     * @param nodeId Node identifier
+     * @param userId Target user identifier
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/node/{nodeId}/user/{userId}/permissions", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity getNodeAcPermissionsForUser(@PathVariable Long nodeId,
+                                                      @PathVariable Long userId) {
+        Set<AccessControlPermission> permissions = aclService.getAccessControlPermissions(nodeId, userId);
+
+        AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
+        representation.setPermissions(permissions);
+
+        return new ResponseEntity<Object>(representation, HttpStatus.OK);
+    }
+
+    /**
      * @param nodeId                                Node identifier
      * @param userId                                Target user identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
@@ -47,7 +67,7 @@ public class AclController extends AbstractController {
     public ResponseEntity updateNodeAclForUser(@PathVariable Long nodeId,
                                                @PathVariable Long userId,
                                                @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodeAccessControlPermissions(nodeId, userId, accessControlPermissionRepresentation.getPermissions());
+        aclService.updateNodeAcpForUser(nodeId, userId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -64,7 +84,7 @@ public class AclController extends AbstractController {
     public ResponseEntity updateNodeAclForGroup(@PathVariable Long nodeId,
                                                 @PathVariable Long groupId,
                                                 @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodeAccessControlPermissions(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
+        aclService.updateNodeAcpForGroup(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

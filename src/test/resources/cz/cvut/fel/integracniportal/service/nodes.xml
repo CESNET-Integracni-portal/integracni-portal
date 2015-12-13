@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <table name="resource_node">
+        <column>node_type</column>
+        <column>node_id</column>
+        <column>changed_on</column>
+        <column>created_on</column>
+        <column>deleted</column>
+        <column>name</column>
+        <column>space</column>
+        <column>archive_on</column>
+        <column>delete_on</column>
+        <column>filesize</column>
+        <column>mimetype</column>
+        <column>online</column>
+        <column>ac_parent_folder_id</column>
+        <column>owner</column>
+        <column>parent</column>
+        <column>acparent_node_id</column>
+    </table>
+</dataset>

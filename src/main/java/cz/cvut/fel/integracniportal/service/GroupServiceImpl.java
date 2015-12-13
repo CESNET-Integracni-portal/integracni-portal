@@ -36,6 +36,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group getGroupById(Long groupId) {
+        return groupDao.get(groupId);
+    }
+
+    @Override
     public List<Group> getUserGroups(UserDetails owner) {
         return groupDao.getUserGroups(owner);
     }

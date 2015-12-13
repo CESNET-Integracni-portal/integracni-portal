@@ -28,14 +28,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/rest")
 public class FileController extends AbstractController {
 
-    private static final Logger logger = Logger.getLogger(FileController.class);
-
-
     @Autowired
     private UserDetailsService userService;
-
-    @Autowired
-    private AclService aclService;
 
     @Autowired
     private SpaceService spaceService;

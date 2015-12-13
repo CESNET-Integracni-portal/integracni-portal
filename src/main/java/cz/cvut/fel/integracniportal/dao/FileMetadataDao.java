@@ -3,7 +3,6 @@ package cz.cvut.fel.integracniportal.dao;
 import cz.cvut.fel.integracniportal.model.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Data Access Object interface for FileMetadata metadata.

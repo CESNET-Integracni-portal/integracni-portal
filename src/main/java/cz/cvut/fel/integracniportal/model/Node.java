@@ -1,5 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -43,6 +45,10 @@ public abstract class Node extends AbstractEntity<Long> {
             uniqueConstraints = {@UniqueConstraint(columnNames = {"label_id", "node_id"})})
     private List<Label> labels;
 
+    @OneToMany(mappedBy = "parent")
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.DELETE})
+    private List<Node> subnodes;
+
     @ManyToOne
     @JoinColumn(name = "ac_parent_folder_id")
     private Node acParent;
@@ -50,11 +56,12 @@ public abstract class Node extends AbstractEntity<Long> {
     @OneToMany(mappedBy = "acParent")
     private Set<Node> acSubparents;
 
-    @OneToMany(mappedBy = "targetNode")
+    @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
 
     public Node() {
         this.labels = new ArrayList<Label>();
+        this.subnodes = new ArrayList<Node>();
         this.acSubparents = new HashSet<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
     }
@@ -135,6 +142,34 @@ public abstract class Node extends AbstractEntity<Long> {
 
     public void setLabels(List<Label> labels) {
         this.labels = labels;
+    }
+
+    public List<Node> getSubnodes() {
+        return subnodes;
+    }
+
+    public void setSubnodes(List<Node> subnodes) {
+        this.subnodes = subnodes;
+    }
+
+    public List<Folder> getFolders() {
+        List<Folder> folders = new ArrayList<Folder>();
+
+        for (Node node : this.subnodes) {
+            node.getFolderNode(folders);
+        }
+
+        return folders;
+    }
+
+    public List<FileMetadata> getFiles() {
+        List<FileMetadata> files = new ArrayList<FileMetadata>();
+
+        for (Node node : this.subnodes) {
+            node.getFileMetadataNode(files);
+        }
+
+        return files;
     }
 
     public Node getAcParent() {

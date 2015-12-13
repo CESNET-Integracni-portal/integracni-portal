@@ -102,7 +102,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         fileMetadata.setOwner(currentUser);
         fileMetadata.setSpace(space);
         fileMetadata.setFilesize(0L);
-        fileMetadata.setAcParent(aclService.getAcParent(fileMetadata));
+        fileMetadata.setAcParent(aclService.getAceParent(parent));
 
         createFileMetadata(fileMetadata);
 
@@ -150,7 +150,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         file.setParent(parent);
 
         file.getAcEntries().clear();//TODO: may not empty the existing AC Entries
-        file.setAcParent(aclService.getAcParent(file));
+        file.setAcParent(aclService.getAceParent(parent));
 
         updateFileMetadata(file);
         getFileApi(file.getSpace()).moveFile(file, parent);

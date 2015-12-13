@@ -83,7 +83,6 @@ public class FolderServiceImpl implements FolderService {
         FileApiAdapter fileApi = getFileApi(folder.getSpace());
 
         folder.setOwner(owner);
-        folder.setAcParent(aclService.getAcParent(folder));
 
         folderDao.createFolder(folder);
         fileApi.createFolder(folder);
@@ -96,6 +95,7 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = new Folder();
         folder.setName(folderName);
         folder.setSpace(spaceId);
+        folder.setAcParent(aclService.getAceParent(null));
 
         return createFolder(folder, owner);
     }
@@ -115,7 +115,7 @@ public class FolderServiceImpl implements FolderService {
         newFolder.setParent(parent);
         newFolder.setSpace(space);
         newFolder.setOwner(owner);
-        newFolder.setAcParent(aclService.getAcParent(newFolder));
+        newFolder.setAcParent(aclService.getAceParent(parent));
 
         createFolder(newFolder, owner);
 
@@ -162,15 +162,18 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void moveFolder(Long folderId, Long parentId) {
         Folder folder = getFolderById(folderId);
-        Folder parent = getFolderById(parentId);
+        Folder parent = parentId == null ? null : getFolderById(parentId);
 
         if (folder.equals(parent)) {
             throw new InvalidStateException("Can not move folder to itself");
         }
 
-        if (folder.getParent() != null && folder.getParent().equals(parent)) {
-            return; // same parent, folder not moved
+        //Folder is moved within space root or the same parent -> ignore
+        if ((parentId == null && folder.getParent() == null) || (folder.getParent() != null && folder.getParent().equals(parent))) {
+            return;
         }
+
+        aclService.updateAceParent(folder, parent);
 
         folder.setParent(parent);
 

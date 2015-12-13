@@ -71,7 +71,7 @@ public class FileApiAdapter {
     }
 
     public void moveFolder(Folder folder, Folder parent) {
-        fileRepository.moveFolder(mapFolder(folder, null), mapFolder(parent, null));
+        fileRepository.moveFolder(mapFolder(folder, null), mapFolder(parent, folder.getOwner()));
     }
 
     public void moveFolderOnline(Folder folder) {
