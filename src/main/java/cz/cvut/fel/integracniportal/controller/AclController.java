@@ -50,7 +50,7 @@ public class AclController extends AbstractController {
         Set<AccessControlPermission> permissions = aclService.getAccessControlPermissions(nodeId, userId);
 
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
-        representation.setPermissions(permissions);
+        representation.setPermissionsFromSet(permissions);
 
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
     }

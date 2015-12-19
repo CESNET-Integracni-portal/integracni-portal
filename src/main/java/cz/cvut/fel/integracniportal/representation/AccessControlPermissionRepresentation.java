@@ -19,7 +19,7 @@ public class AccessControlPermissionRepresentation {
         this.permissions = permissions;
     }
 
-    public void setPermissions(Set<AccessControlPermission> permissions) {
+    public void setPermissionsFromSet(Set<AccessControlPermission> permissions) {
         this.permissions = permissions.toArray(new AccessControlPermission[permissions.size()]);
     }
 }

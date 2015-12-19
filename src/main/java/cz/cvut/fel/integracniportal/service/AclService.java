@@ -44,7 +44,7 @@ public interface AclService {
 
     public void updateNodeAcpForGroup(Long nodeId, Long groupId, AccessControlPermission[] permissions);
 
-    public boolean userHasAcPermission(Node node, UserDetails user, AccessControlPermission permission);
+    public boolean userHasAcPermission(Long nodeId, Long userId, AccessControlPermission permission);
 
     public Set<Node> getSharedNodes(String spaceId, UserDetails currentUser);
 }

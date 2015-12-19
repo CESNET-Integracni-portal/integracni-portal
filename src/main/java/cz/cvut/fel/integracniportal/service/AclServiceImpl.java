@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,14 @@ public class AclServiceImpl implements AclService {
 
     @Override
     public Set<AccessControlPermission> getAccessControlPermissions(Long nodeId, Long userId) {
+        Node node = nodeService.getNodeById(nodeId);
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+
+        //If user is requesting his own permissions => all of them
+        if (currentUser.getId().equals(userId) && node.getOwner().getId().equals(userId)) {
+            return new HashSet<AccessControlPermission>(Arrays.asList(this.getAccessControlPermissionTypes()));
+        }
+
         List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, nodeId);
 
         Set<AccessControlPermission> groupPermissions = new HashSet<AccessControlPermission>();
@@ -88,14 +97,14 @@ public class AclServiceImpl implements AclService {
         Node node = nodeService.getNodeById(nodeId);
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
-        if (!this.couldModifyAcl(node, currentUser)) {
-            throw new AclDeniedAccessException("User has not permission to update Node ACL");
-        }
+        this.checkPermissionToModify(node, currentUser);
 
+        //Update process
         List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, nodeId);
 
         AccessControlEntry accessControlEntry = null;
 
+        //Store ACP as targetUser, not targetGroup
         UserDetails targetUser = userDetailsService.getUserById(userId);
         for (AccessControlEntry entry : accessControlEntries) {
             if (entry.getTargetUser().equals(targetUser)) {
@@ -103,6 +112,9 @@ public class AclServiceImpl implements AclService {
                 break;
             }
         }
+
+        //If first ACE entry or all other entries are targeted on group he is in
+        //create ACE with targetUser
         if (accessControlEntries.isEmpty() || accessControlEntry == null) {
             accessControlEntry = new AccessControlEntry();
 
@@ -111,11 +123,13 @@ public class AclServiceImpl implements AclService {
             accessControlEntry.setTargetUser(targetUser);
         }
 
+        //Override strored ACP
         accessControlEntry.getAccessControlPermissions().clear();
         for (AccessControlPermission permission : permissions) {
             accessControlEntry.getAccessControlPermissions().add(permission);
         }
 
+        //TODO: check in first, if it is acSubnode
         if (accessControlEntry.getAccessControlPermissions().isEmpty()) {
             accessControlEntryDao.delete(accessControlEntry);
         } else {
@@ -126,25 +140,20 @@ public class AclServiceImpl implements AclService {
     @Override
     public void updateNodeAcpForGroup(Long nodeId, Long groupId, AccessControlPermission[] permissions) {
         Node node = nodeService.getNodeById(nodeId);
-
-        if (node == null) {
-            throw new NodeNotFoundException("Node with requested ID was not found.");
-        }
-
         UserDetails currentUser = userDetailsService.getCurrentUser();
 
-        if (!this.couldModifyAcl(node, currentUser)) {
-            throw new AclDeniedAccessException("User has not permission to update Node ACL");
-        }
+        this.checkPermissionToModify(node, currentUser);
 
+        //Get targerGroup and check null
         Group targetGroup = groupService.getGroupById(groupId);
-
         if (targetGroup == null) {
             throw new GroupNotFoundException("Group with requested ID not found.");
         }
 
+        //Update process
         AccessControlEntry accessControlEntry = accessControlEntryDao.getByTargetGroupAndNode(groupId, nodeId);
 
+        //If Node has no ACE for targetGroup, create new
         if (accessControlEntry == null) {
             accessControlEntry = new AccessControlEntry();
 
@@ -153,11 +162,13 @@ public class AclServiceImpl implements AclService {
             accessControlEntry.setTargetGroup(targetGroup);
         }
 
+        //Override previously stored ACPs
         accessControlEntry.getAccessControlPermissions().clear();
         for (AccessControlPermission permission : permissions) {
             accessControlEntry.getAccessControlPermissions().add(permission);
         }
 
+        //TODO: check in first, if it is acSubnode
         if (accessControlEntry.getAccessControlPermissions().isEmpty()) {
             accessControlEntryDao.delete(accessControlEntry);
         } else {
@@ -166,16 +177,13 @@ public class AclServiceImpl implements AclService {
     }
 
     @Override
-    public boolean userHasAcPermission(Node node, UserDetails user, AccessControlPermission permission) {
-        Set<AccessControlPermission> permissions = this.getAccessControlPermissions(node.getId(), user.getId());
-
-        return permissions.contains(permission);
+    public boolean userHasAcPermission(Long nodeId, Long userId, AccessControlPermission permission) {
+        return this.getAccessControlPermissions(nodeId, userId).contains(permission);
     }
 
     @Override
     public Set<Node> getSharedNodes(String spaceId, UserDetails currentUser) {
         List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserNoOwnerPermission(currentUser.getId(), AccessControlPermission.READ);
-
 
         Set<Node> nodes = new HashSet<Node>();
         for (AccessControlEntry entry : accessControlEntries) {
@@ -183,10 +191,6 @@ public class AclServiceImpl implements AclService {
         }
 
         return nodes;
-    }
-
-    private boolean couldModifyAcl(Node node, UserDetails user) {
-        return this.userHasAcPermission(node, user, AccessControlPermission.EDIT_PERMISSIONS) || node.getOwner().equals(user);
     }
 
     private void updateAceParent(Node node, Node parent, boolean hard) {
@@ -198,10 +202,35 @@ public class AclServiceImpl implements AclService {
         //TODO else updateAceParentAcePreserve
     }
 
+    /**
+     * Clear all the subpermissions and set a new acParent for whole subtree.
+     *
+     * @param node      Node filesystem parent
+     * @param aceParent Node new AC parent for subtree
+     */
     private void updateAceParentAceRemove(Node node, Node aceParent) {
         node.setAcParent(aceParent);
+        node.getAcEntries().clear();
         for (Node subnode : node.getSubnodes()) {
             updateAceParentAceRemove(subnode, this.getAceParent(subnode.getParent()));
         }
     }
+
+    /**
+     * Check whether node exists and user has permission to modify it's ACL.
+     *
+     * @param node Node target node
+     * @param user UserDetails user who wants to modify target node ACL
+     */
+    private void checkPermissionToModify(Node node, UserDetails user) {
+        if (node == null) {
+            throw new NodeNotFoundException("Node with requested ID was not found.");
+        }
+
+        if (!(this.userHasAcPermission(node.getId(), user.getId(), AccessControlPermission.EDIT_PERMISSIONS)
+                || node.getOwner().equals(user))) {
+            throw new AclDeniedAccessException("User has not permission to update Node ACL");
+        }
+    }
+
 }
