@@ -33,4 +33,9 @@ public class Folder extends Node {
     public void getFolderNode(List<Folder> context) {
         context.add(this);
     }
+
+    @Override
+    public boolean isFolder() {
+        return true;
+    }
 }

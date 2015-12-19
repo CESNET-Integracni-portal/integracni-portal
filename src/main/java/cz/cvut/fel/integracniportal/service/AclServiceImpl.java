@@ -59,8 +59,6 @@ public class AclServiceImpl implements AclService {
         }
 
         groupPermissions.addAll(userPermissions);
-
-
         return groupPermissions;
     }
 
@@ -84,15 +82,6 @@ public class AclServiceImpl implements AclService {
         this.updateAceParent(node, parent, true);
     }
 
-    @Override
-    public void updateAceParent(Node node, Node parent, boolean hard) {
-        Node aceParent = this.getAceParent(parent);
-
-        if (hard) {
-            this.updateAceParentAceRemove(node, aceParent);
-        }
-        //TODO else updateAceParentAcePreserve
-    }
 
     @Override
     public void updateNodeAcpForUser(Long nodeId, Long userId, AccessControlPermission[] permissions) {
@@ -177,15 +166,36 @@ public class AclServiceImpl implements AclService {
     }
 
     @Override
-    public boolean couldModifyAcl(Node node, UserDetails user) {
-        return this.userHasAcPermission(node, user, AccessControlPermission.EDIT_PERMISSIONS) || node.getOwner().equals(user);
-    }
-
-    @Override
     public boolean userHasAcPermission(Node node, UserDetails user, AccessControlPermission permission) {
         Set<AccessControlPermission> permissions = this.getAccessControlPermissions(node.getId(), user.getId());
 
         return permissions.contains(permission);
+    }
+
+    @Override
+    public Set<Node> getSharedNodes(String spaceId, UserDetails currentUser) {
+        List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserNoOwnerPermission(currentUser.getId(), AccessControlPermission.READ);
+
+
+        Set<Node> nodes = new HashSet<Node>();
+        for (AccessControlEntry entry : accessControlEntries) {
+            nodes.add(entry.getTargetNode());
+        }
+
+        return nodes;
+    }
+
+    private boolean couldModifyAcl(Node node, UserDetails user) {
+        return this.userHasAcPermission(node, user, AccessControlPermission.EDIT_PERMISSIONS) || node.getOwner().equals(user);
+    }
+
+    private void updateAceParent(Node node, Node parent, boolean hard) {
+        Node aceParent = this.getAceParent(parent);
+
+        if (hard) {
+            this.updateAceParentAceRemove(node, aceParent);
+        }
+        //TODO else updateAceParentAcePreserve
     }
 
     private void updateAceParentAceRemove(Node node, Node aceParent) {

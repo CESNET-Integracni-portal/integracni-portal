@@ -72,4 +72,9 @@ public class FileMetadata extends Node {
         //nothing
     }
 
+    @Override
+    public boolean isFolder() {
+        return false;
+    }
+
 }

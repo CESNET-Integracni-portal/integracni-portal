@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.dao;
 
 import cz.cvut.fel.integracniportal.model.AccessControlEntry;
+import cz.cvut.fel.integracniportal.model.AccessControlPermission;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,5 +40,33 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
                         accessControlEntry.targetGroup.groupId.eq(groupId)
                 ))
                 .uniqueResult(accessControlEntry);
+    }
+
+    @Override
+    public List<AccessControlEntry> getByTargetUserNoOwnerPermission(Long userId, AccessControlPermission permission) {
+        List<AccessControlEntry> e = from(accessControlEntry)
+                .where(accessControlEntry.owner.userId.ne(userId)
+                        .and(accessControlEntry.targetUser.userId.eq(userId).or(
+                                accessControlEntry.targetGroup.groupId.in(subQuery()
+                                        .from(group)
+                                        .where(group.members.any().userId.eq(userId))
+                                        .list(group.groupId))
+                        ))
+                        .and(accessControlEntry.accessControlPermissions.contains(permission))
+                )
+                .list(accessControlEntry);
+
+
+        return from(accessControlEntry)
+                .where(accessControlEntry.owner.userId.ne(userId)
+                        .and(accessControlEntry.targetUser.userId.eq(userId).or(
+                                accessControlEntry.targetGroup.groupId.in(subQuery()
+                                        .from(group)
+                                        .where(group.members.any().userId.eq(userId))
+                                        .list(group.groupId))
+                        ))
+                        .and(accessControlEntry.accessControlPermissions.contains(permission))
+                )
+                .list(accessControlEntry);
     }
 }

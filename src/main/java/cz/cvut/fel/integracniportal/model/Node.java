@@ -54,7 +54,7 @@ public abstract class Node extends AbstractEntity<Long> {
     private Node acParent;
 
     @OneToMany(mappedBy = "acParent")
-    private Set<Node> acSubparents;
+    private Set<Node> acSubnodes;
 
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
@@ -62,7 +62,7 @@ public abstract class Node extends AbstractEntity<Long> {
     public Node() {
         this.labels = new ArrayList<Label>();
         this.subnodes = new ArrayList<Node>();
-        this.acSubparents = new HashSet<Node>();
+        this.acSubnodes = new HashSet<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
     }
 
@@ -188,17 +188,19 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acEntries = acEntries;
     }
 
-    public Set<Node> getAcSubparents() {
-        return acSubparents;
+    public Set<Node> getAcSubnodes() {
+        return acSubnodes;
     }
 
-    public void setAcSubparents(Set<Node> acSubparents) {
-        this.acSubparents = acSubparents;
+    public void setAcSubnodes(Set<Node> acSubnodes) {
+        this.acSubnodes = acSubnodes;
     }
 
     public abstract void getFileMetadataNode(List<FileMetadata> context);
 
     public abstract void getFolderNode(List<Folder> context);
+
+    public abstract boolean isFolder();
 
     /*
     public void addAccessControlEntry(AccessControlEntry accessControlEntry) {
