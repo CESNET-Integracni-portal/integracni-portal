@@ -183,16 +183,9 @@ public class AclServiceImpl implements AclService {
 
     @Override
     public boolean userHasAcPermission(Node node, UserDetails user, AccessControlPermission permission) {
-        //TODO: count the group permissions, where user's in
-        List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(user.getId(), node.getId());
+        Set<AccessControlPermission> permissions = this.getAccessControlPermissions(node.getId(), user.getId());
 
-        for (AccessControlEntry entry : accessControlEntries) {
-            if (entry.getAccessControlPermissions().contains(permission)) {
-                return true;
-            }
-        }
-
-        return false;
+        return permissions.contains(permission);
     }
 
     private void updateAceParentAceRemove(Node node, Node aceParent) {
