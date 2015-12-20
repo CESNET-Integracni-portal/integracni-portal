@@ -38,80 +38,41 @@ public class AclServiceImpl implements AclService {
 
         UserDetails targetUser = userDetailsService.getUserById(userId);
         AccessControlEntry accessControlEntry = null;
-        if (node.getAcParent() == null) {
-            //Upravuju slozky ve space rootu, ktere nemaji zadne zavislosti na predkovi
+        //Vytahnu vsechny zaznamy o pravech
+        List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, node.getId());
 
-            //Vytahnu vsechny zaznamy o pravech
-            List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, node.getId());
-
-            //Pokud uz existuje zaznam pro konkretniho uzivatele a Node, tak jenom upravim
-            for (AccessControlEntry entry : accessControlEntries) {
-                if (entry.getTargetUser().equals(targetUser) && entry.getTargetNode().equals(node)) {
-                    accessControlEntry = entry;
-                    accessControlEntry.getAccessControlPermissions().clear();
-                    break;
-                }
+        //Pokud uz existuje zaznam pro konkretniho uzivatele a Node, tak jenom upravim
+        for (AccessControlEntry entry : accessControlEntries) {
+            if (entry.getTargetUser().equals(targetUser) && entry.getTargetNode().equals(node)) {
+                accessControlEntry = entry;
+                accessControlEntry.getAccessControlPermissions().clear();
+                break;
             }
+        }
 
-            //Pokud neexistuje, tak ho vytvorim a pridam jako noveho do nodu
-            if (accessControlEntry == null) {
-                accessControlEntry = new AccessControlEntry();
-                accessControlEntry.setTargetNode(node);
-                accessControlEntry.setOwner(currentUser);
-                accessControlEntry.setTargetUser(targetUser);
-            }
+        //Pokud neexistuje, tak ho vytvorim a pridam jako noveho do nodu
+        if (accessControlEntry == null) {
+            accessControlEntry = new AccessControlEntry();
+            accessControlEntry.setTargetNode(node);
+            accessControlEntry.setOwner(currentUser);
+            accessControlEntry.setTargetUser(targetUser);
+        }
 
-            if (permissions.isEmpty()) {
-                if (accessControlEntry.getId() != null) {
-                    node.getAcEntries().remove(accessControlEntry);
-                    accessControlEntryDao.delete(accessControlEntry);
-                }
-            } else {
-                //Nastavim nova prava a ulozim je
-                node.getAcEntries().add(accessControlEntry);
-                accessControlEntry.getAccessControlPermissions().addAll(permissions);
-                accessControlEntryDao.save(accessControlEntry);
-            }
-
-            //Poslu vsem acSubnodum nove pravidlo, ktere maji zmergovat u sebe a u jejich acSubnoodu (rekurzivne)
-            if (node.getAcEntries().isEmpty()) {
-                node.setAcParent(node.getRootParent());
-                node.setRootParent(null);
-            }
-
-            copyAcEntriesToAcSubnodes(node, accessControlEntry);
-        } else {
-            //Upravuju slozky, ktere jsou na prvni urovni a hloubeji
-
-            //Vytahnu vsechny zaznamy o pravech upravovaneho Nodu
-            List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, node.getId());
-
-            //Pokud uz existuje zaznam pro konkretniho uzivatele a Node, tak jenom upravim
-            for (AccessControlEntry entry : accessControlEntries) {
-                if (entry.getTargetUser().equals(targetUser) && entry.getTargetNode().equals(node)) {
-                    accessControlEntry = entry;
-                    accessControlEntry.getAccessControlPermissions().clear();
-                    break;
-                }
-            }
-
-            //Pokud neexistuje, tak ho vytvorim a pridam jako noveho do nodu
-            if (accessControlEntry == null) {
-                accessControlEntry = new AccessControlEntry();
-                accessControlEntry.setTargetNode(node);
-                accessControlEntry.setOwner(currentUser);
-                accessControlEntry.setTargetUser(targetUser);
-            }
-
-            //Nastavim nova prava a ulozim je
-            accessControlEntry.getAccessControlPermissions().addAll(permissions);
-
-            if (accessControlEntry.getAccessControlPermissions().isEmpty()) {
+        if (permissions.isEmpty()) {
+            if (accessControlEntry.getId() != null) {
+                node.getAcEntries().remove(accessControlEntry);
                 accessControlEntryDao.delete(accessControlEntry);
-            } else {
-                accessControlEntryDao.save(accessControlEntry);
             }
+        } else {
+            //Nastavim nova prava a ulozim je
+            node.getAcEntries().add(accessControlEntry);
+            accessControlEntry.getAccessControlPermissions().addAll(permissions);
+            accessControlEntryDao.save(accessControlEntry);
+        }
 
+        //Lisi se, dle zanoreni (zatim)
+        if (node.getAcParent() != null) {
+            //Upravuju slozky, ktere jsou na prvni urovni a hloubeji
             //Pokud node ma nastaveneho acParenta, tak okopiruju z acParenta vsechna pravidla (asi az na ty, co jsou jine, nez ted ma (dle targetUsera)),
             //a pro vsechny potomky, node se stane novym AcParentem
             for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
@@ -132,10 +93,10 @@ public class AclServiceImpl implements AclService {
             node.setAcParent(null);
 
             updateAcParentForSubnodes(node, node, oldAcParentId);
-
-            //Poslu vsem acSubnodum nove pravidlo, ktere maji zmergovat u sebe a u jejich acSubnoodu (rekurzivne)
-            copyAcEntriesToAcSubnodes(node, accessControlEntry);
         }
+
+        //Poslu vsem acSubnodum nove pravidlo, ktere maji zmergovat u sebe a u jejich acSubnoodu (rekurzivne)
+        copyAcEntriesToAcSubnodes(node, accessControlEntry);
     }
 
     /**
@@ -165,6 +126,11 @@ public class AclServiceImpl implements AclService {
             }
 
             this.copyAcEntriesToAcSubnodes(acSubnode, entry);
+        }
+
+        if (node.getAcSubnodes().isEmpty() && node.getAcEntries().isEmpty()) {
+            node.setAcParent(node.getRootParent());
+            node.setRootParent(null);
         }
     }
 
