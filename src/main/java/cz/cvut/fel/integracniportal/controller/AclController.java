@@ -29,12 +29,44 @@ public class AclController extends AbstractController {
     @RequestMapping(value = "/v0.2/acl/permission", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getPermissions() {
-        AccessControlPermission[] accessControlPermissions = aclService.getAccessControlPermissionTypes();
+        Set<AccessControlPermission> accessControlPermissions = aclService.getAccessControlPermissionTypes();
 
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
         representation.setPermissions(accessControlPermissions);
 
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
+    }
+
+    /**
+     * @param nodeId            Node identifier
+     * @param userId            Target user identifier
+     * @param acpRepresentation Object containing the array of AccessControlPermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/node/{nodeId}/user/{userId}/update", method = RequestMethod.POST)
+    public ResponseEntity updateNodeAclForUser(@PathVariable Long nodeId,
+                                               @PathVariable Long userId,
+                                               @RequestBody AccessControlPermissionRepresentation acpRepresentation) {
+        aclService.updateNodeAcPermissionsByUser(nodeId, userId, acpRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * @param nodeId                                Node identifier
+     * @param groupId                               Target group identifier
+     * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
+     * @return ResponseEntity
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/acl/node/{nodeId}/group/{groupId}/update", method = RequestMethod.POST)
+    public ResponseEntity updateNodeAclForGroup(@PathVariable Long nodeId,
+                                                @PathVariable Long groupId,
+                                                @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
+        aclService.updateNodeAcpForGroup(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -50,43 +82,9 @@ public class AclController extends AbstractController {
         Set<AccessControlPermission> permissions = aclService.getAccessControlPermissions(nodeId, userId);
 
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
-        representation.setPermissionsFromSet(permissions);
+        representation.setPermissions(permissions);
 
         return new ResponseEntity<Object>(representation, HttpStatus.OK);
-    }
-
-    /**
-     * @param nodeId                                Node identifier
-     * @param userId                                Target user identifier
-     * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
-     * @return ResponseEntity
-     */
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/acl/node/{nodeId}/user/{userId}/update", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity updateNodeAclForUser(@PathVariable Long nodeId,
-                                               @PathVariable Long userId,
-                                               @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodeAcpForUser(nodeId, userId, accessControlPermissionRepresentation.getPermissions());
-
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * @param nodeId                                Node identifier
-     * @param groupId                               Target group identifier
-     * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
-     * @return ResponseEntity
-     */
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/acl/node/{nodeId}/group/{groupId}/update", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity updateNodeAclForGroup(@PathVariable Long nodeId,
-                                                @PathVariable Long groupId,
-                                                @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodeAcpForGroup(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
-
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
 }

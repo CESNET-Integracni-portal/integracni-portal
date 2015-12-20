@@ -1,8 +1,10 @@
 package cz.cvut.fel.integracniportal.model;
 
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.*;
 
 @Entity
@@ -53,8 +55,13 @@ public abstract class Node extends AbstractEntity<Long> {
     @JoinColumn(name = "ac_parent_folder_id")
     private Node acParent;
 
-    @OneToMany(mappedBy = "acParent")
-    private Set<Node> acSubnodes;
+    @ManyToOne
+    @JoinColumn(name = "root_parent_id")
+    private Folder rootParent;
+
+    @OneToMany(mappedBy = "rootParent")
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    private List<Node> acSubnodes;
 
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
@@ -62,7 +69,7 @@ public abstract class Node extends AbstractEntity<Long> {
     public Node() {
         this.labels = new ArrayList<Label>();
         this.subnodes = new ArrayList<Node>();
-        this.acSubnodes = new HashSet<Node>();
+        this.acSubnodes = new ArrayList<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
     }
 
@@ -180,6 +187,20 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acParent = acParent;
     }
 
+    public List<Node> getAcSubnodes() {
+        return acSubnodes;
+    }
+
+    public void setAcSubnodes(List<Node> acSubnodes) {
+        this.acSubnodes = acSubnodes;
+    }
+
+    public void addAcSubnode(Node node) {
+        if (!this.getAcSubnodes().contains(node)) {
+            this.acSubnodes.add(node);
+        }
+    }
+
     public List<AccessControlEntry> getAcEntries() {
         return acEntries;
     }
@@ -188,26 +209,17 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acEntries = acEntries;
     }
 
-    public Set<Node> getAcSubnodes() {
-        return acSubnodes;
-    }
-
-    public void setAcSubnodes(Set<Node> acSubnodes) {
-        this.acSubnodes = acSubnodes;
-    }
-
     public abstract void getFileMetadataNode(List<FileMetadata> context);
 
     public abstract void getFolderNode(List<Folder> context);
 
     public abstract boolean isFolder();
 
-    /*
-    public void addAccessControlEntry(AccessControlEntry accessControlEntry) {
-        if (accessControlEntry.getTargetFile() != this) {
-            accessControlEntry.setTargetFile(this);
-        }
-        this.acEntries.add(accessControlEntry);
+    public Folder getRootParent() {
+        return rootParent;
     }
-    */
+
+    public void setRootParent(Folder rootParent) {
+        this.rootParent = rootParent;
+    }
 }

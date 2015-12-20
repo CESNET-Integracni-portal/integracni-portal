@@ -1,5 +1,6 @@
 package cz.cvut.fel.integracniportal.dao;
 
+import com.mysema.query.types.expr.BooleanExpression;
 import cz.cvut.fel.integracniportal.model.AccessControlEntry;
 import cz.cvut.fel.integracniportal.model.AccessControlPermission;
 import org.springframework.stereotype.Repository;
@@ -19,10 +20,27 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
         super(AccessControlEntry.class);
     }
 
+    //TODO: order by targetUser not null first
     @Override
     public List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId) {
         return from(accessControlEntry)
                 .where(accessControlEntry.targetNode.nodeId.eq(nodeId).and(
+                        accessControlEntry.targetUser.userId.eq(userId).or(
+                                accessControlEntry.targetGroup.groupId.in(subQuery()
+                                        .from(group)
+                                        .where(group.members.any().userId.eq(userId))
+                                        .list(group.groupId))
+                        ))
+                )
+                .list(accessControlEntry);
+    }
+
+    //TODO: order by targetUser not null first
+    @Override
+    public List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId, Long aclRootId) {
+
+        return from(accessControlEntry)
+                .where(accessControlEntry.targetNode.nodeId.in(nodeId, aclRootId).and(
                         accessControlEntry.targetUser.userId.eq(userId).or(
                                 accessControlEntry.targetGroup.groupId.in(subQuery()
                                         .from(group)
@@ -44,19 +62,6 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
 
     @Override
     public List<AccessControlEntry> getByTargetUserNoOwnerPermission(Long userId, AccessControlPermission permission) {
-        List<AccessControlEntry> e = from(accessControlEntry)
-                .where(accessControlEntry.owner.userId.ne(userId)
-                        .and(accessControlEntry.targetUser.userId.eq(userId).or(
-                                accessControlEntry.targetGroup.groupId.in(subQuery()
-                                        .from(group)
-                                        .where(group.members.any().userId.eq(userId))
-                                        .list(group.groupId))
-                        ))
-                        .and(accessControlEntry.accessControlPermissions.contains(permission))
-                )
-                .list(accessControlEntry);
-
-
         return from(accessControlEntry)
                 .where(accessControlEntry.owner.userId.ne(userId)
                         .and(accessControlEntry.targetUser.userId.eq(userId).or(
@@ -65,8 +70,9 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
                                         .where(group.members.any().userId.eq(userId))
                                         .list(group.groupId))
                         ))
-                        .and(accessControlEntry.accessControlPermissions.contains(permission))
+                        .and(accessControlEntry.accessControlPermissions.any().eq(permission))
                 )
                 .list(accessControlEntry);
     }
+
 }

@@ -17,7 +17,7 @@ public interface AclService {
      *
      * @return AccessControlPermission[]
      */
-    public AccessControlPermission[] getAccessControlPermissionTypes();
+    public Set<AccessControlPermission> getAccessControlPermissionTypes();
 
     /**
      * Return the intersect of all group permissions where the userId is member in, merged with user permissions.
@@ -40,9 +40,9 @@ public interface AclService {
      */
     public void updateAceParent(Node node, Node parent);
 
-    public void updateNodeAcpForUser(Long nodeId, Long userId, AccessControlPermission[] permissions);
+    public void updateNodeAcPermissionsByUser(Long nodeId, Long userId, Set<AccessControlPermission> permissions);
 
-    public void updateNodeAcpForGroup(Long nodeId, Long groupId, AccessControlPermission[] permissions);
+    public void updateNodeAcpForGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions);
 
     public boolean userHasAcPermission(Long nodeId, Long userId, AccessControlPermission permission);
 

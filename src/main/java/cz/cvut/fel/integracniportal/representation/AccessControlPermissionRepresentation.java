@@ -9,17 +9,13 @@ import java.util.Set;
  */
 public class AccessControlPermissionRepresentation {
 
-    private AccessControlPermission[] permissions;
+    private Set<AccessControlPermission> permissions;
 
-    public AccessControlPermission[] getPermissions() {
+    public Set<AccessControlPermission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(AccessControlPermission[] permissions) {
+    public void setPermissions(Set<AccessControlPermission> permissions) {
         this.permissions = permissions;
-    }
-
-    public void setPermissionsFromSet(Set<AccessControlPermission> permissions) {
-        this.permissions = permissions.toArray(new AccessControlPermission[permissions.size()]);
     }
 }

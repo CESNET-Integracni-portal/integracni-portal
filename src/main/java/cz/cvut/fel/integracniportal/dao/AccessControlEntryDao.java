@@ -16,6 +16,8 @@ public interface AccessControlEntryDao {
 
     List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId);
 
+    List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId, Long aclRootId);
+
     AccessControlEntry getByTargetGroupAndNode(Long userId, Long nodeId);
 
     List<AccessControlEntry> getByTargetUserNoOwnerPermission(Long userId, AccessControlPermission permission);

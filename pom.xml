@@ -12,7 +12,7 @@
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <spring.integration.version>3.0.4.RELEASE</spring.integration.version>
         <jackson.version>2.3.2</jackson.version>
-        <querydsl.version>3.5.1</querydsl.version>
+        <querydsl.version>3.7.0</querydsl.version>
         <flyway.version>3.2.1</flyway.version>
     </properties>
 

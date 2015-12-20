@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.model;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -95,4 +96,20 @@ public class AccessControlEntry extends AbstractEntity<Long> {
         this.accessControlPermissions = accessControlPermissions;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AccessControlEntry entry = (AccessControlEntry) o;
+        return Objects.equals(permissionId, entry.permissionId) &&
+                Objects.equals(getOwner(), entry.getOwner()) &&
+                Objects.equals(getTargetUser(), entry.getTargetUser()) &&
+                Objects.equals(getTargetGroup(), entry.getTargetGroup()) &&
+                Objects.equals(getTargetNode(), entry.getTargetNode());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getOwner(), getTargetUser(), getTargetGroup(), getTargetNode());
+    }
 }
