@@ -61,16 +61,24 @@ public class AclServiceImpl implements AclService {
                 accessControlEntry.setTargetUser(targetUser);
             }
 
-            //Nastavim nova prava a ulozim je
-            accessControlEntry.getAccessControlPermissions().addAll(permissions);
-
-            if (accessControlEntry.getAccessControlPermissions().isEmpty()) {
-                accessControlEntryDao.delete(accessControlEntry);
+            if (permissions.isEmpty()) {
+                if (accessControlEntry.getId() != null) {
+                    node.getAcEntries().remove(accessControlEntry);
+                    accessControlEntryDao.delete(accessControlEntry);
+                }
             } else {
+                //Nastavim nova prava a ulozim je
+                node.getAcEntries().add(accessControlEntry);
+                accessControlEntry.getAccessControlPermissions().addAll(permissions);
                 accessControlEntryDao.save(accessControlEntry);
             }
 
             //Poslu vsem acSubnodum nove pravidlo, ktere maji zmergovat u sebe a u jejich acSubnoodu (rekurzivne)
+            if (node.getAcEntries().isEmpty()) {
+                node.setAcParent(node.getRootParent());
+                node.setRootParent(null);
+            }
+
             copyAcEntriesToAcSubnodes(node, accessControlEntry);
         } else {
             //Upravuju slozky, ktere jsou na prvni urovni a hloubeji
