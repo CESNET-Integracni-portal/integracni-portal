@@ -32,52 +32,40 @@ public class AclServiceImpl implements AclService {
 
     @Override
     public void updateNodeAcPermissionsByUser(Long nodeId, Long userId, Set<AccessControlPermission> permissions) {
+        //Prepare data for processing
         Node node = nodeService.getNodeById(nodeId);
         UserDetails currentUser = userDetailsService.getCurrentUser();
+        UserDetails targetUser = userDetailsService.getUserById(userId);
+
+        //Check whether user could edit permissions for selected Node
         this.checkPermission(node, currentUser, AccessControlPermission.EDIT_PERMISSIONS);
 
-        UserDetails targetUser = userDetailsService.getUserById(userId);
-        AccessControlEntry accessControlEntry = null;
-        //Vytahnu vsechny zaznamy o pravech
-        List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(userId, node.getId());
-
-        //Pokud uz existuje zaznam pro konkretniho uzivatele a Node, tak jenom upravim
-        for (AccessControlEntry entry : accessControlEntries) {
-            if (entry.getTargetUser().equals(targetUser) && entry.getTargetNode().equals(node)) {
-                accessControlEntry = entry;
-                accessControlEntry.getAccessControlPermissions().clear();
-                break;
-            }
-        }
-
-        //Pokud neexistuje, tak ho vytvorim a pridam jako noveho do nodu
-        if (accessControlEntry == null) {
-            accessControlEntry = new AccessControlEntry();
-            accessControlEntry.setTargetNode(node);
-            accessControlEntry.setOwner(currentUser);
-            accessControlEntry.setTargetUser(targetUser);
-        }
+        //Load existing or create new ACE
+        AccessControlEntry accessControlEntry = this.createOrLoadTheAce(node, currentUser, targetUser);
 
         if (permissions.isEmpty()) {
+            //If it's removal, and it's not a detached entity, remove from DB
             if (accessControlEntry.getId() != null) {
                 node.getAcEntries().remove(accessControlEntry);
                 accessControlEntryDao.delete(accessControlEntry);
             }
         } else {
-            //Nastavim nova prava a ulozim je
+            //Update ACPermissions and save
             node.getAcEntries().add(accessControlEntry);
+            accessControlEntry.getAccessControlPermissions().clear();
             accessControlEntry.getAccessControlPermissions().addAll(permissions);
             accessControlEntryDao.save(accessControlEntry);
         }
 
-        //Lisi se, dle zanoreni (zatim)
         if (node.getAcParent() != null) {
-            //Upravuju slozky, ktere jsou na prvni urovni a hloubeji
+            //If it's not a acSubroot -> make one
+
             //Pokud node ma nastaveneho acParenta, tak okopiruju z acParenta vsechna pravidla (asi az na ty, co jsou jine, nez ted ma (dle targetUsera)),
             //a pro vsechny potomky, node se stane novym AcParentem
+            //Copy all the ACEntries from the acParent.
             for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
                 if (targetUser.equals(entry.getTargetUser())) {
-                    continue;
+                    continue; //if we added an ACE for targetUser in previous steps
                 }
                 AccessControlEntry entry1 = new AccessControlEntry();
                 entry1.setTargetNode(node);
@@ -88,25 +76,50 @@ public class AclServiceImpl implements AclService {
                 accessControlEntryDao.save(entry1);
             }
 
+            //Now, Node is subscriber to his parent changes via rootParent reference
             node.setRootParent((Folder) node.getAcParent());
             Long oldAcParentId = node.getAcParent().getId();
             node.setAcParent(null);
 
+            //Register the change to underlying Nodes
             updateAcParentForSubnodes(node, node, oldAcParentId);
         }
 
-        //Poslu vsem acSubnodum nove pravidlo, ktere maji zmergovat u sebe a u jejich acSubnoodu (rekurzivne)
+        //Send by recursion the new ACE, so they can process the rule and optionally restrict theirs state
+        //or initiate the homomorphism to the parents
         copyAcEntriesToAcSubnodes(node, accessControlEntry);
     }
 
+    private AccessControlEntry createOrLoadTheAce(Node node, UserDetails currentUser, UserDetails targetUser) {
+        //Get all entries (could be groups also)
+        List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(
+                targetUser.getId(),
+                node.getId()
+        );
+
+        //If record is already exists for targetUser
+        for (AccessControlEntry entry : accessControlEntries) {
+            if (entry.getTargetUser().equals(targetUser) && entry.getTargetNode().equals(node)) {
+                return entry;
+            }
+        }
+
+        AccessControlEntry entry = new AccessControlEntry();
+        entry.setTargetNode(node);
+        entry.setOwner(currentUser);
+        entry.setTargetUser(targetUser);
+
+        return entry;
+    }
+
     /**
-     * Tady dostanu node, do ktereho jsem pridal nove pravidlo a druhym argumentem je seznam vsech jeho povoleni.
+     * Initial instance of the node holds the new ACEntry with the new list of ACP (could be empty).
      * <p>
-     * Mam za ukol projit vsechny jeho acSubnodes a pridat jim nova pravidla, pokud zjistim, ze pravidlo pro konkretniho
-     * uzivatele jiz existuje v acSubnodu, tak ho zcela prepisu.
+     * Function cycles in recursion through all acSubnodes and if the targetUser found, ACPermissions are rewritten
+     * by the new combination. Otherwise it could be deleted, if the ACE permissions are empty.
      *
-     * @param node
-     * @param entry
+     * @param node  or acSubnode for faster updating the ACL
+     * @param entry newly created ACE
      */
     private void copyAcEntriesToAcSubnodes(Node node, AccessControlEntry entry) {
         for (Node acSubnode : node.getAcSubnodes()) {
@@ -128,6 +141,7 @@ public class AclServiceImpl implements AclService {
             this.copyAcEntriesToAcSubnodes(acSubnode, entry);
         }
 
+        //If the structure is the same as acRoot, reference it as acParent (simplify next search call)
         if (node.getAcSubnodes().isEmpty() && node.getAcEntries().isEmpty()) {
             node.setAcParent(node.getRootParent());
             node.setRootParent(null);
@@ -135,7 +149,11 @@ public class AclServiceImpl implements AclService {
     }
 
     /**
-     * Tady bych mel nastavit noveho acParenta vsem subnoodum, ktere jsou pode mnou a meli stare id.
+     * Change the acParent reference to the newly created one.
+     *
+     * @param node          current node
+     * @param newAcParent   parent to newly reference to
+     * @param oldAcParentId old parent for search purposes
      */
     private void updateAcParentForSubnodes(Node node, Node newAcParent, Long oldAcParentId) {
         for (Node subnode : node.getSubnodes()) {
