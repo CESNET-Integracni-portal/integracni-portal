@@ -41,27 +41,13 @@ public class AclServiceImpl implements AclService {
         this.checkPermission(node, currentUser, AccessControlPermission.EDIT_PERMISSIONS);
 
         //Load existing or create new ACE
-        AccessControlEntry accessControlEntry = this.createOrLoadTheAce(node, currentUser, targetUser);
+        AccessControlEntry accessControlEntry = this.createOrLoadTheUserAce(node, currentUser, targetUser);
 
-        if (permissions.isEmpty()) {
-            //If it's removal, and it's not a detached entity, remove from DB
-            if (accessControlEntry.getId() != null) {
-                node.getAcEntries().remove(accessControlEntry);
-                accessControlEntryDao.delete(accessControlEntry);
-            }
-        } else {
-            //Update ACPermissions and save
-            node.getAcEntries().add(accessControlEntry);
-            accessControlEntry.getAccessControlPermissions().clear();
-            accessControlEntry.getAccessControlPermissions().addAll(permissions);
-            accessControlEntryDao.save(accessControlEntry);
-        }
+        this.updateAcPermissions(node, accessControlEntry, permissions);
 
         if (node.getAcParent() != null) {
             //If it's not a acSubroot -> make one
 
-            //Pokud node ma nastaveneho acParenta, tak okopiruju z acParenta vsechna pravidla (asi az na ty, co jsou jine, nez ted ma (dle targetUsera)),
-            //a pro vsechny potomky, node se stane novym AcParentem
             //Copy all the ACEntries from the acParent.
             for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
                 if (targetUser.equals(entry.getTargetUser())) {
@@ -71,6 +57,7 @@ public class AclServiceImpl implements AclService {
                 entry1.setTargetNode(node);
                 entry1.setOwner(currentUser);
                 entry1.setTargetUser(targetUser);
+                entry1.setTargetGroup(entry.getTargetGroup());
                 entry1.getAccessControlPermissions().addAll(entry.getAccessControlPermissions());
                 node.getAcEntries().add(entry1);
                 accessControlEntryDao.save(entry1);
@@ -90,7 +77,54 @@ public class AclServiceImpl implements AclService {
         copyAcEntriesToAcSubnodes(node, accessControlEntry);
     }
 
-    private AccessControlEntry createOrLoadTheAce(Node node, UserDetails currentUser, UserDetails targetUser) {
+    @Override
+    public void updateNodeAcpForGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions) {
+        //Prepare data for processing
+        Node node = nodeService.getNodeById(nodeId);
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+        Group targetGroup = groupService.getGroupById(groupId);
+
+        //Check whether user could edit permissions for selected Node
+        this.checkPermission(node, currentUser, AccessControlPermission.EDIT_PERMISSIONS);
+
+        //Load existing or create new ACE
+        AccessControlEntry accessControlEntry = this.createOrLoadTheGroupAce(node, currentUser, targetGroup);
+
+        this.updateAcPermissions(node, accessControlEntry, permissions);
+
+        if (node.getAcParent() != null) {
+            //If it's not a acSubroot -> make one
+
+            //Copy all the ACEntries from the acParent.
+            for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
+                if (targetGroup.equals(entry.getTargetGroup())) {
+                    continue; //if we added an ACE for targetUser in previous steps
+                }
+                AccessControlEntry entry1 = new AccessControlEntry();
+                entry1.setTargetNode(node);
+                entry1.setOwner(currentUser);
+                entry1.setTargetGroup(targetGroup);
+                entry1.setTargetUser(entry.getTargetUser());
+                entry1.getAccessControlPermissions().addAll(entry.getAccessControlPermissions());
+                node.getAcEntries().add(entry1);
+                accessControlEntryDao.save(entry1);
+            }
+
+            //Now, Node is subscriber to his parent changes via rootParent reference
+            node.setRootParent((Folder) node.getAcParent());
+            Long oldAcParentId = node.getAcParent().getId();
+            node.setAcParent(null);
+
+            //Register the change to underlying Nodes
+            updateAcParentForSubnodes(node, node, oldAcParentId);
+        }
+
+        //Send by recursion the new ACE, so they can process the rule and optionally restrict theirs state
+        //or initiate the homomorphism to the parents
+        copyAcEntriesToAcSubnodes(node, accessControlEntry);
+    }
+
+    private AccessControlEntry createOrLoadTheUserAce(Node node, UserDetails currentUser, UserDetails targetUser) {
         //Get all entries (could be groups also)
         List<AccessControlEntry> accessControlEntries = accessControlEntryDao.getByTargetUserAndNode(
                 targetUser.getId(),
@@ -112,6 +146,38 @@ public class AclServiceImpl implements AclService {
         return entry;
     }
 
+    private AccessControlEntry createOrLoadTheGroupAce(Node node, UserDetails currentUser, Group targetGroup) {
+        AccessControlEntry entry = accessControlEntryDao.getByTargetGroupAndNode(
+                targetGroup.getId(),
+                node.getId()
+        );
+
+        if (entry == null) {
+            entry = new AccessControlEntry();
+            entry.setTargetNode(node);
+            entry.setOwner(currentUser);
+            entry.setTargetGroup(targetGroup);
+        }
+
+        return entry;
+    }
+
+    private void updateAcPermissions(Node node, AccessControlEntry entry, Set<AccessControlPermission> permissions) {
+        if (permissions.isEmpty()) {
+            //If it's removal, and it's not a detached entity, remove from DB
+            if (entry.getId() != null) {
+                node.getAcEntries().remove(entry);
+                accessControlEntryDao.delete(entry);
+            }
+        } else {
+            //Update ACPermissions and save
+            node.getAcEntries().add(entry);
+            entry.getAccessControlPermissions().clear();
+            entry.getAccessControlPermissions().addAll(permissions);
+            accessControlEntryDao.save(entry);
+        }
+    }
+
     /**
      * Initial instance of the node holds the new ACEntry with the new list of ACP (could be empty).
      * <p>
@@ -125,7 +191,8 @@ public class AclServiceImpl implements AclService {
         for (Node acSubnode : node.getAcSubnodes()) {
             for (Iterator<AccessControlEntry> j = acSubnode.getAcEntries().iterator(); j.hasNext(); ) {
                 AccessControlEntry persistedEntry = j.next();
-                if (entry.getTargetUser().equals(persistedEntry.getTargetUser())) {
+                if (entry.getTargetUser().equals(persistedEntry.getTargetUser())
+                        || entry.getTargetGroup().equals(persistedEntry.getTargetGroup())) {
                     if (entry.getAccessControlPermissions().isEmpty()) {
                         j.remove();
                         accessControlEntryDao.delete(persistedEntry);
@@ -164,48 +231,12 @@ public class AclServiceImpl implements AclService {
         }
     }
 
-    @Override
-    public void updateNodeAcpForGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions) {
-        Node node = nodeService.getNodeById(nodeId);
-        UserDetails currentUser = userDetailsService.getCurrentUser();
-        this.checkPermission(node, currentUser, AccessControlPermission.EDIT_PERMISSIONS);
 
-        //Get targerGroup
-        Group targetGroup = groupService.getGroupById(groupId);
-        if (targetGroup == null) {
-            throw new GroupNotFoundException("Group with requested ID not found.");
-        }
-
-        AccessControlEntry accessControlEntry = accessControlEntryDao.getByTargetGroupAndNode(groupId, nodeId);
-
-        //If Node has no ACE for targetGroup, create new
-        if (accessControlEntry == null) {
-            accessControlEntry = new AccessControlEntry();
-
-            accessControlEntry.setTargetNode(node);
-            accessControlEntry.setOwner(currentUser);
-            accessControlEntry.setTargetGroup(targetGroup);
-        }
-
-        //Override previously stored ACPs
-        accessControlEntry.getAccessControlPermissions().clear();
-        for (AccessControlPermission permission : permissions) {
-            accessControlEntry.getAccessControlPermissions().add(permission);
-        }
-
-        //TODO: change "node.getAcParent().getAcEntries().isEmpty()" to check if ACE for the same target exists
-        //TODO: move save recursion into another elseif
-        if (accessControlEntry.getAccessControlPermissions().isEmpty() &&
-                (node.getAcParent() == null || node.getAcParent().getAcEntries().isEmpty())) {
-            for (Node subnode : node.getSubnodes()) {
-                this.updateAcParentAcePreserve(subnode, node.getAcParent() == null ? node : node.getAcParent());
-            }
-            accessControlEntryDao.delete(accessControlEntry);
+    private List<AccessControlEntry> getInheritedAcEntries(Long targetUserId, Node targetNode) {
+        if (targetNode.getAcParent() == null) {
+            return accessControlEntryDao.getByTargetUserAndNode(targetUserId, targetNode.getId());
         } else {
-            for (Node subnode : node.getSubnodes()) {
-                this.updateAcParentAcePreserve(subnode, node);
-            }
-            accessControlEntryDao.save(accessControlEntry);
+            return accessControlEntryDao.getByTargetUserAndNode(targetUserId, targetNode.getId(), targetNode.getAcParent().getId());
         }
     }
 
@@ -222,14 +253,6 @@ public class AclServiceImpl implements AclService {
         }
 
         return nodes;
-    }
-
-    private List<AccessControlEntry> getInheritedAcEntries(Long targetUserId, Node targetNode) {
-        if (targetNode.getAcParent() == null) {
-            return accessControlEntryDao.getByTargetUserAndNode(targetUserId, targetNode.getId());
-        } else {
-            return accessControlEntryDao.getByTargetUserAndNode(targetUserId, targetNode.getId(), targetNode.getAcParent().getId());
-        }
     }
 
     @Override

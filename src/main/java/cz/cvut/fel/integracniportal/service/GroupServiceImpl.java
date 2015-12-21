@@ -2,6 +2,7 @@ package cz.cvut.fel.integracniportal.service;
 
 import cz.cvut.fel.integracniportal.dao.GroupDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
+import cz.cvut.fel.integracniportal.exceptions.GroupNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.NotFoundException;
 import cz.cvut.fel.integracniportal.model.Group;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -37,7 +38,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getGroupById(Long groupId) {
-        return groupDao.get(groupId);
+        Group group = groupDao.get(groupId);
+        if (group == null) {
+            throw new GroupNotFoundException("Group with requested ID not found.");
+        }
+
+        return group;
     }
 
     @Override
