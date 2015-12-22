@@ -1,6 +1,7 @@
 package cz.cvut.fel.integracniportal.model;
 
 import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -48,7 +49,7 @@ public abstract class Node extends AbstractEntity<Long> {
     private List<Label> labels;
 
     @OneToMany(mappedBy = "parent")
-    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.DELETE})
+    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.DELETE})
     private List<Node> subnodes;
 
     @ManyToOne
@@ -65,6 +66,10 @@ public abstract class Node extends AbstractEntity<Long> {
 
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
+
+    @OneToMany(mappedBy = "node")
+    @Cascade({CascadeType.ALL})
+    private List<NodePolicy> policies;
 
     public Node() {
         this.labels = new ArrayList<Label>();
@@ -207,6 +212,14 @@ public abstract class Node extends AbstractEntity<Long> {
 
     public void setAcEntries(List<AccessControlEntry> acEntries) {
         this.acEntries = acEntries;
+    }
+
+    public List<NodePolicy> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(List<NodePolicy> policies) {
+        this.policies = policies;
     }
 
     public abstract void getFileMetadataNode(List<FileMetadata> context);
