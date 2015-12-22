@@ -34,7 +34,7 @@ public class AclController extends AbstractController {
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
         representation.setPermissions(accessControlPermissions);
 
-        return new ResponseEntity<Object>(representation, HttpStatus.OK);
+        return new ResponseEntity<AccessControlPermissionRepresentation>(representation, HttpStatus.OK);
     }
 
     /**
@@ -84,7 +84,7 @@ public class AclController extends AbstractController {
         AccessControlPermissionRepresentation representation = new AccessControlPermissionRepresentation();
         representation.setPermissions(permissions);
 
-        return new ResponseEntity<Object>(representation, HttpStatus.OK);
+        return new ResponseEntity<AccessControlPermissionRepresentation>(representation, HttpStatus.OK);
     }
 
 }

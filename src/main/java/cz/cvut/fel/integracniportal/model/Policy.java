@@ -1,41 +1,86 @@
 package cz.cvut.fel.integracniportal.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import cz.cvut.fel.integracniportal.exceptions.PolicyNotFoundException;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author Eldar Iosip
  */
-public enum Policy {
+@Entity
+@Table(name = "resource_node_policy")
+public class Policy extends AbstractEntity<Long> {
 
-    NOTIFY("NOTIFY"),
-    REMOVE("REMOVE");
+    @Id
+    @GeneratedValue
+    @Column(name = "policy_id")
+    private Long policyId;
 
-    private String name;
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private PolicyType type;
 
-    Policy(String name) {
-        this.name = name;
-    }
+    @Column(name = "active_after")
+    private Date activeAfter;
 
-    @JsonValue
+    @Column(name = "is_processed")
+    private boolean isProcessed;
+
+    @ManyToOne
+    @JoinColumn(name = "node", referencedColumnName = "node_id", nullable = false)
+    private Node node;
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "user_id", nullable = false)
+    private UserDetails owner;
+
     @Override
-    public String toString() {
-        return this.name;
+    public Long getId() {
+        return policyId;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public void setId(Long id) {
+        this.policyId = id;
     }
-     
-    @JsonCreator
-    public static Policy create(String name) throws PolicyNotFoundException {
-        Policy permission;
-        try {
-            permission = Policy.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            throw new PolicyNotFoundException("policy.notFound", name);
-        }
-        return permission;
+
+    public PolicyType getType() {
+        return type;
+    }
+
+    public void setPolicyType(PolicyType policyType) {
+        this.type = policyType;
+    }
+
+    public Date getActiveAfter() {
+        return activeAfter;
+    }
+
+    public void setActiveAfter(Date activeAfter) {
+        this.activeAfter = activeAfter;
+    }
+
+    public boolean isProcessed() {
+        return isProcessed;
+    }
+
+    public void setProcessed(boolean processed) {
+        isProcessed = processed;
+    }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
+    }
+
+    public UserDetails getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserDetails owner) {
+        this.owner = owner;
     }
 }

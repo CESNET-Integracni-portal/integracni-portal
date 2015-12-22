@@ -69,7 +69,7 @@ public abstract class Node extends AbstractEntity<Long> {
 
     @OneToMany(mappedBy = "node")
     @Cascade({CascadeType.ALL})
-    private List<NodePolicy> policies;
+    private List<Policy> policies;
 
     public Node() {
         this.labels = new ArrayList<Label>();
@@ -214,11 +214,11 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acEntries = acEntries;
     }
 
-    public List<NodePolicy> getPolicies() {
+    public List<Policy> getPolicies() {
         return policies;
     }
 
-    public void setPolicies(List<NodePolicy> policies) {
+    public void setPolicies(List<Policy> policies) {
         this.policies = policies;
     }
 
