@@ -43,4 +43,11 @@ public interface PolicyService {
      * @param policyId Policy to remove
      */
     void deletePolicy(Long policyId);
+
+    /**
+     * Process policies.
+     *
+     * @param date from where to start the policy search
+     */
+    void processByDate(Date date);
 }

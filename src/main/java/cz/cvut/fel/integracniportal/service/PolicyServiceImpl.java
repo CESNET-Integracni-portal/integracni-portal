@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Eldar Iosip
@@ -22,6 +19,8 @@ import java.util.Set;
 @Service
 @Transactional
 public class PolicyServiceImpl implements PolicyService {
+
+    public final static int MAXIMUM_CRON_ATTEMPTS = 3;
 
     @Autowired
     private NodeService nodeService;
@@ -54,6 +53,8 @@ public class PolicyServiceImpl implements PolicyService {
 
         policyDao.save(policy);
 
+        this.updateNodePolicyState(policy.getNode(), type);
+
         return policy;
     }
 
@@ -67,8 +68,9 @@ public class PolicyServiceImpl implements PolicyService {
         //Update policy
         policy.setActiveAfter(activeAfter);
         policy.setPolicyType(type);
-
         policyDao.save(policy);
+
+        this.updateNodePolicyState(policy.getNode(), type);
 
         return policy;
     }
@@ -81,6 +83,58 @@ public class PolicyServiceImpl implements PolicyService {
         this.checkPermissionToNodePolicy(currentUser, policy);
 
         policyDao.delete(policy);
+
+        this.updateNodePolicyState(policy.getNode(), null);
+    }
+
+    @Override
+    public void processByDate(Date date) {
+        List<Policy> policyList = policyDao.findByActiveAfter(date);
+
+        for (Policy policy : policyList) {
+            Node node = policy.getNode();
+            switch (policy.getType()) {
+                case REMOVE:
+                    try {
+                        nodeService.removeSubtree(node);
+                    } catch (Exception e) {
+                        policy.increaseAttempts();
+                        if (policy.getAttempts() == MAXIMUM_CRON_ATTEMPTS) {
+                            node.setCurrentPolicy(PolicyType.FAILED_REMOVAL);
+                            nodeService.saveNode(node);
+                            policy.setProcessed(true);
+                        }
+                    }
+                    break;
+                case NOTICATION:
+                    node.setCurrentPolicy(PolicyType.NOTICATION);
+                    nodeService.saveNode(node);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Update node policy state.
+     * <p>
+     * Informative state about the a process, the selected policy will initiate
+     *
+     * @param node affected by the policy
+     * @param type of the policy
+     */
+    private void updateNodePolicyState(Node node, PolicyType type) {
+        PolicyType semiType;
+
+        switch (type) {
+            case REMOVE:
+                semiType = PolicyType.AWAITING_REMOVAL;
+                break;
+            default:
+                semiType = null;
+        }
+
+        node.setCurrentPolicy(semiType);
+        nodeService.saveNode(node);
     }
 
     private void checkPermissionToNodePolicy(UserDetails user, Policy policy)

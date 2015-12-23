@@ -10,6 +10,9 @@ import cz.cvut.fel.integracniportal.exceptions.PolicyNotFoundException;
 public enum PolicyType {
 
     NOTICATION("NOTICATION"),
+    AWAITING("AWAITING"),
+    AWAITING_REMOVAL("AWAITING_REMOVAL"),
+    FAILED_REMOVAL("FAILED_REMOVAL"),
     REMOVE("REMOVE");
 
     private String name;
@@ -27,7 +30,7 @@ public enum PolicyType {
     public String getName() {
         return name;
     }
-     
+
     @JsonCreator
     public static PolicyType create(String name) throws PolicyNotFoundException {
         PolicyType permission;

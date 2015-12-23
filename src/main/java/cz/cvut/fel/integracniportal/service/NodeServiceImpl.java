@@ -61,4 +61,10 @@ public class NodeServiceImpl implements NodeService {
     public void saveNode(Node node) {
         nodeDao.save(node);
     }
+
+    @Override
+    public void removeSubtree(Node node) {
+        //TODO: remove physical files
+        nodeDao.delete(node);
+    }
 }

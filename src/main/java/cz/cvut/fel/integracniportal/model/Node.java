@@ -60,14 +60,18 @@ public abstract class Node extends AbstractEntity<Long> {
     @JoinColumn(name = "root_parent_id")
     private Folder rootParent;
 
-    @OneToMany(mappedBy = "rootParent")
+    @OneToMany(mappedBy = "rootParent", orphanRemoval = true)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     private List<Node> acSubnodes;
 
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
 
-    @OneToMany(mappedBy = "node")
+    @Column(name = "current_policy")
+    @Enumerated(EnumType.STRING)
+    private PolicyType currentPolicy;
+
+    @OneToMany(mappedBy = "node", orphanRemoval = true)
     @Cascade({CascadeType.ALL})
     private List<Policy> policies;
 
@@ -76,6 +80,7 @@ public abstract class Node extends AbstractEntity<Long> {
         this.subnodes = new ArrayList<Node>();
         this.acSubnodes = new ArrayList<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
+        this.policies = new ArrayList<Policy>();
     }
 
     @Override
@@ -212,6 +217,14 @@ public abstract class Node extends AbstractEntity<Long> {
 
     public void setAcEntries(List<AccessControlEntry> acEntries) {
         this.acEntries = acEntries;
+    }
+
+    public PolicyType getCurrentPolicy() {
+        return currentPolicy;
+    }
+
+    public void setCurrentPolicy(PolicyType currentPolicy) {
+        this.currentPolicy = currentPolicy;
     }
 
     public List<Policy> getPolicies() {

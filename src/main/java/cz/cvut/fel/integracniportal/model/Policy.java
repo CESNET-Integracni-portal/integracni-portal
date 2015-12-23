@@ -23,15 +23,18 @@ public class Policy extends AbstractEntity<Long> {
     @Column(name = "active_after")
     private Date activeAfter;
 
+    @Column(name = "attempts")
+    private int attempts = 0;
+
     @Column(name = "is_processed")
     private boolean isProcessed;
 
     @ManyToOne
-    @JoinColumn(name = "node", referencedColumnName = "node_id", nullable = false)
+    @JoinColumn(name = "node", referencedColumnName = "node_id")
     private Node node;
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "user_id")
     private UserDetails owner;
 
     @Override
@@ -58,6 +61,18 @@ public class Policy extends AbstractEntity<Long> {
 
     public void setActiveAfter(Date activeAfter) {
         this.activeAfter = activeAfter;
+    }
+
+    public int getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(int attempts) {
+        this.attempts = attempts;
+    }
+
+    public void increaseAttempts() {
+        this.attempts++;
     }
 
     public boolean isProcessed() {

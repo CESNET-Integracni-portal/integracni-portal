@@ -12,13 +12,9 @@ import java.util.List;
  * Representation class for file metadata.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FileMetadataRepresentation {
+public class FileMetadataRepresentation extends NodeRepresentation {
 
     private String type = "file";
-
-    private Long id;
-
-    private String name;
 
     private String mimetype;
 
@@ -31,8 +27,6 @@ public class FileMetadataRepresentation {
     private Date createdOn;
 
     private Date changedOn;
-
-    private List<LabelRepresentation> labels;
 
     public FileMetadataRepresentation() {
     }
@@ -56,37 +50,6 @@ public class FileMetadataRepresentation {
         }
         createdOn = fileMetadata.getCreatedOn();
         changedOn = fileMetadata.getChangedOn();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * @deprecated
-     */
-    public String getUuid() {
-        return "" + id;
-    }
-
-    /**
-     * @param id
-     * @deprecated
-     */
-    public void setUuid(String id) {
-        this.id = Long.parseLong(id);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getMimetype() {
@@ -135,14 +98,6 @@ public class FileMetadataRepresentation {
 
     public void setChangedOn(Date changedOn) {
         this.changedOn = changedOn;
-    }
-
-    public List<LabelRepresentation> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<LabelRepresentation> labels) {
-        this.labels = labels;
     }
 
     public String getType() {

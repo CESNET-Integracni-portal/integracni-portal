@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Set;
 public class PolicyController extends AbstractController {
 
     @Autowired
-    private PolicyService nodePolicyService;
+    private PolicyService policyService;
 
     /**
      * Return all the available policy types.
@@ -29,12 +30,24 @@ public class PolicyController extends AbstractController {
     @RequestMapping(value = "/v0.2/policy/type", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getPolicyTypes() {
-        Set<PolicyType> types = nodePolicyService.getPolicyTypes();
+        Set<PolicyType> types = policyService.getPolicyTypes();
 
         PolicyTypeRepresentation representation = new PolicyTypeRepresentation();
         representation.setTypes(types);
 
         return new ResponseEntity<PolicyTypeRepresentation>(representation, HttpStatus.OK);
+    }
+
+    /**
+     * Process all the policies
+     * TODO: testing only !!! Remove
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/policy", method = RequestMethod.PUT)
+    public ResponseEntity processPolicies() {
+        policyService.processByDate(new Date());
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
 }

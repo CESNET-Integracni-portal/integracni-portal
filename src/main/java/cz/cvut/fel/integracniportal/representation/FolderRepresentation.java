@@ -12,13 +12,9 @@ import java.util.*;
  * Representation class for folder.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FolderRepresentation {
+public class FolderRepresentation extends NodeRepresentation {
 
     private String type = "folder";
-
-    private String id;
-
-    private String name;
 
     private List<Map<String, String>> breadcrumbs;
 
@@ -32,8 +28,6 @@ public class FolderRepresentation {
 
     private Date changedOn;
 
-    private List<LabelRepresentation> labels;
-
     public FolderRepresentation() {
     }
 
@@ -42,7 +36,7 @@ public class FolderRepresentation {
     }
 
     public FolderRepresentation(Folder folder, UserDetails viewer, boolean deepCopy) {
-        id = folder.getId().toString();
+        id = folder.getId();
         name = folder.getName();
         if (folder.getOwner() != null) {
             owner = new UserDetailsRepresentation();
@@ -95,22 +89,6 @@ public class FolderRepresentation {
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<Map<String, String>> getBreadcrumbs() {
         return breadcrumbs;
     }
@@ -157,14 +135,6 @@ public class FolderRepresentation {
 
     public void setChangedOn(Date changedOn) {
         this.changedOn = changedOn;
-    }
-
-    public List<LabelRepresentation> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<LabelRepresentation> labels) {
-        this.labels = labels;
     }
 
     public String getType() {
