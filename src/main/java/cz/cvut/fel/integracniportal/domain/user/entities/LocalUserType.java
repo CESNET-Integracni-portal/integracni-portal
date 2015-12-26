@@ -9,10 +9,17 @@ import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
 import org.axonframework.eventsourcing.annotation.EventSourcingHandler;
 
 /**
+ * This user type is used for users that are registered internally in the system with
+ * their own password. That means that these users must be verified and also need
+ * support for setting and restoring their password.
+ *
  * @author Radek Jezdik
  */
 public class LocalUserType extends UserType {
 
+    /**
+     * True if user is verified.
+     */
     private boolean verified;
 
     @EventSourcingHandler
