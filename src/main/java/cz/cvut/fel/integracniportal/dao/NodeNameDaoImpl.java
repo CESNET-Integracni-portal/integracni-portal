@@ -5,6 +5,8 @@ import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import cz.cvut.fel.integracniportal.model.NodeName;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static cz.cvut.fel.integracniportal.model.QNodeName.nodeName;
 
 /**
@@ -32,5 +34,12 @@ public class NodeNameDaoImpl extends GenericHibernateDao<NodeName> implements No
                 .where(nodeName.userId.eq(userId.getId()))
                 .where(nodeName.space.eq(space))
                 .exists();
+    }
+
+    @Override
+    public List<NodeName> getChildNodes(FolderId folderId) {
+        return from(nodeName)
+                .where(nodeName.parentId.eq(folderId.getId()))
+                .list(nodeName);
     }
 }

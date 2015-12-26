@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import cz.cvut.fel.integracniportal.model.NodeName;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Data Access Object interface for node names.
@@ -22,4 +23,7 @@ public interface NodeNameDao {
     public boolean nameExists(String name, FolderId parentId);
 
     public boolean nameInRootExists(String name, UserId userId, String space);
+
+    public List<NodeName> getChildNodes(FolderId folderId);
+
 }

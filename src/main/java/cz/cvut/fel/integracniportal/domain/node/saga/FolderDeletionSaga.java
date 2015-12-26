@@ -3,16 +3,14 @@ package cz.cvut.fel.integracniportal.domain.node.saga;
 import cz.cvut.fel.integracniportal.command.node.DeleteFileCommand;
 import cz.cvut.fel.integracniportal.command.node.DeleteFolderCommand;
 import cz.cvut.fel.integracniportal.command.node.DeleteFolderInternalCommand;
-import cz.cvut.fel.integracniportal.dao.FolderDao;
+import cz.cvut.fel.integracniportal.dao.NodeNameDao;
 import cz.cvut.fel.integracniportal.domain.node.events.FolderDeletionStartedEvent;
 import cz.cvut.fel.integracniportal.domain.node.events.NodeDeletedEvent;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.NodeId;
 import cz.cvut.fel.integracniportal.exceptions.IllegalOperationException;
-import cz.cvut.fel.integracniportal.model.FileMetadata;
-import cz.cvut.fel.integracniportal.model.Folder;
-import cz.cvut.fel.integracniportal.model.Node;
+import cz.cvut.fel.integracniportal.model.NodeName;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.saga.annotation.AbstractAnnotatedSaga;
 import org.axonframework.saga.annotation.SagaEventHandler;
@@ -29,7 +27,7 @@ import java.util.Set;
 public class FolderDeletionSaga extends AbstractAnnotatedSaga {
 
     @Autowired
-    private FolderDao folderDao;
+    private NodeNameDao nodeNameDao;
 
     @Autowired
     private CommandGateway gateway;
@@ -54,21 +52,19 @@ public class FolderDeletionSaga extends AbstractAnnotatedSaga {
         started = true;
         folderId = event.getId();
 
-        Folder folder = folderDao.get(event.getId().getId());
+        List<NodeName> childNodes = nodeNameDao.getChildNodes(event.getId());
 
-        List<Node> childNodes = folder.getChildNodes();
-
-        if (childNodes != null && childNodes.isEmpty() == false) {
-            for (Node node : childNodes) {
+        if (childNodes.isEmpty() == false) {
+            for (NodeName node : childNodes) {
                 NodeId nodeId;
                 Object command;
 
-                if (node instanceof FileMetadata) {
-                    nodeId = FileId.of(node.getId());
-                    command = new DeleteFileCommand((FileId) nodeId);
-                } else {
+                if (node.isFolder()) {
                     nodeId = FolderId.of(node.getId());
                     command = new DeleteFolderCommand((FolderId) nodeId);
+                } else {
+                    nodeId = FileId.of(node.getId());
+                    command = new DeleteFileCommand((FileId) nodeId);
                 }
                 associateWith("toDelete", nodeId.toString());
                 nodesToDelete.add(nodeId);
@@ -94,8 +90,8 @@ public class FolderDeletionSaga extends AbstractAnnotatedSaga {
         end();
     }
 
-    public void setFolderDao(FolderDao folderDao) {
-        this.folderDao = folderDao;
+    public void setNodeNameDao(NodeNameDao nodeNameDao) {
+        this.nodeNameDao = nodeNameDao;
     }
 
     public void setGateway(CommandGateway gateway) {

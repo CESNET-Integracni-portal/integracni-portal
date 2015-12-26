@@ -26,6 +26,8 @@ public class NodeName extends AbstractEntity<String> {
 
     private String space;
 
+    private boolean isFolder;
+
     @Override
     public String getId() {
         return nodeId;
@@ -74,5 +76,13 @@ public class NodeName extends AbstractEntity<String> {
 
     public void setSpace(String space) {
         this.space = space;
+    }
+
+    public boolean isFolder() {
+        return isFolder;
+    }
+
+    public void setIsFolder(boolean folder) {
+        isFolder = folder;
     }
 }
