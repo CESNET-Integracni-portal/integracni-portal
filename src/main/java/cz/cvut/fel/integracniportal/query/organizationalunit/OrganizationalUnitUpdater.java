@@ -38,7 +38,6 @@ public class OrganizationalUnitUpdater {
     public void renameUnit(OrganizationalUnitRenamedEvent event) {
         OrganizationalUnit unit = unitDao.load(event.getId().getId());
         unit.setName(event.getNewName());
-        unitDao.save(unit);
     }
 
     @EventHandler
@@ -51,7 +50,6 @@ public class OrganizationalUnitUpdater {
     public void changeQuota(OrganizationalUnitQuotaChangedEvent event) {
         OrganizationalUnit unit = unitDao.load(event.getId().getId());
         unit.setSize(event.getNewQuota());
-        unitDao.save(unit);
     }
 
     @EventHandler
@@ -63,7 +61,6 @@ public class OrganizationalUnitUpdater {
             admins = new HashSet<UserDetails>();
         }
         admins.add(user);
-        unitDao.save(unit);
     }
 
     @EventHandler
@@ -73,7 +70,6 @@ public class OrganizationalUnitUpdater {
         Set<UserDetails> admins = unit.getAdmins();
         if (admins != null) {
             admins.remove(user);
-            unitDao.save(unit);
         }
     }
 

@@ -52,6 +52,7 @@ public class NodeNameUpdater {
         nodeName.setId(event.getId().getId());
         nodeName.setName(event.getName());
         nodeName.setSpace(event.getSpace());
+        nodeName.setIsFolder(event instanceof FolderCreatedEvent);
 
         if (event.getParentFolder() == null) {
             nodeName.setUserId(event.getOwner().getId());
@@ -66,16 +67,12 @@ public class NodeNameUpdater {
         NodeName nodeName = nodeNameDao.load(event.getId().getId());
 
         nodeName.setName(event.getNewName());
-
-        nodeNameDao.save(nodeName);
     }
 
     private void moveNodeName(NodeMovedEvent event) {
         NodeName nodeName = nodeNameDao.load(event.getId().getId());
 
         nodeName.setParentId(event.getNewParent().getId());
-
-        nodeNameDao.save(nodeName);
     }
 
     private void moveToRoot(NodeMovedEvent event, UserId rootOwner) {
@@ -83,8 +80,6 @@ public class NodeNameUpdater {
 
         nodeName.setParentId(null);
         nodeName.setUserId(rootOwner.getId());
-
-        nodeNameDao.save(nodeName);
     }
 
     private void deleteNodeName(NodeDeletedEvent event) {

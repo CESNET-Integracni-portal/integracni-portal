@@ -54,8 +54,6 @@ public class FileUpdater {
         FileMetadata file = fileDao.load(event.getId().getId());
 
         file.setName(event.getNewName());
-
-        fileDao.update(file);
     }
 
     @EventHandler
@@ -64,15 +62,12 @@ public class FileUpdater {
         Folder folder = folderDao.load(event.getNewParent().getId());
 
         file.setParent(folder);
-
-        fileDao.update(file);
     }
 
     @EventHandler
     public void moveFileToRoot(FileMovedToRootEvent event) {
         FileMetadata file = fileDao.load(event.getId().getId());
         file.setParent(null);
-        fileDao.update(file);
     }
 
     @EventHandler
@@ -86,8 +81,6 @@ public class FileUpdater {
         FileMetadata file = fileDao.load(event.getId().getId());
 
         file.setFilesize(event.getNewSize());
-
-        fileDao.update(file);
     }
 
 }

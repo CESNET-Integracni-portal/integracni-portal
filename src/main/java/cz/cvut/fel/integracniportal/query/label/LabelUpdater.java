@@ -46,7 +46,6 @@ public class LabelUpdater {
         Label label = labelDao.load(event.getId().getId());
         label.setName(event.getName());
         label.setColor(event.getColor());
-        labelDao.save(label);
     }
 
     @EventHandler
@@ -66,7 +65,6 @@ public class LabelUpdater {
 
         node.getLabels().add(label);
 
-        nodeDao.save(node);
     }
 
     @EventHandler
@@ -80,7 +78,6 @@ public class LabelUpdater {
 
         node.getLabels().remove(label);
 
-        nodeDao.save(node);
     }
 
 }

@@ -39,8 +39,6 @@ public class UserRoleUpdater {
 
         role.setName(event.getName());
         role.setDescription(event.getDescription());
-
-        roleDao.save(role);
     }
 
     @EventHandler
@@ -60,8 +58,6 @@ public class UserRoleUpdater {
         for (Permission permission : event.getRemovedPermissions()) {
             permissions.remove(permission);
         }
-
-        roleDao.save(role);
     }
 
 }

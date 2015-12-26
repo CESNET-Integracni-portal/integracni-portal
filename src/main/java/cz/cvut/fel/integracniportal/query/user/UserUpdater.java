@@ -60,8 +60,6 @@ public class UserUpdater {
             UserRole role = roleDao.load(roleId.getId());
             userRoles.remove(role);
         }
-
-        userDao.save(user);
     }
 
     @EventHandler
@@ -76,8 +74,6 @@ public class UserUpdater {
 
         permissions.addAll(event.getAddedPermissions());
         permissions.removeAll(event.getRemovedPermissions());
-
-        userDao.save(user);
     }
 
 }

@@ -44,8 +44,6 @@ public class FolderUpdater {
         Folder folder = folderDao.load(event.getId().getId());
 
         folder.setName(event.getNewName());
-
-        folderDao.update(folder);
     }
 
     @EventHandler
@@ -54,8 +52,6 @@ public class FolderUpdater {
         Folder newParent = folderDao.load(event.getNewParent().getId());
 
         folder.setParent(newParent);
-
-        folderDao.update(folder);
     }
 
     @EventHandler
@@ -63,8 +59,6 @@ public class FolderUpdater {
         Folder folder = folderDao.load(event.getId().getId());
 
         folder.setParent(null);
-
-        folderDao.update(folder);
     }
 
     @EventHandler

@@ -39,7 +39,6 @@ public class GroupUpdater {
     public void renameGroup(GroupRenamedEvent event) {
         Group group = groupDao.load(event.getId().getId());
         group.setName(event.getNewName());
-        groupDao.save(group);
     }
 
     @EventHandler
@@ -57,8 +56,6 @@ public class GroupUpdater {
         }
 
         group.getMembers().add(userDao.getReference(event.getUser().getId()));
-
-        groupDao.save(group);
     }
 
     @EventHandler
@@ -70,8 +67,6 @@ public class GroupUpdater {
         }
 
         group.getMembers().remove(userDao.getReference(event.getUser().getId()));
-
-        groupDao.save(group);
     }
 
 }
