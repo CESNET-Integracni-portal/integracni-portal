@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractExpirableUserTokenSaga extends AbstractAnnotatedSaga {
 
-    // FIXME inject a property value (@Value)
+    // TODO inject a property value (@Value)
     private long expireInMinutes = 60;
 
     @Autowired
