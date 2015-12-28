@@ -335,6 +335,7 @@ public class AclServiceImpl implements AclService {
      */
     private void updateAceParentAceRemove(Node node, Node aceParent) {
         node.setAcParent(aceParent);
+        node.setRootParent(null);
         node.getAcEntries().clear();
         for (Node subnode : node.getSubnodes()) {
             updateAceParentAceRemove(subnode, this.getAceParent(subnode.getParent()));

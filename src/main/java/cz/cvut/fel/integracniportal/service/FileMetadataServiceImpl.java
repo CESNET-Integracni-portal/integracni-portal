@@ -213,6 +213,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     @Override
     public void shareFile(Long fileId, List<Long> userIds, UserDetails currentUser) {
         FileMetadata file = getFileMetadataById(fileId);
+        //Solved by the ACL module
         // TODO
     }
 

@@ -3,12 +3,8 @@ package cz.cvut.fel.integracniportal.service
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
-import cz.cvut.fel.integracniportal.api.FolderDefinition
-import cz.cvut.fel.integracniportal.model.AccessControlPermission
 import cz.cvut.fel.integracniportal.model.FileMetadata
 import cz.cvut.fel.integracniportal.model.Folder
-import cz.cvut.fel.integracniportal.model.UserDetails
-import cz.cvut.fel.integracniportal.utils.UploadUtils
 import org.apache.commons.io.IOUtils
 import org.junit.Before
 import org.junit.Test
@@ -16,22 +12,14 @@ import org.kubek2k.springockito.annotations.experimental.DirtiesMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.mock.web.MockMultipartHttpServletRequest
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.User
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 
-import javax.servlet.http.HttpServletResponse
-
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertNull
-import static org.junit.Assert.assertTrue
-import static org.mockito.Mockito.when
-import static org.mockito.Mockito.when
 import static org.mockito.Mockito.when
 
 /**
