@@ -171,4 +171,26 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(74L, file.getParent().getId())
         assertEquals(79L, file.getAcParent().getId())
     }
+
+    @Test
+    void "move folder from inner lever of tree into subroot"() {
+        folderService.moveFolder(76L, 79L)
+
+        Folder movedFolder = folderService.getFolderById(76L);
+
+        assertNotNull(movedFolder)
+        assertEquals("dirtestinner2", movedFolder.getName())
+        assertEquals(SPACE_NAME, movedFolder.getSpace())
+
+        //Assert moved folder
+        assertEquals(79L, movedFolder.getAcParent().getId())
+        assertEquals(79L, movedFolder.getParent().getId())
+        assertNull(movedFolder.getRootParent())
+
+        //Assert file inside moved folder
+        FileMetadata file = movedFolder.getFiles().first();
+        assertEquals(77L, file.getId())
+        assertEquals(76L, file.getParent().getId())
+        assertEquals(79L, file.getAcParent().getId())
+    }
 }
