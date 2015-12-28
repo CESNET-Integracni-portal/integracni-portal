@@ -3,6 +3,7 @@ package cz.cvut.fel.integracniportal.service
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationTestCase
 import cz.cvut.fel.integracniportal.SpringockitoWebContextLoader
+import cz.cvut.fel.integracniportal.model.FileMetadata
 import cz.cvut.fel.integracniportal.model.Folder
 import org.junit.Before
 import org.junit.Test
@@ -147,5 +148,27 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertNull(movedFolder.getAcParent())
         assertNull(movedFolder.getParent())
         assertNull(movedFolder.getRootParent())
+    }
+
+    @Test
+    void "move folder from root into subroot"() {
+        folderService.moveFolder(74L, 79L)
+
+        Folder movedFolder = folderService.getFolderById(74L);
+
+        assertNotNull(movedFolder)
+        assertEquals("dirtest2", movedFolder.getName())
+        assertEquals(SPACE_NAME, movedFolder.getSpace())
+
+        //Assert moved folder
+        assertEquals(79L, movedFolder.getAcParent().getId())
+        assertEquals(79L, movedFolder.getParent().getId())
+        assertNull(movedFolder.getRootParent())
+
+        //Assert file inside moved folder
+        FileMetadata file = movedFolder.getFiles().first();
+        assertEquals(78L, file.getId())
+        assertEquals(74L, file.getParent().getId())
+        assertEquals(79L, file.getAcParent().getId())
     }
 }
