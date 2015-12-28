@@ -96,7 +96,7 @@ public class PolicyServiceImpl implements PolicyService {
             switch (policy.getType()) {
                 case REMOVE:
                     try {
-                        nodeService.removeSubtree(node);
+                        nodeService.removeNode(node, true);
                     } catch (Exception e) {
                         policy.increaseAttempts();
                         if (policy.getAttempts() == MAXIMUM_CRON_ATTEMPTS) {

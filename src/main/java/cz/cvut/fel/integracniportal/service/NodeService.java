@@ -15,6 +15,6 @@ public interface NodeService {
 
     public void saveNode(Node node);
 
-    void removeSubtree(Node node);
+    void removeNode(Node node, boolean removeFromRepository);
 
 }

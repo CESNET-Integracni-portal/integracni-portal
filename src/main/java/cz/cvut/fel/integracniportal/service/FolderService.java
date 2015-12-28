@@ -24,7 +24,7 @@ public interface FolderService {
     /**
      * Finds a folder in database by its id and returns its representation.
      *
-     * @param id Id of the folder.
+     * @param id          Id of the folder.
      * @param currentUser
      * @return The folder representation.
      */
@@ -95,6 +95,13 @@ public interface FolderService {
     public void removeFolder(Long folderId);
 
     /**
+     * Removes a folder from the database and optionally from file repo.
+     *
+     * @param folder to be removed from the database.
+     */
+    public void removeFolder(Folder folder, boolean removeFromRepository);
+
+    /**
      * Updates the given folder entity.
      *
      * @param folder the folder entity to update
@@ -150,6 +157,7 @@ public interface FolderService {
 
     /**
      * Returns the list of user favorite folders.
+     *
      * @param spaceId
      * @param currentUser
      * @return

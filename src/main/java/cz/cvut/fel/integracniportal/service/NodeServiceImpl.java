@@ -32,6 +32,15 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private FileMetadataService fileMetadataService;
+
+    @Autowired
+    private FolderService folderService;
+
+    @Autowired
+    private SpaceService spaceService;
+
     @Override
     public Node getNodeById(Long nodeId) {
         return nodeDao.get(nodeId);
@@ -63,8 +72,26 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void removeSubtree(Node node) {
-        //TODO: remove physical files
+    public void removeNode(Node node, boolean removeFromRepository) {
+
+        for (Folder subFolder : node.getFolders()) {
+            folderService.removeFolder(subFolder, true);
+        }
+
+        for (FileMetadata fileMetadata : node.getFiles()) {
+            fileMetadataService.deleteFile(fileMetadata, true);
+        }
+
+
+        if (removeFromRepository) {
+            //TODO: remove node from repository
+            //getFileApi(node.getSpace()).moveFolderToBin(folder);
+        }
+
         nodeDao.delete(node);
+    }
+
+    private FileApiAdapter getFileApi(String type) {
+        return new FileApiAdapter(spaceService.getOfType(type));
     }
 }

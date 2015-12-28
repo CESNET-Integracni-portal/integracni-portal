@@ -140,7 +140,8 @@ public class FolderServiceImpl implements FolderService {
         removeFolder(folder, true);
     }
 
-    private void removeFolder(Folder folder, boolean removeFromRepository) {
+    @Override
+    public void removeFolder(Folder folder, boolean removeFromRepository) {
 
         for (Folder subFolder : folder.getFolders()) {
             removeFolder(subFolder, false);
