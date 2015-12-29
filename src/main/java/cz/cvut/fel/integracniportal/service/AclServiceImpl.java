@@ -65,19 +65,7 @@ public class AclServiceImpl implements AclService {
             node.setAcParent(null);
         }
 
-        if (node.getAcEntries().isEmpty()) {
-            //Register the change to underlying Nodes
-            if (node.getParent() == null) {
-                updateAceParentAceRemove(node, null);
-            } else {
-                node.setAcParent(node.getRootParent());
-                node.setRootParent(null);
-                updateAceParentAceRemove(node, node.getAcParent());
-            }
-        } else {
-            //Register the change to underlying Nodes
-            updateSubnodes(node, accessControlEntry, node);
-        }
+        updateTree(node, accessControlEntry);
     }
 
     @Override
@@ -116,6 +104,10 @@ public class AclServiceImpl implements AclService {
             node.setAcParent(null);
         }
 
+        updateTree(node, accessControlEntry);
+    }
+
+    private void updateTree(Node node, AccessControlEntry accessControlEntry) {
         if (node.getAcEntries().isEmpty()) {
             //Register the change to underlying Nodes
             if (node.getParent() == null) {
