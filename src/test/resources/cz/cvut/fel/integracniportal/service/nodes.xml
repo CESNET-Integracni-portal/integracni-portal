@@ -47,6 +47,31 @@
         </row>
     </table>
 
+    <table name="user_group">
+        <column>group_id</column>
+        <column>name</column>
+        <column>owner</column>
+        <row>
+            <value>21</value>
+            <value>Owners</value>
+            <value>80</value>
+        </row>
+        <row>
+            <value>22</value>
+            <value>Readers</value>
+            <value>80</value>
+        </row>
+    </table>
+
+    <table name="user_group_members">
+        <column>group_id</column>
+        <column>user_id</column>
+        <row>
+            <value>22</value>
+            <value>82</value>
+        </row>
+    </table>
+
     <table name="resource_node">
         <column>node_type</column>
         <column>node_id</column>

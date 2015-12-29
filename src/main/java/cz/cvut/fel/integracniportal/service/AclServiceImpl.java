@@ -134,8 +134,8 @@ public class AclServiceImpl implements AclService {
                 boolean isFound = false;
                 for (Iterator<AccessControlEntry> j = subnode.getAcEntries().iterator(); j.hasNext(); ) {
                     AccessControlEntry persistedEntry = j.next();
-                    if (entry.getTargetUser().equals(persistedEntry.getTargetUser())
-                            || entry.getTargetGroup() != null && (entry.getTargetGroup().equals(persistedEntry.getTargetGroup()))) {
+                    if ((entry.getTargetUser() != null && entry.getTargetUser().equals(persistedEntry.getTargetUser()))
+                            || (entry.getTargetGroup() != null && (entry.getTargetGroup().equals(persistedEntry.getTargetGroup())))) {
                         isFound = true;
                         if (entry.getAccessControlPermissions().isEmpty()) {
                             j.remove();

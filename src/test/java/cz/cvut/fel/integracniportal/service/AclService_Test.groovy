@@ -207,7 +207,6 @@ public class AclService_Test extends AbstractIntegrationTestCase {
     }
 
     @Test
-    //TODO: dupl of prev
     void "should override subtree if empty AC entries"() {
         Set<AccessControlPermission> permissions = new HashSet<AccessControlPermission>()
         //Firstly add Download Permission
