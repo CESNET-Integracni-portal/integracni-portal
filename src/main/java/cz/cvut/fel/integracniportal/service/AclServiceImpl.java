@@ -171,7 +171,7 @@ public class AclServiceImpl implements AclService {
             }
         } else {
             //Update ACPermissions and save
-            node.getAcEntries().add(entry);
+            //TODO: commented when tested, remove -> node.getAcEntries().add(entry);
             entry.getAccessControlPermissions().clear();
             entry.getAccessControlPermissions().addAll(permissions);
             accessControlEntryDao.save(entry);
