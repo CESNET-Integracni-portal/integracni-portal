@@ -29,6 +29,14 @@
             <null/>
             <null/>
         </row>
+        <row>
+            <value>81</value>
+            <value>reader</value>
+            <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
+            <value>1</value>
+            <null/>
+            <null/>
+        </row>
     </table>
 
     <table name="resource_node">
