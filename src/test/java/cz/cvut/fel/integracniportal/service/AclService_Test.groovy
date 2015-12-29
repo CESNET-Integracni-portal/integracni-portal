@@ -161,17 +161,52 @@ public class AclService_Test extends AbstractIntegrationTestCase {
         assertNull(parentFolder.getAcParent())
         assertNull(parentFolder.getParent())
         assertNull(parentFolder.getRootParent())
-
-        println parentFolder.getAcSubnodes()
         assertEquals(2, parentFolder.getSubnodes().size())
-
-        //assertEquals(1, parentFolder.getAcSubnodes().size()) Unable to test, lazy load?
 
         //Check children of new subroot
         FileMetadata file = fileMetadataService.getFileMetadataById(77L)
 
         assertEquals(OWNER_ID, file.getOwner().getId())
         assertEquals(76L, file.getParent().getId())
+        assertEquals(76L, file.getAcParent().getId())
+        assertNull(file.getRootParent())
+        assertEquals(0, file.getAcEntries().size())
+    }
+
+    @Test
+    void "should reset a subroot if ac entries are empty"() {
+        Set<AccessControlPermission> permissions = new HashSet<AccessControlPermission>();
+        //Firstly add Download Permission
+        permissions.add(AccessControlPermission.READ);
+        aclService.updateNodeAcPermissionsByUser(76L, 81L, permissions);
+
+        Folder affectedFolder = folderService.getFolderById(76L)
+
+        assertEquals(OWNER_ID, affectedFolder.getOwner().getId())
+        assertNull(affectedFolder.getAcParent())
+        assertEquals(73L, affectedFolder.getParent().getId())
+        assertEquals(73L, affectedFolder.getRootParent().getId())
+        assertEquals(1, affectedFolder.getAcEntries().size())
+        assertTrue(affectedFolder.getAcEntries().get(0).getAccessControlPermissions().contains(AccessControlPermission.READ))
+
+        //Update subroot with empty aces
+        permissions.clear();
+        aclService.updateNodeAcPermissionsByUser(76L, 81L, permissions);
+
+        affectedFolder = folderService.getFolderById(76L)
+
+        assertEquals(OWNER_ID, affectedFolder.getOwner().getId())
+        assertEquals(73L, affectedFolder.getParent().getId())
+        assertEquals(73L, affectedFolder.getAcParent().getId())
+        assertNull(affectedFolder.getRootParent())
+        assertEquals(0, affectedFolder.getAcEntries().size())
+
+        //Check children of old subroot
+        FileMetadata file = fileMetadataService.getFileMetadataById(77L)
+
+        assertEquals(OWNER_ID, file.getOwner().getId())
+        assertEquals(76L, file.getParent().getId())
+        assertEquals(73L, file.getAcParent().getId())
         assertNull(file.getRootParent())
         assertEquals(0, file.getAcEntries().size())
     }

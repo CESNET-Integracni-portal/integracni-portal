@@ -171,7 +171,9 @@ public class AclServiceImpl implements AclService {
             }
         } else {
             //Update ACPermissions and save
-            //TODO: commented when tested, remove -> node.getAcEntries().add(entry);
+            if (!node.getAcEntries().contains(entry)) {
+                node.getAcEntries().add(entry);
+            }
             entry.getAccessControlPermissions().clear();
             entry.getAccessControlPermissions().addAll(permissions);
             accessControlEntryDao.save(entry);
@@ -212,6 +214,8 @@ public class AclServiceImpl implements AclService {
         if (node.getAcSubnodes().isEmpty() && node.getAcEntries().isEmpty()) {
             node.setAcParent(node.getRootParent());
             node.setRootParent(null);
+
+            this.updateAcParentForSubnodes(node, node.getAcParent(), node.getId());
         }
     }
 
