@@ -27,9 +27,7 @@ import static org.mockito.Mockito.when
 @Transactional
 public class AclService_getAccessControlPermissions_Test extends AbstractIntegrationTestCase {
 
-    final OWNER_ID = 80L
     final OWNER_USERNAME = "owner"
-    final READER_USERNAME = "reader"
 
     @Autowired
     private AclService aclService
