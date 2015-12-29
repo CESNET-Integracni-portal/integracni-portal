@@ -98,4 +98,43 @@ public class AclService_Test extends AbstractIntegrationTestCase {
         assertEquals(0, nodes.first().files.size())
         assertEquals(71L, nodes.first().getId())
     }
+
+    @Test
+    void "should update permission for user 81 from download to upload"() {
+        Set<AccessControlPermission> permissions = new HashSet<AccessControlPermission>();
+        //Firstly add Download Permission
+        permissions.add(AccessControlPermission.DOWNLOAD);
+        aclService.updateNodeAcPermissionsByUser(74L, 81L, permissions);
+
+
+        Folder affectedFolder = folderService.getFolderById(74L)
+
+        assertEquals(OWNER_ID, affectedFolder.getOwner().getId())
+        assertNull(affectedFolder.getAcParent())
+        assertNull(affectedFolder.getParent())
+        assertNull(affectedFolder.getRootParent())
+
+        //Check permission
+        Set<AccessControlPermission> userPermissions = aclService.getAccessControlPermissions(74L, 81L);
+        assertEquals(1, userPermissions.size())
+        assertEquals(AccessControlPermission.DOWNLOAD, userPermissions.first())
+
+        //Update to upload, should override prev
+        permissions.clear();
+        permissions.add(AccessControlPermission.UPLOAD);
+
+        aclService.updateNodeAcPermissionsByUser(74L, 81L, permissions);
+
+        affectedFolder = folderService.getFolderById(74L)
+
+        assertEquals(OWNER_ID, affectedFolder.getOwner().getId())
+        assertNull(affectedFolder.getAcParent())
+        assertNull(affectedFolder.getParent())
+        assertNull(affectedFolder.getRootParent())
+
+        //Check permission
+        userPermissions = aclService.getAccessControlPermissions(74L, 81L);
+        assertEquals(1, userPermissions.size())
+        assertEquals(AccessControlPermission.UPLOAD, userPermissions.first())
+    }
 }
