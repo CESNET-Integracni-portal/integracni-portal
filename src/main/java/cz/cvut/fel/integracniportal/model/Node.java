@@ -60,10 +60,6 @@ public abstract class Node extends AbstractEntity<Long> {
     @JoinColumn(name = "root_parent_id")
     private Folder rootParent;
 
-    @OneToMany(mappedBy = "rootParent", orphanRemoval = true)
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
-    private List<Node> acSubnodes;
-
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
 
@@ -78,7 +74,6 @@ public abstract class Node extends AbstractEntity<Long> {
     public Node() {
         this.labels = new ArrayList<Label>();
         this.subnodes = new ArrayList<Node>();
-        this.acSubnodes = new ArrayList<Node>();
         this.acEntries = new ArrayList<AccessControlEntry>();
         this.policies = new ArrayList<Policy>();
     }
@@ -195,20 +190,6 @@ public abstract class Node extends AbstractEntity<Long> {
 
     public void setAcParent(Node acParent) {
         this.acParent = acParent;
-    }
-
-    public List<Node> getAcSubnodes() {
-        return acSubnodes;
-    }
-
-    public void setAcSubnodes(List<Node> acSubnodes) {
-        this.acSubnodes = acSubnodes;
-    }
-
-    public void addAcSubnode(Node node) {
-        if (!this.getAcSubnodes().contains(node)) {
-            this.acSubnodes.add(node);
-        }
     }
 
     public List<AccessControlEntry> getAcEntries() {

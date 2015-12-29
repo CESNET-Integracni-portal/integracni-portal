@@ -20,9 +20,8 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
         super(AccessControlEntry.class);
     }
 
-    //TODO: order by targetUser not null first
     @Override
-    public List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId) {
+    public List<AccessControlEntry> getByTargetUserGroupsAndNode(Long userId, Long nodeId) {
         return from(accessControlEntry)
                 .where(accessControlEntry.targetNode.nodeId.eq(nodeId).and(
                         accessControlEntry.targetUser.userId.eq(userId).or(
@@ -35,10 +34,8 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
                 .list(accessControlEntry);
     }
 
-    //TODO: order by targetUser not null first
     @Override
-    public List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId, Long aclRootId) {
-
+    public List<AccessControlEntry> getByTargetUserGroupsAndNode(Long userId, Long nodeId,  Long aclRootId) {
         return from(accessControlEntry)
                 .where(accessControlEntry.targetNode.nodeId.in(nodeId, aclRootId).and(
                         accessControlEntry.targetUser.userId.eq(userId).or(
@@ -49,6 +46,15 @@ public class AccessControlEntryDaoImpl extends GenericHibernateDao<AccessControl
                         ))
                 )
                 .list(accessControlEntry);
+    }
+
+    @Override
+    public AccessControlEntry getByTargetUserAndNode(Long userId, Long nodeId) {
+        return from(accessControlEntry)
+                .where(accessControlEntry.targetNode.nodeId.eq(nodeId).and(
+                        accessControlEntry.targetUser.userId.eq(userId)
+                ))
+                .uniqueResult(accessControlEntry);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class AclController extends AbstractController {
     public ResponseEntity updateNodeAclForUser(@PathVariable Long nodeId,
                                                @PathVariable Long userId,
                                                @RequestBody AccessControlPermissionRepresentation acpRepresentation) {
-        aclService.updateNodeAcPermissionsByUser(nodeId, userId, acpRepresentation.getPermissions());
+        aclService.updateNodeAceByUser(nodeId, userId, acpRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -64,7 +64,7 @@ public class AclController extends AbstractController {
     public ResponseEntity updateNodeAclForGroup(@PathVariable Long nodeId,
                                                 @PathVariable Long groupId,
                                                 @RequestBody AccessControlPermissionRepresentation accessControlPermissionRepresentation) {
-        aclService.updateNodeAcpForGroup(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
+        aclService.updateNodeAceByGroup(nodeId, groupId, accessControlPermissionRepresentation.getPermissions());
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

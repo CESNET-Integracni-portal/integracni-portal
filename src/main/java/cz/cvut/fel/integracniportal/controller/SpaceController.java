@@ -87,13 +87,13 @@ public class SpaceController extends AbstractController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/file", method = POST)
-    public ResponseEntity<FolderRepresentation> uploadFile(@PathVariable String spaceId,
+    public ResponseEntity uploadFile(@PathVariable String spaceId,
                                                            HttpServletRequest request) throws IOException, FileUploadException {
 
         FileUpload fileUpload = UploadUtils.handleFileUpload(request);
 
         FileMetadata fileMetadata = fileMetadataService.uploadFileToRoot(spaceId, fileUpload);
-        return new ResponseEntity(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
+        return new ResponseEntity<FileMetadataRepresentation>(new FileMetadataRepresentation(fileMetadata), HttpStatus.CREATED);
     }
 
     @PreAuthorize("isAuthenticated()")

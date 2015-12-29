@@ -11,7 +11,9 @@ public interface NodeDao {
 
     Node get(Serializable id);
 
-    public void save(Node node);
+    void update(Node node);
+
+    void save(Node node);
 
     void delete(Node node);
 }

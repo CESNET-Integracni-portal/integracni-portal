@@ -1,5 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
+    <table name="organization_unit">
+        <column>unit_id</column>
+        <column>name</column>
+        <column>size</column>
+        <row>
+            <value>1</value>
+            <value>unit1</value>
+            <value>100000000</value>
+        </row>
+        <row>
+            <value>2</value>
+            <value>unit2</value>
+            <value>100000000</value>
+        </row>
+    </table>
+
+    <table name="user_details">
+        <column>user_id</column>
+        <column>username</column>
+        <column>password</column>
+        <column>organizationalunit_unit_id</column>
+        <row>
+            <value>80</value>
+            <value>owner</value>
+            <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
+            <value>1</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>81</value>
+            <value>reader</value>
+            <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
+            <value>1</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>82</value>
+            <value>reader2</value>
+            <value>$2a$10$v1JxNpJgcLaWoVNtuavU.O6wisxLjnFhsa4r5TlpDh/Zi7/mvJDxS</value>
+            <value>1</value>
+            <null/>
+            <null/>
+        </row>
+    </table>
+
+    <table name="user_group">
+        <column>group_id</column>
+        <column>name</column>
+        <column>owner</column>
+        <row>
+            <value>21</value>
+            <value>Owners</value>
+            <value>80</value>
+        </row>
+        <row>
+            <value>22</value>
+            <value>Readers</value>
+            <value>80</value>
+        </row>
+    </table>
+
+    <table name="user_group_members">
+        <column>group_id</column>
+        <column>user_id</column>
+        <row>
+            <value>22</value>
+            <value>82</value>
+        </row>
+    </table>
+
     <table name="resource_node">
         <column>node_type</column>
         <column>node_id</column>
@@ -16,6 +88,193 @@
         <column>ac_parent_folder_id</column>
         <column>owner</column>
         <column>parent</column>
-        <column>acparent_node_id</column>
+        <column>root_parent_id</column>
+
+        <row>
+            <value>FILE</value>
+            <value>71</value>
+            <value>2015-12-13 13:27:52.175</value>
+            <value>2015-12-13 13:27:52.175</value>
+            <value>false</value>
+            <value>test.jpg</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <value>1234567</value>
+            <value>image/jpeg</value>
+            <value>false</value>
+            <null/>
+            <value>80</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>FILE</value>
+            <value>72</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>test2.jpg</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <value>1234568</value>
+            <value>image/jpeg</value>
+            <value>false</value>
+            <null/>
+            <value>80</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>FOLDER</value>
+            <value>73</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>dirtest1</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <null/>
+            <null/>
+            <value>true</value>
+            <null/>
+            <value>80</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>FOLDER</value>
+            <value>74</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>dirtest2</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <null/>
+            <null/>
+            <value>true</value>
+            <null/>
+            <value>80</value>
+            <null/>
+            <null/>
+        </row>
+        <row>
+            <value>FOLDER</value>
+            <value>75</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>dirtestinner1</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <null/>
+            <null/>
+            <value>true</value>
+            <value>73</value>
+            <value>80</value>
+            <value>73</value>
+            <null/>
+        </row>
+        <row>
+            <value>FOLDER</value>
+            <value>76</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>dirtestinner2</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <null/>
+            <null/>
+            <value>true</value>
+            <value>73</value>
+            <value>80</value>
+            <value>73</value>
+            <null/>
+        </row>
+        <row>
+            <value>FILE</value>
+            <value>77</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>test3.jpg</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <value>1234568</value>
+            <value>image/jpeg</value>
+            <value>false</value>
+            <value>73</value>
+            <value>80</value>
+            <value>76</value>
+            <null/>
+        </row>
+        <row>
+            <value>FILE</value>
+            <value>78</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>test4.jpg</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <value>123321</value>
+            <value>image/jpeg</value>
+            <value>false</value>
+            <value>74</value>
+            <value>80</value>
+            <value>74</value>
+            <null/>
+        </row>
+        <row>
+            <value>FOLDER</value>
+            <value>79</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>2015-12-13 13:28:52.175</value>
+            <value>false</value>
+            <value>dirtestinnerinner1</value>
+            <value>cesnet</value>
+            <null/>
+            <null/>
+            <null/>
+            <null/>
+            <value>true</value>
+            <null/>
+            <value>80</value>
+            <value>75</value>
+            <null/>
+        </row>
+    </table>
+
+    <table name="access_control_entry">
+        <column>permission_id</column>
+        <column>owner_id</column>
+        <column>target_group_id</column>
+        <column>node_id</column>
+        <column>target_user_id</column>
+        <row>
+            <value>1</value>
+            <value>80</value>
+            <null/>
+            <value>79</value>
+            <value>81</value>
+        </row>
+    </table>
+
+    <table name="accesscontrolentry_accesscontrolpermissions">
+        <column>accesscontrolentry_permission_id</column>
+        <column>node_permissions</column>
+        <row>
+            <value>1</value>
+            <value>READ</value>
+        </row>
     </table>
 </dataset>
