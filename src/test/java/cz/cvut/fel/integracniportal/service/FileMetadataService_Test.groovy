@@ -74,7 +74,6 @@ public class FileMetadataService_Test extends AbstractIntegrationTestCase {
         assertEquals(OWNER_ID, createdFile.getOwner().getId())
         assertNull(createdFile.getAcParent())
         assertNull(createdFile.getParent())
-        assertNull(createdFile.getRootParent())
     }
 
     @Test
@@ -86,7 +85,6 @@ public class FileMetadataService_Test extends AbstractIntegrationTestCase {
         assertEquals(OWNER_ID, createdFile.getOwner().getId())
         assertEquals(74L, createdFile.getAcParent().getId())
         assertEquals(74L, createdFile.getParent().getId())
-        assertNull(createdFile.getRootParent())
     }
 
     @Test
@@ -100,7 +98,6 @@ public class FileMetadataService_Test extends AbstractIntegrationTestCase {
         assertEquals(OWNER_ID, movedFile.getOwner().getId())
         assertEquals(74L, movedFile.getAcParent().getId())
         assertEquals(74L, movedFile.getParent().getId())
-        assertNull(movedFile.getRootParent())
     }
 
     @Test
@@ -111,14 +108,12 @@ public class FileMetadataService_Test extends AbstractIntegrationTestCase {
         assertEquals(OWNER_ID, createdFile.getOwner().getId())
         assertEquals(73L, createdFile.getAcParent().getId())
         assertEquals(76L, createdFile.getParent().getId())
-        assertNull(createdFile.getRootParent())
     }
 
     @Test
     void "should add file to folder with modified acl"() {
         Folder parentFolder = folderService.getFolderById(79L)
 
-        assertEquals(75L, parentFolder.getRootParent().getId())
         assertEquals(75L, parentFolder.getParent().getId())
         assertNull(parentFolder.getAcParent())
 
@@ -128,7 +123,6 @@ public class FileMetadataService_Test extends AbstractIntegrationTestCase {
         assertEquals(OWNER_ID, createdFile.getOwner().getId())
         assertEquals(79L, createdFile.getAcParent().getId())
         assertEquals(79L, createdFile.getParent().getId())
-        assertNull(createdFile.getRootParent())
     }
 
     def uploadFile() {

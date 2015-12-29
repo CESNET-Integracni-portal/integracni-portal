@@ -40,9 +40,9 @@ public interface AclService {
      */
     public void updateAceParent(Node node, Node parent);
 
-    public void updateNodeAcPermissionsByUser(Long nodeId, Long userId, Set<AccessControlPermission> permissions);
+    public void updateNodeAceByUser(Long nodeId, Long userId, Set<AccessControlPermission> permissions);
 
-    public void updateNodeAcpForGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions);
+    public void updateNodeAceByGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions);
 
     public boolean userHasAcPermission(Long nodeId, Long userId, AccessControlPermission permission);
 

@@ -14,11 +14,13 @@ public interface AccessControlEntryDao {
 
     void delete(AccessControlEntry accessControlEntry);
 
-    List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId);
+    List<AccessControlEntry> getByTargetUserGroupsAndNode(Long userId, Long nodeId);
 
-    List<AccessControlEntry> getByTargetUserAndNode(Long userId, Long nodeId, Long aclRootId);
+    List<AccessControlEntry> getByTargetUserGroupsAndNode(Long userId, Long nodeId,  Long aclRootId);
 
-    AccessControlEntry getByTargetGroupAndNode(Long userId, Long nodeId);
+    AccessControlEntry getByTargetUserAndNode(Long userId, Long nodeId);
+
+    AccessControlEntry getByTargetGroupAndNode(Long groupId, Long nodeId);
 
     List<AccessControlEntry> getByTargetUserNoOwnerPermission(Long userId, AccessControlPermission permission);
 }

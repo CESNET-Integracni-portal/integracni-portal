@@ -71,7 +71,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, createdFolder.getSpace())
         assertNull(createdFolder.getAcParent())
         assertNull(createdFolder.getParent())
-        assertNull(createdFolder.getRootParent())
     }
 
     @Test
@@ -87,7 +86,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, createdFolder.getSpace())
         assertEquals(74L, createdFolder.getAcParent().getId())
         assertEquals(74L, createdFolder.getParent().getId())
-        assertNull(createdFolder.getRootParent())
     }
 
     @Test
@@ -103,7 +101,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, createdFolder.getSpace())
         assertEquals(79L, createdFolder.getAcParent().getId())
         assertEquals(79L, createdFolder.getParent().getId())
-        assertNull(createdFolder.getRootParent())
     }
 
     @Test
@@ -119,7 +116,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, createdFolder.getSpace())
         assertEquals(79L, createdFolder.getAcParent().getId())
         assertEquals(79L, createdFolder.getParent().getId())
-        assertNull(createdFolder.getRootParent())
 
         //Create another folder inside a new folder
         Folder createdFolderInner = folderService.createSubFolder(
@@ -133,7 +129,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, createdFolderInner.getSpace())
         assertEquals(79L, createdFolderInner.getAcParent().getId())
         assertEquals(createdFolder.getId(), createdFolderInner.getParent().getId())
-        assertNull(createdFolderInner.getRootParent())
     }
 
     @Test
@@ -147,7 +142,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         assertEquals(SPACE_NAME, movedFolder.getSpace())
         assertNull(movedFolder.getAcParent())
         assertNull(movedFolder.getParent())
-        assertNull(movedFolder.getRootParent())
     }
 
     @Test
@@ -163,7 +157,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         //Assert moved folder
         assertEquals(79L, movedFolder.getAcParent().getId())
         assertEquals(79L, movedFolder.getParent().getId())
-        assertNull(movedFolder.getRootParent())
 
         //Assert file inside moved folder
         FileMetadata file = movedFolder.getFiles().first();
@@ -185,7 +178,6 @@ public class FolderService_Test extends AbstractIntegrationTestCase {
         //Assert moved folder
         assertEquals(79L, movedFolder.getAcParent().getId())
         assertEquals(79L, movedFolder.getParent().getId())
-        assertNull(movedFolder.getRootParent())
 
         //Assert file inside moved folder
         FileMetadata file = movedFolder.getFiles().first();
