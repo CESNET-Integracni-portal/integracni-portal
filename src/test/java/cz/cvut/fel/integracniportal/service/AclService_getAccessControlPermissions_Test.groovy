@@ -112,7 +112,8 @@ public class AclService_getAccessControlPermissions_Test extends AbstractIntegra
         aclService.updateNodeAceByUser(79L, 82L, permissions)
 
         Set<AccessControlPermission> userPermissions = aclService.getAccessControlPermissions(79L, 82L)
-        assertEquals(2, userPermissions.size())
+        assertEquals(1, userPermissions.size())
         assertTrue(userPermissions.contains(AccessControlPermission.DOWNLOAD))
     }
+
 }
