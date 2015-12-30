@@ -42,29 +42,7 @@ public class AclServiceImpl implements AclService {
         AccessControlEntry accessControlEntry = loadOrCreateUserAce(node, currentUser, targetUser);
 
         updateAcePermissions(node, accessControlEntry, permissions);
-
-        //Become an acSubroot
-        if (node.getAcParent() != null) {
-            //Copy all ACE from acParent
-            for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
-                if (targetUser.equals(entry.getTargetUser())) {
-                    //ignore parent ACE for targetUser
-                    continue;
-                }
-                AccessControlEntry entryCopy = new AccessControlEntry();
-                entryCopy.setTargetNode(node);
-                entryCopy.setOwner(currentUser);
-                entryCopy.setTargetUser(entry.getTargetUser());
-                entryCopy.setTargetGroup(entry.getTargetGroup());
-                entryCopy.getAccessControlPermissions().addAll(entry.getAccessControlPermissions());
-                node.getAcEntries().add(entryCopy);
-                accessControlEntryDao.save(entryCopy);
-            }
-
-            node.setRootParent((Folder) node.getAcParent());
-            node.setAcParent(null);
-        }
-
+        copyAce(node, currentUser, targetUser, null);
         updateTree(node, accessControlEntry);
     }
 
@@ -81,13 +59,18 @@ public class AclServiceImpl implements AclService {
         AccessControlEntry accessControlEntry = loadOrCreateGroupAce(node, currentUser, targetGroup);
 
         updateAcePermissions(node, accessControlEntry, permissions);
+        copyAce(node, currentUser, null, targetGroup);
+        updateTree(node, accessControlEntry);
+    }
 
-        //Become an acSubroot
+    private void copyAce(Node node, UserDetails currentUser, UserDetails targetUser, Group targetGroup) {
         if (node.getAcParent() != null) {
             //Copy all ACE from acParent
             for (AccessControlEntry entry : node.getAcParent().getAcEntries()) {
-                if (targetGroup.equals(entry.getTargetGroup())) {
-                    //ignore parent ACE for targetGroup
+                if ((targetUser != null && targetUser.equals(entry.getTargetUser()))
+                        || (targetGroup != null && targetGroup.equals(entry.getTargetGroup()))
+                        ) {
+                    //ignore parent ACE for targetUser or targetGroup
                     continue;
                 }
                 AccessControlEntry entryCopy = new AccessControlEntry();
@@ -103,8 +86,6 @@ public class AclServiceImpl implements AclService {
             node.setRootParent((Folder) node.getAcParent());
             node.setAcParent(null);
         }
-
-        updateTree(node, accessControlEntry);
     }
 
     private void updateTree(Node node, AccessControlEntry accessControlEntry) {
@@ -269,13 +250,11 @@ public class AclServiceImpl implements AclService {
                     groupPermissions.retainAll(entry.getAccessControlPermissions());
                 }
             } else if (entry.getTargetUser() != null) {
-                //User permissions
-                userPermissions.addAll(entry.getAccessControlPermissions());
+                //Permissions addressed to the user are the most valuable
+                return entry.getAccessControlPermissions();
             }
         }
 
-        //Permissions addressed to the user are the most valuable
-        groupPermissions.addAll(userPermissions);
         return groupPermissions;
     }
 
