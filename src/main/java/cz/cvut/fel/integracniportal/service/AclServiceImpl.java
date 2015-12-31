@@ -105,6 +105,11 @@ public class AclServiceImpl implements AclService {
     }
 
     private void updateSubnodes(Node node, AccessControlEntry entry, Node acParent) {
+        if (node.getAcEntries().isEmpty()) {
+            node.setAcParent(acParent);
+            node.setRootParent(null);
+        }
+
         for (Node subnode : node.getSubnodes()) {
             if (subnode.getAcParent() != null && !subnode.getAcParent().equals(acParent)) {
                 //referenced to old acParent -> update to new
@@ -146,11 +151,6 @@ public class AclServiceImpl implements AclService {
             } else {
                 updateSubnodes(subnode, entry, acParent);
             }
-        }
-
-        if (node.getAcEntries().isEmpty()) {
-            node.setAcParent(acParent);
-            node.setRootParent(null);
         }
     }
 
