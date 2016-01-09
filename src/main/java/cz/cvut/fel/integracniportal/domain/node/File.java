@@ -38,14 +38,14 @@ public class File extends AbstractNodeAggregateRoot {
                 fileState));
     }
 
-    public void renameFile(String newName) {
+    public void rename(String newName) {
         if (newName.equals(name)) {
             return;
         }
         apply(new FileRenamedEvent(id, newName));
     }
 
-    public void moveFile(FolderId newParent, UserId sentBy) {
+    public void move(FolderId newParent, UserId sentBy) {
         if (parentFolder == null && newParent == null) {
             return;
         }
@@ -66,28 +66,42 @@ public class File extends AbstractNodeAggregateRoot {
         }
     }
 
-    public void setSize(long newSize) {
-        apply(new FileSizeChangedEvent(id, newSize, this.size));
+    public void updateContents(long newSize) {
+        moveOnline(); // automatically moved online in file repository when downloaded
+        apply(new FileContentsChangedEvent(id, newSize, this.size));
     }
 
-    public void moveFileOffline() {
+    public void moveOffline() {
         if (fileState.equals(FileState.ONLINE) == false) {
-            throw new IllegalStateException("Could not move file offline, it's not online");
+            return;
         }
-
-        apply(new StartMovingFileOfflineEvent(id));
+        apply(new FileMovedOfflineEvent(id));
     }
 
-    public void moveFileOnline() {
-        apply(new StartMovingFileOnlineEvent(id));
+    public void moveOnline() {
+        if (fileState.equals(FileState.ONLINE) == false) {
+            return;
+        }
+        apply(new FileMovedOnlineEvent(id));
     }
 
-    public void onMoveOfflineStart(StartMovingFileOfflineEvent event) {
-        fileState = FileState.MOVING_TO_OFFLINE;
+    public void download() {
+        moveOnline(); // automatically moved online in file repository when downloaded
+        apply(new FileDownloadedEvent(id));
     }
 
     @EventSourcingHandler
-    public void onFileCreated(FileCreatedEvent event) {
+    public void handle(FileMovedOnlineEvent event) {
+        fileState = FileState.ONLINE;
+    }
+
+    @EventSourcingHandler
+    public void handle(FileMovedOfflineEvent event) {
+        fileState = FileState.OFFLINE;
+    }
+
+    @EventSourcingHandler
+    public void handle(FileCreatedEvent event) {
         id = event.getId();
         name = event.getName();
         parentFolder = event.getParentFolder();
@@ -99,12 +113,12 @@ public class File extends AbstractNodeAggregateRoot {
     }
 
     @EventSourcingHandler
-    public void onSizeChanged(FileSizeChangedEvent event) {
+    public void handle(FileContentsChangedEvent event) {
         size = event.getNewSize();
     }
 
     @EventSourcingHandler
-    public void onFileDeleted(FileDeletedEvent event) {
+    public void handle(FileDeletedEvent event) {
         markDeleted();
     }
 }

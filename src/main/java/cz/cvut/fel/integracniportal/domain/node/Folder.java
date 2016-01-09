@@ -61,6 +61,14 @@ public class Folder extends AbstractNodeAggregateRoot {
         }
     }
 
+    public void moveOnline() {
+        apply(new FolderMovedOnlineEvent(id));
+    }
+
+    public void moveOffline() {
+        apply(new FolderMovedOfflineEvent(id));
+    }
+
     @EventSourcingHandler
     public void onFolderCreated(FolderCreatedEvent event) {
         id = event.getId();
@@ -74,5 +82,4 @@ public class Folder extends AbstractNodeAggregateRoot {
     public void onDelete(FolderDeletedEvent event) {
         markDeleted();
     }
-
 }

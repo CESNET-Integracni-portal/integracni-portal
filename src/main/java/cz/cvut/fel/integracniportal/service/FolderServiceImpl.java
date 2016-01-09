@@ -1,9 +1,6 @@
 package cz.cvut.fel.integracniportal.service;
 
-import cz.cvut.fel.integracniportal.command.node.CreateFolderCommand;
-import cz.cvut.fel.integracniportal.command.node.DeleteFolderCommand;
-import cz.cvut.fel.integracniportal.command.node.MoveFolderCommand;
-import cz.cvut.fel.integracniportal.command.node.RenameFolderCommand;
+import cz.cvut.fel.integracniportal.command.node.*;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
@@ -135,42 +132,35 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public void moveFolderOnline(String folderId) {
-        Folder folder = getFolderById(folderId);
-        if (folder.isOnline()) {
-            return;
-        }
-        folder.setOnline(true);
-        getFileApi(folder.getSpace()).moveFolderOnline(folder);
-
+        commandGateway.sendAndWait(new MoveFolderOnlineCommand(
+                FolderId.of(folderId)
+        ));
     }
 
     @Override
     public void moveFolderOffline(String folderId) {
-        Folder folder = getFolderById(folderId);
-        if (folder.isOnline() == false) {
-            return;
-        }
-        folder.setOnline(false);
-        getFileApi(folder.getSpace()).moveFolderOffline(folder);
+        commandGateway.sendAndWait(new MoveFolderOfflineCommand(
+                FolderId.of(folderId)
+        ));
     }
 
 
     @Override
     public void favoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
-        // TODO
+        // TODO backend
     }
 
     @Override
     public void unfavoriteFolder(String folderId, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
-        // TODO
+        // TODO backend
     }
 
     @Override
     public void shareFolder(String folderId, List<Long> userIds, UserDetails currentUser) {
         Folder folder = getFolderById(folderId);
-        // TODO
+        // TODO backend
     }
 
     @Override

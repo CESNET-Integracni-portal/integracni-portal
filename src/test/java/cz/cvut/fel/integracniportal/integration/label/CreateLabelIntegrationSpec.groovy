@@ -28,8 +28,10 @@ public class CreateLabelIntegrationSpec extends AbstractIntegrationSpecification
     }
 
     def "creating duplicate label (name, color, owner) results in error"() {
-        when:
+        given:
             dispatch new CreateLabelCommand(LabelId.of("1"), "work", "red")
+
+        when:
             dispatch new CreateLabelCommand(LabelId.of("2"), "work", "red")
 
         then:

@@ -6,8 +6,6 @@ package cz.cvut.fel.integracniportal.domain.node.valueobjects;
 public enum FileState {
 
     ONLINE,
-    MOVING_TO_OFFLINE,
-    OFFLINE,
-    MOVING_TO_ONLINE
+    OFFLINE
 
 }

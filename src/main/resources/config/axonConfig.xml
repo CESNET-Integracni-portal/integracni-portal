@@ -37,6 +37,7 @@
             cz.cvut.fel.integracniportal.domain.user.saga.UserEmailVerificationSaga
             cz.cvut.fel.integracniportal.domain.user.saga.RestoreLostUserPasswordSaga
             cz.cvut.fel.integracniportal.domain.node.saga.FolderDeletionSaga
+            cz.cvut.fel.integracniportal.domain.node.saga.FolderMigrationSaga
         </axon:types>
     </axon:saga-manager>
 

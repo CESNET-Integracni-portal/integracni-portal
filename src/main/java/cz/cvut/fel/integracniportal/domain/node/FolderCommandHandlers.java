@@ -19,30 +19,6 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
 
     @CommandHandler
     public void handle(CreateFolderCommand command) {
-        createFolder(command);
-    }
-
-    @CommandHandler
-    public void handle(RenameFolderCommand command) {
-        renameFolder(command);
-    }
-
-    @CommandHandler
-    public void handle(MoveFolderCommand command) {
-        moveFolder(command);
-    }
-
-    @CommandHandler
-    public void handle(DeleteFolderCommand command) {
-        deleteFolder(command);
-    }
-
-    @CommandHandler
-    public void handle(DeleteFolderInternalCommand command) {
-        deleteFolderInternal(command);
-    }
-
-    private void createFolder(CreateFolderCommand command) {
         Folder folder = new Folder(
                 command.getId(),
                 command.getName(),
@@ -55,7 +31,8 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
         repository.add(folder);
     }
 
-    private void renameFolder(RenameFolderCommand command) {
+    @CommandHandler
+    public void handle(RenameFolderCommand command) {
         Folder folder = repository.load(command.getId());
 
         if (folder.getName().equals(command.getNewName())) {
@@ -67,7 +44,8 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
         folder.renameFolder(command.getNewName());
     }
 
-    private void moveFolder(MoveFolderCommand command) {
+    @CommandHandler
+    public void handle(MoveFolderCommand command) {
         Folder folder = repository.load(command.getId());
 
         if (folder.getId().equals(command.getNewParent())) {
@@ -85,16 +63,28 @@ public class FolderCommandHandlers extends AbstractNodeCommandHandler {
         folder.moveFolder(command.getNewParent(), command.getSentBy());
     }
 
-    private void deleteFolder(DeleteFolderCommand command) {
+    @CommandHandler
+    public void handle(DeleteFolderCommand command) {
         Folder folder = repository.load(command.getId());
-
         folder.recursivelyDelete();
     }
 
-    private void deleteFolderInternal(DeleteFolderInternalCommand command) {
+    @CommandHandler
+    public void handle(DeleteFolderInternalCommand command) {
         Folder folder = repository.load(command.getId());
-
         folder.delete();
+    }
+
+    @CommandHandler
+    public void handle(MoveFolderOnlineCommand command) {
+        Folder folder = repository.load(command.getId());
+        folder.moveOnline();
+    }
+
+    @CommandHandler
+    public void handle(MoveFolderOfflineCommand command) {
+        Folder folder = repository.load(command.getId());
+        folder.moveOffline();
     }
 
     public void setRepository(Repository<Folder> repository) {

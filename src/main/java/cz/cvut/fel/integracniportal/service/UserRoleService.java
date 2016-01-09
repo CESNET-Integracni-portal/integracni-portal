@@ -47,10 +47,4 @@ public interface UserRoleService {
      */
     public void updateRole(String roleId, UserRoleRepresentation userRoleRepresentation);
 
-    /**
-     * Removes the user role from database.
-     *
-     * @param roleId UserRole id to be removed.
-     */
-    public void deleteRole(String roleId);
 }

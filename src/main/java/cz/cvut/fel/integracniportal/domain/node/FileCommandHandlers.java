@@ -65,15 +65,27 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
     }
 
     @CommandHandler
-    public void moveFileOffline(MoveFileOfflineCommand command) {
+    public void handle(DownloadFileCommand command) {
         File file = repository.load(command.getId());
-        file.moveFileOffline();
+        file.download();
     }
 
     @CommandHandler
-    public void moveFileOnline(MoveFileOnlineCommand command) {
+    public void moveFileOffline(MoveFileOfflineCommand command, UnitOfWork unitOfWork) {
         File file = repository.load(command.getId());
-        file.moveFileOnline();
+        file.moveOffline();
+
+        FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
+        getFileApi(file.getSpace()).moveFileOffline(fileMetadata);
+    }
+
+    @CommandHandler
+    public void moveFileOnline(MoveFileOnlineCommand command, UnitOfWork unitOfWork) {
+        File file = repository.load(command.getId());
+        file.moveOnline();
+
+        FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
+        getFileApi(file.getSpace()).moveFileOnline(fileMetadata);
     }
 
     private void createFile(final CreateFileCommand command, UnitOfWork unitOfWork) {
@@ -133,7 +145,7 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
 
         checkUniqueName(command.getNewName(), file.getParentFolder(), file.getSpace(), command);
 
-        file.renameFile(command.getNewName());
+        file.rename(command.getNewName());
 
         getFileApi(file.getSpace()).renameFile(fileDao.getByUUID(file.getId().getId()), command.getNewName());
     }
@@ -150,7 +162,7 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
 
         checkUniqueName(file.getName(), command.getNewParent(), file.getSpace(), command);
 
-        file.moveFile(command.getNewParent(), command.getSentBy());
+        file.move(command.getNewParent(), command.getSentBy());
 
         cz.cvut.fel.integracniportal.model.Folder parent = null;
         if (command.getNewParent() != null) {
@@ -182,7 +194,7 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
 
         getFileApi(file.getSpace()).putFile(fileMetadata, fileUpload.getInputStream());
 
-        file.setSize(fileUpload.getByteReadCount());
+        file.updateContents(fileUpload.getByteReadCount());
     }
 
     public void setRepository(Repository<File> repository) {

@@ -35,7 +35,10 @@ public class Label extends AbstractAnnotatedAggregateRoot<LabelId> {
         apply(new LabelCreatedEvent(id, name, color, owner));
     }
 
-    public void update(String name, String color) {
+    public void edit(String name, String color) {
+        if (this.name.equals(name) && this.color.equals(color)) {
+            return; // no change
+        }
         apply(new LabelUpdatedEvent(id, name, color));
     }
 
@@ -45,20 +48,20 @@ public class Label extends AbstractAnnotatedAggregateRoot<LabelId> {
 
     public void addToNode(NodeId nodeId) {
         if (labeledNodes.contains(nodeId)) {
-            return;
+            return; // no change
         }
         apply(new LabelAddedToNodeEvent(id, nodeId));
     }
 
     public void removeFromNode(NodeId nodeId) {
         if (!labeledNodes.contains(nodeId)) {
-            return;
+            return; // no change
         }
         apply(new LabelRemovedFromNodeEvent(id, nodeId));
     }
 
     @EventSourcingHandler
-    public void onLabelCreated(LabelCreatedEvent event) {
+    public void handle(LabelCreatedEvent event) {
         id = event.getId();
         name = event.getName();
         color = event.getColor();
@@ -66,18 +69,23 @@ public class Label extends AbstractAnnotatedAggregateRoot<LabelId> {
     }
 
     @EventSourcingHandler
-    public void onLabelDeleted(LabelDeletedEvent event) {
+    public void handle(LabelUpdatedEvent event) {
+        name = event.getName();
+        color = event.getColor();
+    }
+
+    @EventSourcingHandler
+    public void handle(LabelDeletedEvent event) {
         markDeleted();
     }
 
     @EventSourcingHandler
-    public void labelAdded(LabelAddedToNodeEvent event) {
+    public void handle(LabelAddedToNodeEvent event) {
         labeledNodes.add(event.getNodeId());
     }
 
     @EventSourcingHandler
-    public void labelRemoved(LabelRemovedFromNodeEvent event) {
+    public void handle(LabelRemovedFromNodeEvent event) {
         labeledNodes.remove(event.getNodeId());
     }
-
 }

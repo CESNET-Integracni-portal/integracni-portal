@@ -139,8 +139,10 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     }
 
     @Override
-    public void copyFileToOutputStream(String fileuuid, OutputStream outputStream) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileuuid);
+    public void downloadFile(String id, OutputStream outputStream) {
+        gateway.send(new DownloadFileCommand(FileId.of(id)));
+
+        FileMetadata fileMetadata = getFileMetadataByUuid(id);
         String space = fileMetadata.getSpace();
 
         getFileApi(space).getFile(fileMetadata, outputStream);
@@ -148,22 +150,16 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @Override
     public void moveFileOnline(String fileId) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
-        if (fileMetadata.isOnline()) {
-            return;
-        }
-        fileMetadata.setOnline(true);
-        getFileApi(fileMetadata.getSpace()).moveFileOnline(fileMetadata);
+        gateway.sendAndWait(new MoveFileOnlineCommand(
+                FileId.of(fileId)
+        ));
     }
 
     @Override
     public void moveFileOffline(String fileId) {
-        FileMetadata fileMetadata = getFileMetadataByUuid(fileId);
-        if (fileMetadata.isOnline() == false) {
-            return;
-        }
-        fileMetadata.setOnline(false);
-        getFileApi(fileMetadata.getSpace()).moveFileOffline(fileMetadata);
+        gateway.sendAndWait(new MoveFileOfflineCommand(
+                FileId.of(fileId)
+        ));
     }
 
     @Override

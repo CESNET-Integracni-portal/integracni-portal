@@ -97,15 +97,13 @@ public class FileApiAdapter {
 
     public void moveFileOnline(FileMetadata fileMetadata) {
         if (fileRepository instanceof OfflinableFileRepository) {
-            // TODO
-//            ((OfflinableFileRepository) fileRepository).moveOnline();
+            ((OfflinableFileRepository) fileRepository).moveFileOnline(mapFile(fileMetadata));
         }
     }
 
     public void moveFileOffline(FileMetadata fileMetadata) {
         if (fileRepository instanceof OfflinableFileRepository) {
-            // TODO
-//            ((OfflinableFileRepository) fileRepository).moveOffline();
+            ((OfflinableFileRepository) fileRepository).moveFileOffline(mapFile(fileMetadata));
         }
     }
 

@@ -239,7 +239,7 @@ public class FileController extends AbstractController {
 
         ServletOutputStream outputStream = response.getOutputStream();
 
-        fileMetadataService.copyFileToOutputStream(fileId, outputStream);
+        fileMetadataService.downloadFile(fileId, outputStream);
 
         outputStream.flush();
         response.flushBuffer();

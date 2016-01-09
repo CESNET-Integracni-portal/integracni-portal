@@ -29,8 +29,8 @@ public class LabelCommandHandler {
     }
 
     @CommandHandler
-    public void handle(UpdateLabelCommand command) {
-        updateLabel(command);
+    public void handle(EditLabelCommand command) {
+        editLabel(command);
     }
 
     @CommandHandler
@@ -61,12 +61,12 @@ public class LabelCommandHandler {
         repository.add(label);
     }
 
-    private void updateLabel(UpdateLabelCommand command) {
+    private void editLabel(EditLabelCommand command) {
         Label label = repository.load(command.getId());
 
         checkUnique(label.getOwner(), command.getName(), command.getColor());
 
-        label.update(command.getName(), command.getColor());
+        label.edit(command.getName(), command.getColor());
     }
 
     private void deleteLabel(DeleteLabelCommand command) {

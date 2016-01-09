@@ -96,7 +96,7 @@ public interface FileMetadataService {
      *
      * @param fileuuid The uuid identifier of the file to be deleted.
      */
-    public void copyFileToOutputStream(String fileuuid, OutputStream outputStream);
+    public void downloadFile(String fileuuid, OutputStream outputStream);
 
     /**
      * Moves the file to online state.

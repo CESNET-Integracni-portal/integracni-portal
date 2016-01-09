@@ -75,10 +75,4 @@ public class UserRoleServiceImpl implements UserRoleService {
         ));
     }
 
-    @Override
-    public void deleteRole(String roleId) {
-        // TODO ??
-        //userRoleDao.delete(role);
-    }
-
 }

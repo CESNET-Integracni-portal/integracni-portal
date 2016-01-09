@@ -3,13 +3,13 @@ package cz.cvut.fel.integracniportal.integration.label
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import cz.cvut.fel.integracniportal.AbstractIntegrationSpecification
 import cz.cvut.fel.integracniportal.command.label.CreateLabelCommand
-import cz.cvut.fel.integracniportal.command.label.UpdateLabelCommand
+import cz.cvut.fel.integracniportal.command.label.EditLabelCommand
 import cz.cvut.fel.integracniportal.domain.label.valueobjects.LabelId
 import cz.cvut.fel.integracniportal.exceptions.AlreadyExistsException
 import cz.cvut.fel.integracniportal.model.Label
 
 /**
- * Integration test for {@link UpdateLabelCommand}.
+ * Integration test for {@link EditLabelCommand}.
  *
  * @author Radek Jezdik
  */
@@ -21,7 +21,7 @@ public class UpdateLabelIntegrationSpec extends AbstractIntegrationSpecification
             dispatch new CreateLabelCommand(LabelId.of("1"), "work", "red")
 
         when:
-            dispatch new UpdateLabelCommand(LabelId.of("1"), "school", "blue")
+            dispatch new EditLabelCommand(LabelId.of("1"), "school", "blue")
 
         then:
             def label = get(Label, "1")
@@ -37,7 +37,7 @@ public class UpdateLabelIntegrationSpec extends AbstractIntegrationSpecification
             dispatch new CreateLabelCommand(LabelId.of("2"), "school", "blue")
 
         when:
-            dispatch new UpdateLabelCommand(LabelId.of("1"), "school", "blue")
+            dispatch new EditLabelCommand(LabelId.of("1"), "school", "blue")
 
         then:
             thrown(AlreadyExistsException)

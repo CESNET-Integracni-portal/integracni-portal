@@ -7,12 +7,8 @@ import lombok.Value;
  * @author Radek Jezdik
  */
 @Value
-public class FileSizeChangedEvent {
+public class FileDownloadedEvent {
 
     private final FileId id;
-
-    private final long newSize;
-
-    private final long originalSize;
 
 }

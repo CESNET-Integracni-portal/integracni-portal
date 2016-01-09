@@ -30,8 +30,6 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     private static final String HOME_FOLDER_PREFIX = "home_";
 
-    private static final String BIN_FOLDER_PREFIX = "bin_";
-
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
     @Autowired
@@ -90,29 +88,17 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     @Override
     public void moveFolder(FolderDefinition from, FolderDefinition to) {
-
+        // no code - files are in one folder anyway
     }
 
     @Override
     public void moveFolderToBin(FolderDefinition folder) {
-        SftpChannel sftpChannel = null;
-        try {
-            sftpChannel = sftpChannelChannelProvider.get();
-            String path = getUserBinFolder(folder.getOwner()) + "/" + folder.getPath();
-            createFolderPath(path.split("/", -1));
-            sftpChannel.renameFolder(getHomeFolderPath(folder), getBinFolderPath(folder));
-        } catch (SftpException e) {
-            throw new ServiceAccessException("Could not move folder to bin", e);
-        } finally {
-            if (sftpChannel != null) {
-                sftpChannel.returnToPool();
-            }
-        }
+        // no code - files are in one folder anyway
     }
 
     @Override
     public void renameFolder(String newName, FolderDefinition folder) {
-
+        // no code - files are in one folder anyway
     }
 
     @Override
@@ -153,18 +139,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     @Override
     public void moveFileToBin(FileDefinition file) {
-        SftpChannel sftpChannel = null;
-        try {
-            sftpChannel = sftpChannelChannelProvider.get();
-            createFolderPath(getBinFolderPath(file.getFolder()).split("/"));
-            sftpChannel.renameFile(getHomeFolderPath(file.getFolder()) + "/" + file.getId(), getBinFolderPath(file.getFolder()) + "/" + file.getId());
-        } catch (SftpException e) {
-            throw new ServiceAccessException("Could not move file to bin", e);
-        } finally {
-            if (sftpChannel != null) {
-                sftpChannel.returnToPool();
-            }
-        }
+        // no code - files are in one folder anyway
     }
 
     @Override
@@ -204,7 +179,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sshChannel = sshResourceProvider.get();
 
-            String filePath = getHomeFolderPath(file.getFolder()) + "/" + file.getId();
+            String filePath = getUserHomeFolder(file.getOwner()) + "/" + file.getId();
             List<String> lsOutput = sshChannel.sendCommand("dmls -l " + filePath);
             if (lsOutput.size() != 1) {
                 throw new FileNotFoundException("Could not get file metadata from CESNET");
@@ -243,7 +218,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sshChannel = sshResourceProvider.get();
 
-            String filePath = getHomeFolderPath(file.getFolder()) + "/" + file.getId();
+            String filePath = getUserHomeFolder(file.getOwner()) + "/" + file.getId();
             List<String> response = sshChannel.sendCommand("dmput -r " + filePath);
             if (response.size() > 0) {
                 throw new FileAccessException(response.get(0));
@@ -261,7 +236,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sshChannel = sshResourceProvider.get();
 
-            String filePath = getHomeFolderPath(file.getFolder()) + "/" + file.getId();
+            String filePath = getUserHomeFolder(file.getOwner()) + "/" + file.getId();
             List<String> response = sshChannel.sendCommand("dmget " + filePath);
             if (response.size() > 0) {
                 throw new FileAccessException(response.get(0));
@@ -279,22 +254,6 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
             orgUnitId = "";
         }
         return ROOT_DIR + "/" + orgUnitId + "/" + HOME_FOLDER_PREFIX + user.getId();
-    }
-
-    private String getUserBinFolder(User user) {
-        String orgUnitId = user.getOrganizationalUnitId();
-        if (orgUnitId == null) {
-            orgUnitId = "";
-        }
-        return ROOT_DIR + "/" + orgUnitId + "/" + BIN_FOLDER_PREFIX + user.getId();
-    }
-
-    private String getHomeFolderPath(FolderDefinition folder) {
-        return getUserHomeFolder(folder.getOwner()) + "/" + folder.getPath();
-    }
-
-    private String getBinFolderPath(FolderDefinition folder) {
-        return getUserBinFolder(folder.getOwner()) + "/" + folder.getPath();
     }
 
     public Date toDate(String date) throws ParseException {

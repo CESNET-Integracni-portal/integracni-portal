@@ -7,7 +7,7 @@ import lombok.Value;
  * @author Radek Jezdik
  */
 @Value
-public class UpdateLabelCommand {
+public class EditLabelCommand {
 
     private final LabelId id;
 

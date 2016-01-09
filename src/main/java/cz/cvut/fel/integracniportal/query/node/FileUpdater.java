@@ -4,6 +4,7 @@ import cz.cvut.fel.integracniportal.dao.FileMetadataDao;
 import cz.cvut.fel.integracniportal.dao.FolderDao;
 import cz.cvut.fel.integracniportal.dao.UserDetailsDao;
 import cz.cvut.fel.integracniportal.domain.node.events.*;
+import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileState;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
@@ -43,8 +44,7 @@ public class FileUpdater {
         file.setFilesize(event.getSize());
         file.setParent(parentFolder);
 
-        file.setOnline(true);
-        //TODO file.setOnline(event.getFileState());
+        file.setOnline(event.getFileState() == FileState.ONLINE ? true : false);
 
         fileDao.createFileMetadata(file);
     }
@@ -77,7 +77,7 @@ public class FileUpdater {
     }
 
     @EventHandler
-    public void changeSize(FileSizeChangedEvent event) {
+    public void changeSize(FileContentsChangedEvent event) {
         FileMetadata file = fileDao.load(event.getId().getId());
 
         file.setFilesize(event.getNewSize());

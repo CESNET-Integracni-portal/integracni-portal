@@ -7,7 +7,7 @@ import lombok.Value;
  * @author Radek Jezdik
  */
 @Value
-public class StartMovingFileOfflineEvent {
+public class FileMovedOnlineEvent {
 
     private FileId id;
 

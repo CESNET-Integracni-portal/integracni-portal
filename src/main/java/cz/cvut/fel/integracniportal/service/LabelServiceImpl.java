@@ -60,7 +60,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Label updateLabel(String labelId, LabelRepresentation labelRepresentation) {
-        commandGateway.sendAndWait(new UpdateLabelCommand(
+        commandGateway.sendAndWait(new EditLabelCommand(
                 LabelId.of(labelId),
                 labelRepresentation.getName(),
                 labelRepresentation.getColor()
