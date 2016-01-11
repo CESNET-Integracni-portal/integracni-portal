@@ -7,15 +7,16 @@ import cz.cvut.fel.integracniportal.exceptions.PolicyNotFoundException;
 /**
  * @author Eldar Iosip
  */
-public enum PolicyType {
+public enum PolicyState {
 
-    NOTICATION("NOTIFY"),
-    REMOVE("REMOVE"),
-    NONE("NONE");
+    AWAITING("AWAITING"),
+    AWAITING_REMOVAL("AWAITING_REMOVAL"),
+    AWAITING_NOTIFICATION("AWAITING_NOTIFICATION"),
+    FAILED_REMOVAL("FAILED_REMOVAL");
 
     private String name;
 
-    PolicyType(String name) {
+    PolicyState(String name) {
         this.name = name;
     }
 
@@ -30,12 +31,12 @@ public enum PolicyType {
     }
 
     @JsonCreator
-    public static PolicyType create(String name) throws PolicyNotFoundException {
-        PolicyType permission;
+    public static PolicyState create(String name) throws PolicyNotFoundException {
+        PolicyState permission;
         try {
-            permission = PolicyType.valueOf(name);
+            permission = PolicyState.valueOf(name);
         } catch (IllegalArgumentException e) {
-            throw new PolicyNotFoundException("policy.notFound", name);
+            throw new PolicyNotFoundException("policy.state.notFound", name);
         }
         return permission;
     }

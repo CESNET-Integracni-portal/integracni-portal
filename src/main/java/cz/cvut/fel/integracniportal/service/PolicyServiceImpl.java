@@ -3,10 +3,7 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.dao.PolicyDao;
 import cz.cvut.fel.integracniportal.exceptions.AccessDeniedException;
 import cz.cvut.fel.integracniportal.exceptions.PolicyNotFoundException;
-import cz.cvut.fel.integracniportal.model.Node;
-import cz.cvut.fel.integracniportal.model.Policy;
-import cz.cvut.fel.integracniportal.model.PolicyType;
-import cz.cvut.fel.integracniportal.model.UserDetails;
+import cz.cvut.fel.integracniportal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +50,7 @@ public class PolicyServiceImpl implements PolicyService {
 
         policyDao.save(policy);
 
-        this.updateNodePolicyState(policy.getNode(), type);
+        updateNodePolicyState(node, policy);
 
         return policy;
     }
@@ -70,7 +67,7 @@ public class PolicyServiceImpl implements PolicyService {
         policy.setPolicyType(type);
         policyDao.save(policy);
 
-        this.updateNodePolicyState(policy.getNode(), type);
+        updateNodePolicyState(policy.getNode(), policy);
 
         return policy;
     }
@@ -84,7 +81,20 @@ public class PolicyServiceImpl implements PolicyService {
 
         policyDao.delete(policy);
 
-        this.updateNodePolicyState(policy.getNode(), null);
+        policy.getNode().getPolicies().remove(policy);
+        nodeService.saveNode(policy.getNode());
+    }
+
+    @Override
+    public List<Policy> getNodePolicies(Long nodeId) {
+        UserDetails currentUser = userDetailsService.getCurrentUser();
+        Node node = nodeService.getNodeById(nodeId);
+
+        if (!node.getOwner().equals(currentUser)) {
+            throw new AccessDeniedException("policy.Accessdenied");
+        }
+
+        return node.getPolicies();
     }
 
     @Override
@@ -100,40 +110,22 @@ public class PolicyServiceImpl implements PolicyService {
                     } catch (Exception e) {
                         policy.increaseAttempts();
                         if (policy.getAttempts() == MAXIMUM_CRON_ATTEMPTS) {
-                            node.setCurrentPolicy(PolicyType.FAILED_REMOVAL);
+                            node.setPolicyState(PolicyState.FAILED_REMOVAL);
                             nodeService.saveNode(node);
                             policy.setProcessed(true);
                         }
                     }
                     break;
                 case NOTICATION:
-                    node.setCurrentPolicy(PolicyType.NOTICATION);
+                    node.setPolicyState(PolicyState.AWAITING_NOTIFICATION);
                     nodeService.saveNode(node);
                     break;
             }
         }
     }
 
-    /**
-     * Update node policy state.
-     * <p>
-     * Informative state about the a process, the selected policy will initiate
-     *
-     * @param node affected by the policy
-     * @param type of the policy
-     */
-    private void updateNodePolicyState(Node node, PolicyType type) {
-        PolicyType semiType;
-
-        switch (type) {
-            case REMOVE:
-                semiType = PolicyType.AWAITING_REMOVAL;
-                break;
-            default:
-                semiType = null;
-        }
-
-        node.setCurrentPolicy(semiType);
+    private void updateNodePolicyState(Node node, Policy policy) {
+        node.setPolicyState(getPolicyState(policy));
         nodeService.saveNode(node);
     }
 
@@ -145,6 +137,17 @@ public class PolicyServiceImpl implements PolicyService {
 
         if (!user.equals(policy.getNode().getOwner())) {
             throw new AccessDeniedException("Only the owner is able to set the policies.");
+        }
+    }
+
+    private PolicyState getPolicyState(Policy policy) {
+        switch (policy.getType()) {
+            case REMOVE:
+                return PolicyState.AWAITING_REMOVAL;
+            case NOTICATION:
+                return PolicyState.AWAITING_NOTIFICATION;
+            default:
+                return PolicyState.AWAITING;
         }
     }
 }

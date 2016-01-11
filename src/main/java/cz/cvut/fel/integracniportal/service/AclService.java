@@ -40,11 +40,40 @@ public interface AclService {
      */
     public void updateAceParent(Node node, Node parent);
 
+    /**
+     * Update ACE record for selected Node (user), may be propageted down the tree.
+     *
+     * @param nodeId      target
+     * @param userId      target
+     * @param permissions list
+     */
     public void updateNodeAceByUser(Long nodeId, Long userId, Set<AccessControlPermission> permissions);
 
+    /**
+     * Update ACE record for selected Node (group), may be propageted down the tree.
+     *
+     * @param nodeId      target
+     * @param groupId     target
+     * @param permissions list
+     */
     public void updateNodeAceByGroup(Long nodeId, Long groupId, Set<AccessControlPermission> permissions);
 
+    /**
+     * Check if user has an ACP.
+     *
+     * @param nodeId     target node
+     * @param userId     to check
+     * @param permission to check
+     * @return true if has
+     */
     public boolean userHasAcPermission(Long nodeId, Long userId, AccessControlPermission permission);
 
+    /**
+     * Return a set of shared nodes.
+     *
+     * @param spaceId     for space
+     * @param currentUser by user
+     * @return set of nodes or empty set, when no records found
+     */
     public Set<Node> getSharedNodes(String spaceId, UserDetails currentUser);
 }

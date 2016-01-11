@@ -5,6 +5,7 @@ import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.*;
 
@@ -63,12 +64,13 @@ public abstract class Node extends AbstractEntity<Long> {
     @OneToMany(mappedBy = "targetNode", orphanRemoval = true)
     private List<AccessControlEntry> acEntries;
 
-    @Column(name = "current_policy")
+    @Column(name = "policy_state")
     @Enumerated(EnumType.STRING)
-    private PolicyType currentPolicy;
+    private PolicyState policyState;
 
     @OneToMany(mappedBy = "node", orphanRemoval = true)
     @Cascade({CascadeType.ALL})
+    @OrderBy("activeAfter")
     private List<Policy> policies;
 
     public Node() {
@@ -200,12 +202,12 @@ public abstract class Node extends AbstractEntity<Long> {
         this.acEntries = acEntries;
     }
 
-    public PolicyType getCurrentPolicy() {
-        return currentPolicy;
+    public PolicyState getPolicyState() {
+        return policyState;
     }
 
-    public void setCurrentPolicy(PolicyType currentPolicy) {
-        this.currentPolicy = currentPolicy;
+    public void setPolicyState(PolicyState policyState) {
+        this.policyState = policyState;
     }
 
     public List<Policy> getPolicies() {

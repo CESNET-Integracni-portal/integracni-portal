@@ -19,9 +19,6 @@ public class PolicyRepresentation {
 
     private boolean isProcessed;
 
-    public PolicyRepresentation() {
-    }
-
     public PolicyRepresentation(Policy policy) {
         this.id = policy.getId();
         this.activeAfter = policy.getActiveAfter();

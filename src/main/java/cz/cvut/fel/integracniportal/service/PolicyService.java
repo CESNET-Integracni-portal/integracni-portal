@@ -5,6 +5,7 @@ import cz.cvut.fel.integracniportal.model.PolicyType;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,13 +30,13 @@ public interface PolicyService {
     Policy createPolicy(Long nodeId, PolicyType type, Date activeAfter);
 
     /**
-     * Create new policy rule for user on node.
+     * Update existing policy
      *
-     * @param nodeId      Node affected by the policy
-     * @param type        PolicyType type, determining the action initiated in future
-     * @param activeAfter Earliest date and time when the action should be processed
+     * @param policyId    identification
+     * @param type        new PolicyType
+     * @param activeAfter new date
      */
-    Policy updatePolicy(Long nodeId, PolicyType type, Date activeAfter);
+    Policy updatePolicy(Long policyId, PolicyType type, Date activeAfter);
 
     /**
      * Delete policy.
@@ -45,7 +46,14 @@ public interface PolicyService {
     void deletePolicy(Long policyId);
 
     /**
-     * Process policies.
+     * Return all policies stored on node.
+     *
+     * @param nodeId Node to query
+     */
+    List<Policy> getNodePolicies(Long nodeId);
+
+    /**
+     * Process policies by provided date.
      *
      * @param date from where to start the policy search
      */

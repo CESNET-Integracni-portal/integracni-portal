@@ -21,6 +21,8 @@ public class FileDefinition {
 
     private FolderDefinition folder;
 
+    private String salt;
+
     public Long getId() {
         return id;
     }
@@ -75,5 +77,13 @@ public class FileDefinition {
 
     public void setFolder(FolderDefinition folder) {
         this.folder = folder;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

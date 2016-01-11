@@ -38,16 +38,4 @@ public class PolicyController extends AbstractController {
         return new ResponseEntity<PolicyTypeRepresentation>(representation, HttpStatus.OK);
     }
 
-    /**
-     * Process all the policies
-     * TODO: testing only !!! Remove
-     */
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/v0.2/policy", method = RequestMethod.PUT)
-    public ResponseEntity processPolicies() {
-        policyService.processByDate(new Date());
-
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
 }

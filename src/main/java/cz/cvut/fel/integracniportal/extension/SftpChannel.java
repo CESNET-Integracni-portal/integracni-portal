@@ -52,14 +52,16 @@ public class SftpChannel {
         sftpChannel.cd(path);
     }
 
-    public void getFile(String name, OutputStream outputStream) throws SftpException, IOException {
+    public InputStream getFile(String name, OutputStream outputStream) throws SftpException, IOException {
         InputStream inputStream = sftpChannel.get(name);
 
-        IOUtils.copyLarge(inputStream, outputStream);
+        //IOUtils.copyLarge(inputStream, outputStream);
 
-        outputStream.flush();
+        //outputStream.flush();
 
         sftpChannel.disconnect();
+
+        return inputStream;
     }
 
     public void mkdir(String path) throws SftpException {

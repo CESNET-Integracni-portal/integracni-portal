@@ -38,6 +38,8 @@ public class AclController extends AbstractController {
     }
 
     /**
+     * Update user ACL for selected Node.
+     *
      * @param nodeId            Node identifier
      * @param userId            Target user identifier
      * @param acpRepresentation Object containing the array of AccessControlPermission instances
@@ -54,6 +56,8 @@ public class AclController extends AbstractController {
     }
 
     /**
+     * Update user ACL for selected Group.
+     *
      * @param nodeId                                Node identifier
      * @param groupId                               Target group identifier
      * @param accessControlPermissionRepresentation Object containing the array of AccessControlPermission instances
@@ -70,6 +74,8 @@ public class AclController extends AbstractController {
     }
 
     /**
+     * Get ACL for user on specified Node (merged with group permissions).
+     *
      * @param nodeId Node identifier
      * @param userId Target user identifier
      * @return ResponseEntity

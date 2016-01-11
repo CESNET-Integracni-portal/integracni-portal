@@ -5,11 +5,15 @@ import cz.cvut.fel.integracniportal.model.*;
 import cz.cvut.fel.integracniportal.representation.FileMetadataRepresentation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Implementation of the {@link FileMetadataService}.
@@ -19,6 +23,8 @@ import java.util.List;
 public class FileMetadataServiceImpl implements FileMetadataService {
 
     private static final Logger logger = Logger.getLogger(FileMetadataServiceImpl.class);
+
+    private static final Random RANDOM = new SecureRandom();
 
     @Autowired
     private FileMetadataDao fileMetadataDao;
@@ -103,6 +109,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         fileMetadata.setSpace(space);
         fileMetadata.setFilesize(0L);
         fileMetadata.setAcParent(aclService.getAceParent(parent));
+        fileMetadata.setSalt(getSalt());
 
         createFileMetadata(fileMetadata);
 
@@ -226,4 +233,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
     private FileApiAdapter getFileApi(String type) {
         return new FileApiAdapter(fileRepositoryService.getOfType(type));
     }
+
+    private static String getSalt() {
+        return KeyGenerators.string().generateKey();
+    }
+
 }

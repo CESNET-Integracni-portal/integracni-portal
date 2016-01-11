@@ -2,3 +2,5 @@
 target
 integracni-portal.iml
 .DS_Store
+etc/cesnet.properties
+etc/portal.properties

@@ -5,13 +5,16 @@ import cz.cvut.fel.integracniportal.api.*;
 import cz.cvut.fel.integracniportal.exceptions.FileAccessException;
 import cz.cvut.fel.integracniportal.exceptions.FileNotFoundException;
 import cz.cvut.fel.integracniportal.exceptions.ServiceAccessException;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.encrypt.BytesEncryptor;
+import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Provider;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,7 +25,7 @@ import java.util.List;
  * @author Radek Jezdik
  */
 @Component
-public class CesnetFileRepository implements FileRepository, OfflinableFileRepository, BinFileRepository {
+public class CesnetFileRepository implements FileRepository, OfflinableFileRepository, BinFileRepository, EncryptableRepository {
 
     private static final Logger logger = Logger.getLogger(CesnetFileRepository.class);
 
@@ -34,11 +37,17 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
+    private String encryptionPassword;
+
     @Autowired
     private Provider<SshChannel> sshResourceProvider;
 
     @Autowired
     private Provider<SftpChannel> sftpChannelChannelProvider;
+
+    public void setEncryptionPassword(String encryptionPassword) {
+        this.encryptionPassword = encryptionPassword;
+    }
 
     @Override
     public String getName() {
@@ -125,7 +134,7 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
             createFolderPath(toArray(path));
             sftpChannel.cd(path);
 
-            sftpChannel.uploadFile(stream, "" + file.getId());
+            sftpChannel.uploadFile(encrypt(stream, file.getSalt()), "" + file.getId());
         } catch (SftpException e) {
             throw new ServiceAccessException("Could not upload file", e);
         } finally {
@@ -141,7 +150,10 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
         try {
             sftpChannel = sftpChannelChannelProvider.get();
             sftpChannel.cd(getUserHomeFolder(file.getOwner()));
-            sftpChannel.getFile("" + file.getId(), outputStream);
+            InputStream encryptedFile = sftpChannel.getFile("" + file.getId(), outputStream);
+
+            IOUtils.copyLarge(decrypt(encryptedFile, file.getSalt()), outputStream);
+            outputStream.flush();
         } catch (Exception e) {
             throw new FileAccessException("Could not get file", e);
         } finally {
@@ -304,5 +316,38 @@ public class CesnetFileRepository implements FileRepository, OfflinableFileRepos
 
     private String[] toArray(String path) {
         return path.split("/", -1);
+    }
+
+    @Override
+    public InputStream encrypt(InputStream file, String salt) {
+        BytesEncryptor encryptor = Encryptors.standard(encryptionPassword, salt);
+        ByteArrayOutputStream outFile = new ByteArrayOutputStream();
+
+        try {
+            System.out.println(javax.crypto.Cipher.getMaxAllowedKeyLength("AES"));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            byte[] input = new byte[64];
+            int bytesRead;
+
+            while ((bytesRead = file.read(input)) != -1) {
+                outFile.write(input);
+            }
+            outFile.flush();
+            outFile.close();
+        } catch (java.io.FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ByteArrayInputStream(encryptor.encrypt(outFile.toByteArray()));
+    }
+
+    @Override
+    public InputStream decrypt(InputStream file, String salt) {
+        return null;
     }
 }

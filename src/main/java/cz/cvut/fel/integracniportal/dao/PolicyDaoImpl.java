@@ -21,7 +21,7 @@ public class PolicyDaoImpl extends GenericHibernateDao<Policy> implements Policy
     @Override
     public List<Policy> findByActiveAfter(Date date) {
         return from(policy)
-                .where(policy.isProcessed.isFalse().and(policy.activeAfter.after(date)))
+                .where(policy.isProcessed.isFalse().and(policy.activeAfter.before(date)))
                 .list(policy);
     }
 }

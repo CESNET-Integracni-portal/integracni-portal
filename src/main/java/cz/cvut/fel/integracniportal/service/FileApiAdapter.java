@@ -158,6 +158,7 @@ public class FileApiAdapter {
         fileDefinition.setDateCreated(fileMetadata.getCreatedOn());
         fileDefinition.setFolder(mapFolder(fileMetadata.getParent(), fileMetadata.getOwner()));
         fileDefinition.setOwner(mapUser(fileMetadata.getOwner()));
+        fileDefinition.setSalt(fileMetadata.getSalt());
 
         return fileDefinition;
     }

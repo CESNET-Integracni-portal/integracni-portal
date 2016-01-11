@@ -26,6 +26,10 @@
         <property name="sshDataSource" ref="sshDataSource"/>
     </bean>
 
+    <bean id="cesnetFileRepository" class="cz.cvut.fel.integracniportal.extension.CesnetFileRepository">
+        <property name="encryptionPassword" value="${enc.password}"/>
+    </bean>
+
     <bean id="sftpResource"
           class="cz.cvut.fel.integracniportal.extension.SftpChannel"
           scope="prototype">

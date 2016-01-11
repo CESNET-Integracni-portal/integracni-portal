@@ -9,11 +9,17 @@ import cz.cvut.fel.integracniportal.representation.SharedNodeRepresentation;
  */
 public interface NodeService {
 
-    public Node getNodeById(Long nodeId);
+    Node getNodeById(Long nodeId);
 
-    public SharedNodeRepresentation getSharedNodeRepresentation(String spaceId);
+    /**
+     * Return a list of files and folders shared via ACL.
+     *
+     * @param spaceId string
+     * @return SharedNodeRepresentation
+     */
+    SharedNodeRepresentation getSharedNodeRepresentation(String spaceId);
 
-    public void saveNode(Node node);
+    void saveNode(Node node);
 
     void removeNode(Node node, boolean removeFromRepository);
 

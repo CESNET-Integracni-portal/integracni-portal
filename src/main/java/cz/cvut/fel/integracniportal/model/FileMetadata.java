@@ -22,6 +22,9 @@ public class FileMetadata extends Node {
     @Column(name = "online")
     private boolean online;
 
+    @Column(name = "salt")
+    private String salt;
+
     public String getMimetype() {
         return mimetype;
     }
@@ -60,6 +63,14 @@ public class FileMetadata extends Node {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     @Override

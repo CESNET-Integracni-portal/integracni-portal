@@ -82,10 +82,10 @@ public class NodeServiceImpl implements NodeService {
             fileMetadataService.deleteFile(fileMetadata, true);
         }
 
-
-        if (removeFromRepository) {
-            //TODO: remove node from repository
-            //getFileApi(node.getSpace()).moveFolderToBin(folder);
+        if (node.isFolder() && removeFromRepository) {
+            getFileApi(node.getSpace()).moveFolderToBin((Folder) node);
+        } else if (!node.isFolder() && removeFromRepository) {
+            getFileApi(node.getSpace()).moveFileToBin((FileMetadata) node);
         }
 
         nodeDao.delete(node);
