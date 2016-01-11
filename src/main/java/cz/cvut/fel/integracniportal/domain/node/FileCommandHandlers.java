@@ -41,27 +41,88 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
 
     @CommandHandler
     public void handle(CreateFileCommand command, UnitOfWork unitOfWork) {
-        createFile(command, unitOfWork);
+        checkUniqueName(command.getName(), command.getParentFolder(), command.getSpace(), command);
+
+        FileUpload fileUpload = command.getFileUpload();
+
+        sendFileToRepository(fileUpload, command, unitOfWork);
+
+        File file = new File(
+                command.getId(),
+                command.getName(),
+                command.getParentFolder(),
+                command.getOwner(),
+                command.getSpace(),
+                fileUpload.getByteReadCount(),
+                fileUpload.getContentType(),
+                command.getFileState().orElse(FileState.ONLINE));
+
+        repository.add(file);
     }
 
     @CommandHandler
     public void handle(RenameFileCommand command) {
-        renameFile(command);
+        File file = repository.load(command.getId());
+
+        if (file.getName().equals(command.getNewName())) {
+            return;
+        }
+
+        checkUniqueName(command.getNewName(), file.getParentFolder(), file.getSpace(), command);
+
+        file.rename(command.getNewName());
+
+        getFileApi(file.getSpace()).renameFile(fileDao.getByUUID(file.getId().getId()), command.getNewName());
     }
 
     @CommandHandler
     public void handle(MoveFileCommand command) {
-        moveFile(command);
+        File file = repository.load(command.getId());
+
+        if (file.getParentFolder() == null && command.getNewParent() == null) {
+            return;
+        }
+        if (file.getParentFolder() != null && file.getParentFolder().equals(command.getNewParent())) {
+            return;
+        }
+
+        checkUniqueName(file.getName(), command.getNewParent(), file.getSpace(), command);
+
+        file.move(command.getNewParent(), command.getSentBy());
+
+        cz.cvut.fel.integracniportal.model.Folder parent = null;
+        if (command.getNewParent() != null) {
+            parent = folderDao.get(command.getNewParent().getId());
+        }
+        getFileApi(file.getSpace()).moveFile(fileDao.getByUUID(file.getId().getId()), parent);
     }
 
     @CommandHandler
     public void handle(DeleteFileCommand command, UnitOfWork unitOfWork) {
-        deleteFile(command, unitOfWork);
+        final File file = repository.load(command.getId());
+
+        final FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
+
+        unitOfWork.registerListener(new UnitOfWorkListenerAdapter() {
+            @Override
+            public void afterCommit(UnitOfWork unitOfWork) {
+                getFileApi(fileMetadata.getSpace()).deleteFile(fileMetadata);
+            }
+        });
+
+        file.delete();
     }
 
     @CommandHandler
     public void handle(UpdateFileContentsCommand command) {
-        updateFileContents(command);
+        File file = repository.load(command.getId());
+
+        FileUpload fileUpload = command.getFileUpload();
+        FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
+
+        getFileApi(file.getSpace()).putFile(fileMetadata, fileUpload.getInputStream());
+
+        file.updateContents(fileUpload.getByteReadCount());
     }
 
     @CommandHandler
@@ -86,26 +147,6 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
 
         FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
         getFileApi(file.getSpace()).moveFileOnline(fileMetadata);
-    }
-
-    private void createFile(final CreateFileCommand command, UnitOfWork unitOfWork) {
-        checkUniqueName(command.getName(), command.getParentFolder(), command.getSpace(), command);
-
-        FileUpload fileUpload = command.getFileUpload();
-
-        sendFileToRepository(fileUpload, command, unitOfWork);
-
-        File file = new File(
-                command.getId(),
-                command.getName(),
-                command.getParentFolder(),
-                command.getOwner(),
-                command.getSpace(),
-                fileUpload.getByteReadCount(),
-                fileUpload.getContentType(),
-                command.getFileState().orElse(FileState.ONLINE));
-
-        repository.add(file);
     }
 
     private void sendFileToRepository(FileUpload fileUpload, final CreateFileCommand command, UnitOfWork unitOfWork) {
@@ -134,67 +175,6 @@ public class FileCommandHandlers extends AbstractNodeCommandHandler {
             }
 
         });
-    }
-
-    private void renameFile(RenameFileCommand command) {
-        File file = repository.load(command.getId());
-
-        if (file.getName().equals(command.getNewName())) {
-            return;
-        }
-
-        checkUniqueName(command.getNewName(), file.getParentFolder(), file.getSpace(), command);
-
-        file.rename(command.getNewName());
-
-        getFileApi(file.getSpace()).renameFile(fileDao.getByUUID(file.getId().getId()), command.getNewName());
-    }
-
-    private void moveFile(MoveFileCommand command) {
-        File file = repository.load(command.getId());
-
-        if (file.getParentFolder() == null && command.getNewParent() == null) {
-            return;
-        }
-        if (file.getParentFolder() != null && file.getParentFolder().equals(command.getNewParent())) {
-            return;
-        }
-
-        checkUniqueName(file.getName(), command.getNewParent(), file.getSpace(), command);
-
-        file.move(command.getNewParent(), command.getSentBy());
-
-        cz.cvut.fel.integracniportal.model.Folder parent = null;
-        if (command.getNewParent() != null) {
-            parent = folderDao.get(command.getNewParent().getId());
-        }
-        getFileApi(file.getSpace()).moveFile(fileDao.getByUUID(file.getId().getId()), parent);
-    }
-
-    private void deleteFile(DeleteFileCommand command, UnitOfWork unitOfWork) {
-        final File file = repository.load(command.getId());
-
-        final FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
-
-        unitOfWork.registerListener(new UnitOfWorkListenerAdapter() {
-            @Override
-            public void afterCommit(UnitOfWork unitOfWork) {
-                getFileApi(fileMetadata.getSpace()).deleteFile(fileMetadata);
-            }
-        });
-
-        file.delete();
-    }
-
-    private void updateFileContents(UpdateFileContentsCommand command) {
-        File file = repository.load(command.getId());
-
-        FileUpload fileUpload = command.getFileUpload();
-        FileMetadata fileMetadata = fileDao.getByUUID(command.getId().getId());
-
-        getFileApi(file.getSpace()).putFile(fileMetadata, fileUpload.getInputStream());
-
-        file.updateContents(fileUpload.getByteReadCount());
     }
 
     public void setRepository(Repository<File> repository) {

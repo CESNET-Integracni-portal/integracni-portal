@@ -18,14 +18,14 @@ public class PasswordResetIntegrationSpec extends AbstractIntegrationSpecificati
     def "should reset user password by token if password was forgotten"() {
         given:
             dispatch new CreateUserCommand(UserId.of("1"), "tester1", "test@example.com")
-            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, "foo")
+            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, password("foo"))
 
             def user = getUser("1")
             assert user.password == "foo"
 
         when:
             dispatch new ResetUserPasswordCommand(UserId.of("1"))
-            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, "bar")
+            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, password("bar"))
 
         then:
             def user2 = getUser("1")
@@ -35,7 +35,7 @@ public class PasswordResetIntegrationSpec extends AbstractIntegrationSpecificati
     def "should throw exception if unknown token was passed"() {
         given:
             dispatch new CreateUserCommand(UserId.of("1"), "tester1", "test@example.com")
-            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, "initialPassword")
+            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, password("initialPassword"))
 
             assert getUser("1").password == "initialPassword"
 
@@ -43,7 +43,7 @@ public class PasswordResetIntegrationSpec extends AbstractIntegrationSpecificati
             dispatch new ResetUserPasswordCommand(UserId.of("1"))
 
             def unknownToken = ";@;666;@;"
-            dispatch new SetUserPasswordCommand(unknownToken, "newPassword")
+            dispatch new SetUserPasswordCommand(unknownToken, password("newPassword"))
 
         then:
             def user = getUser("1")

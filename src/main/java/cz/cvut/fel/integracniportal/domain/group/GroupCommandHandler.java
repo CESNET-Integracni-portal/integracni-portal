@@ -25,30 +25,6 @@ public class GroupCommandHandler {
 
     @CommandHandler
     public void handle(CreateGroupCommand command) {
-        createGroup(command);
-    }
-
-    @CommandHandler
-    public void handle(RenameGroupCommand command) {
-        renameGroup(command);
-    }
-
-    @CommandHandler
-    public void handle(DeleteGroupCommand command) {
-        deleteGroup(command);
-    }
-
-    @CommandHandler
-    public void handle(AddUserToGroupCommand command) {
-        addUserToGroup(command);
-    }
-
-    @CommandHandler
-    public void handle(RemoveUserFromGroupCommand command) {
-        removeUserFromGroup(command);
-    }
-
-    private void createGroup(CreateGroupCommand command) {
         checkUnique(command.getSentBy(), command.getName());
 
         Group group = new Group(
@@ -60,7 +36,8 @@ public class GroupCommandHandler {
         repository.add(group);
     }
 
-    private void renameGroup(RenameGroupCommand command) {
+    @CommandHandler
+    public void handle(RenameGroupCommand command) {
         Group group = repository.load(command.getId());
 
         checkUnique(group.getOwner(), command.getNewName());
@@ -68,17 +45,20 @@ public class GroupCommandHandler {
         group.rename(command.getNewName());
     }
 
-    private void deleteGroup(DeleteGroupCommand command) {
+    @CommandHandler
+    public void handle(DeleteGroupCommand command) {
         Group group = repository.load(command.getId());
         group.delete();
     }
 
-    private void addUserToGroup(AddUserToGroupCommand command) {
+    @CommandHandler
+    public void handle(AddUserToGroupCommand command) {
         Group group = repository.load(command.getId());
         group.addUser(command.getUser());
     }
 
-    private void removeUserFromGroup(RemoveUserFromGroupCommand command) {
+    @CommandHandler
+    public void handle(RemoveUserFromGroupCommand command) {
         Group group = repository.load(command.getId());
         group.removeUser(command.getUser());
     }

@@ -4,6 +4,7 @@ import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import lombok.Value;
 
 /**
+ * A command that issues a users password reset.
  * @author Radek Jezdik
  */
 @Value

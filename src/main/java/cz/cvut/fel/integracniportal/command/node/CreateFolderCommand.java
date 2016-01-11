@@ -10,7 +10,7 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class CreateFolderCommand extends AbstractNodeCommand<FolderId> {
+public class CreateFolderCommand extends AbstractCreateNodeCommand<FolderId> {
 
     public CreateFolderCommand(FolderId id, String name, FolderId parentFolder, UserId owner, String space) {
         super(id, name, parentFolder, owner, space);

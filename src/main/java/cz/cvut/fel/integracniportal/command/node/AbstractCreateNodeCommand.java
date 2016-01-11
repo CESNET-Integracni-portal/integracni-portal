@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
+ * An abstract class for Create commands of nodes (files and folders).
+ *
  * @author Radek Jezdik
  */
 @Getter
 @AllArgsConstructor
-abstract public class AbstractNodeCommand<T> extends UserAwareCommand {
+abstract public class AbstractCreateNodeCommand<T> extends UserAwareCommand {
 
     protected final T id;
 

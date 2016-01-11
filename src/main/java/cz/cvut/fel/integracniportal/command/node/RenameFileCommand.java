@@ -5,7 +5,7 @@ import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId;
 /**
  * @author Radek Jezdik
  */
-public class RenameFileCommand extends RenameNodeCommand<FileId> {
+public class RenameFileCommand extends AbstractRenameNodeCommand<FileId> {
 
     public RenameFileCommand(FileId nodeId, String newName) {
         super(nodeId, newName);

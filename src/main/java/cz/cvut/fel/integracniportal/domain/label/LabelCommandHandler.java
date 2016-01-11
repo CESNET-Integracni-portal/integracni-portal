@@ -25,30 +25,6 @@ public class LabelCommandHandler {
 
     @CommandHandler
     public void handle(CreateLabelCommand command) {
-        createLabel(command);
-    }
-
-    @CommandHandler
-    public void handle(EditLabelCommand command) {
-        editLabel(command);
-    }
-
-    @CommandHandler
-    public void handle(DeleteLabelCommand command) {
-        deleteLabel(command);
-    }
-
-    @CommandHandler
-    public void handle(AddLabelToNodeCommand command) {
-        addLabelToNode(command);
-    }
-
-    @CommandHandler
-    public void handle(RemoveLabelFromNodeCommand command) {
-        removeLabelFromNode(command);
-    }
-
-    private void createLabel(CreateLabelCommand command) {
         checkUnique(command.getSentBy(), command.getName(), command.getColor());
 
         Label label = new Label(
@@ -61,7 +37,8 @@ public class LabelCommandHandler {
         repository.add(label);
     }
 
-    private void editLabel(EditLabelCommand command) {
+    @CommandHandler
+    public void handle(EditLabelCommand command) {
         Label label = repository.load(command.getId());
 
         checkUnique(label.getOwner(), command.getName(), command.getColor());
@@ -69,17 +46,20 @@ public class LabelCommandHandler {
         label.edit(command.getName(), command.getColor());
     }
 
-    private void deleteLabel(DeleteLabelCommand command) {
+    @CommandHandler
+    public void handle(DeleteLabelCommand command) {
         Label label = repository.load(command.getId());
         label.delete();
     }
 
-    private void addLabelToNode(AddLabelToNodeCommand command) {
+    @CommandHandler
+    public void handle(AddLabelToNodeCommand command) {
         Label label = repository.load(command.getId());
         label.addToNode(command.getNodeId());
     }
 
-    private void removeLabelFromNode(RemoveLabelFromNodeCommand command) {
+    @CommandHandler
+    public void handle(RemoveLabelFromNodeCommand command) {
         Label label = repository.load(command.getId());
         label.removeFromNode(command.getNodeId());
     }

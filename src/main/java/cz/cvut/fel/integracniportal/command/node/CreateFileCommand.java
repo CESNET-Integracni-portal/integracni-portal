@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class CreateFileCommand extends AbstractNodeCommand<FileId> {
+public class CreateFileCommand extends AbstractCreateNodeCommand<FileId> {
 
     private FileUpload fileUpload;
 

@@ -19,9 +19,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
+ * A saga that recursively sets online/offline status of the file.
+ *
  * @author Radek Jezdik
  */
 public class FolderMigrationSaga extends AbstractAnnotatedSaga {
+
+    /**
+     * Sends the actual commands. Implementing classes are responsible for
+     * sending correct commands.
+     */
+    private interface Migrator {
+
+        void migrateFolder(FolderId folderId);
+
+        void migrateFile(FileId fileId);
+
+    }
 
     @Autowired
     private NodeNameDao nodeNameDao;
@@ -29,50 +43,61 @@ public class FolderMigrationSaga extends AbstractAnnotatedSaga {
     @Autowired
     private CommandGateway gateway;
 
-    private boolean started = false;
-
     @StartSaga
     @SagaEventHandler(associationProperty = "id")
     public void handle(FolderMovedOnlineEvent event) {
-        FolderId folderId = event.getId();
-
-        List<NodeName> childNodes = nodeNameDao.getChildNodes(event.getId());
-
-        if (childNodes.isEmpty() == false) {
-            for (NodeName node : childNodes) {
-                if (node.isFolder()) {
-                    FolderId id = FolderId.of(node.getId());
-                    gateway.send(new MoveFolderOnlineCommand(id));
-
-                } else {
-                    FileId id = FileId.of(node.getId());
-                    gateway.send(new MoveFileOnlineCommand(id));
-                }
-            }
-        }
-        end();
+        migrate(event.getId(), onlineMigrator());
     }
 
     @StartSaga
     @SagaEventHandler(associationProperty = "id")
     public void handle(FolderMovedOfflineEvent event) {
-        FolderId folderId = event.getId();
+        migrate(event.getId(), offlineMigrator());
+    }
 
-        List<NodeName> childNodes = nodeNameDao.getChildNodes(event.getId());
+    private void migrate(FolderId folderId, Migrator migrator) {
+        List<NodeName> childNodes = nodeNameDao.getChildNodes(folderId);
 
-        if (childNodes.isEmpty() == false) {
-            for (NodeName node : childNodes) {
-                if (node.isFolder()) {
-                    FolderId id = FolderId.of(node.getId());
-                    gateway.send(new MoveFolderOfflineCommand(id));
+        for (NodeName node : childNodes) {
+            if (node.isFolder()) {
+                FolderId id = FolderId.of(node.getId());
+                migrator.migrateFolder(id);
 
-                } else {
-                    FileId id = FileId.of(node.getId());
-                    gateway.send(new MoveFileOfflineCommand(id));
-                }
+            } else {
+                FileId id = FileId.of(node.getId());
+                migrator.migrateFile(id);
             }
         }
+
         end();
+    }
+
+    private Migrator onlineMigrator() {
+        return new Migrator() {
+            @Override
+            public void migrateFolder(FolderId folderId) {
+                gateway.send(new MoveFolderOnlineCommand(folderId));
+            }
+
+            @Override
+            public void migrateFile(FileId fileId) {
+                gateway.send(new MoveFileOnlineCommand(fileId));
+            }
+        };
+    }
+
+    private Migrator offlineMigrator() {
+        return new Migrator() {
+            @Override
+            public void migrateFolder(FolderId folderId) {
+                gateway.send(new MoveFolderOfflineCommand(folderId));
+            }
+
+            @Override
+            public void migrateFile(FileId fileId) {
+                gateway.send(new MoveFileOfflineCommand(fileId));
+            }
+        };
     }
 
     public void setNodeNameDao(NodeNameDao nodeNameDao) {
@@ -82,4 +107,5 @@ public class FolderMigrationSaga extends AbstractAnnotatedSaga {
     public void setGateway(CommandGateway gateway) {
         this.gateway = gateway;
     }
+
 }

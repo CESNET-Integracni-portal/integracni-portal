@@ -6,6 +6,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
+ * Implementation of the secure random generator. Uses BigInteger with {@link SecureRandom} to
+ * create secure random strings.
+ *
  * @author Radek Jezdik
  */
 @Component

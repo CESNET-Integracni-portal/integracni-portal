@@ -5,7 +5,7 @@ import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId;
 /**
  * @author Radek Jezdik
  */
-public class MoveFolderCommand extends MoveNodeCommand<FolderId> {
+public class MoveFolderCommand extends AbstractMoveNodeCommand<FolderId> {
 
     public MoveFolderCommand(FolderId id, FolderId newParent) {
         super(id, newParent);

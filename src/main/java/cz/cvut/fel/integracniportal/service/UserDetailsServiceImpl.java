@@ -15,11 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the {@link cz.cvut.fel.integracniportal.service.UserDetailsService}.
@@ -71,33 +73,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return null;
         }
 
-        //UserDetails specialUserDetails = resolveSpecialUser(loggedUser);
-
-//        if (specialUserDetails != null) {
-//            return specialUserDetails;
-//        } else {
-            return getUserByUsername(loggedUser.getUsername());
-//        }
+        return getUserByUsername(loggedUser.getUsername());
     }
 
-    private UserDetails resolveSpecialUser(User loggedUser) {
-        try {
-            org.springframework.security.core.userdetails.UserDetails adminDetails = adminUserService.loadUserByUsername(loggedUser.getUsername());
-
-            UserDetails userDetails = new UserDetails();
-            userDetails.setId("0");
-            userDetails.setUsername(adminDetails.getUsername());
-
-            Set<Permission> permissions = new HashSet<Permission>();
-            permissions.addAll(Arrays.asList(Permission.values()));
-            userDetails.setPermissions(permissions);
-
-            return userDetails;
-
-        } catch (UsernameNotFoundException e) {
-            return null;
-        }
-    }
 
     @Override
     @Transactional
@@ -118,7 +96,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         commandGateway.sendAndWait(new CreateUserCommand(
                 UserId.of(userId),
                 userDetailsRepresentation.getUsername(),
-                "test@email.cz"));
+                "test@email.cz")); // FIXME real email
 
         return getUserById(userId);
     }
@@ -126,12 +104,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public void changePassword(String userId, String newPassword, String oldPassword) {
 
-        // TODO
-//
+        // TODO - put on hold, because of email infrastructure
+
 //        commandGateway.sendAndWait(new SetUserPasswordCommand(
-//                UserId.of(userId),
-//                userDetailsRepresentation.getUsername(),
-//                "test@email.cz"));
+//                token,
+//                password);
 
 
     }

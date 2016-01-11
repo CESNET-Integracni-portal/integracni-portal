@@ -4,6 +4,7 @@ import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId;
 import lombok.Value;
 
 /**
+ * A command that issues an email verification.
  * @author Radek Jezdik
  */
 @Value

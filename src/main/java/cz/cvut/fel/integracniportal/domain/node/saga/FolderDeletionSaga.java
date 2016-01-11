@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * A saga that recursively deletes content of a given folder.
+ * Started by {@link FolderDeletionStartedEvent}.
+ * Progressed by {@link NodeDeletedEvent}.
+ * Finished, when all nodes were deleted (all {@link NodeDeletedEvent} handled).
+ *
  * @author Radek Jezdik
  */
 public class FolderDeletionSaga extends AbstractAnnotatedSaga {
@@ -52,28 +57,48 @@ public class FolderDeletionSaga extends AbstractAnnotatedSaga {
         started = true;
         folderId = event.getId();
 
-        List<NodeName> childNodes = nodeNameDao.getChildNodes(event.getId());
+        deleteContents(folderId);
+    }
+
+    /**
+     * Gets the content of the folder and sends commands to delete each.
+     *
+     * @param folderToDeleteId
+     */
+    private void deleteContents(FolderId folderToDeleteId) {
+        List<NodeName> childNodes = nodeNameDao.getChildNodes(folderToDeleteId);
 
         if (childNodes.isEmpty() == false) {
             for (NodeName node : childNodes) {
-                NodeId nodeId;
-                Object command;
-
-                if (node.isFolder()) {
-                    nodeId = FolderId.of(node.getId());
-                    command = new DeleteFolderCommand((FolderId) nodeId);
-                } else {
-                    nodeId = FileId.of(node.getId());
-                    command = new DeleteFileCommand((FileId) nodeId);
-                }
-                associateWith("toDelete", nodeId.toString());
-                nodesToDelete.add(nodeId);
-                gateway.send(command);
+                deleteNode(node);
             }
 
         } else {
             deleteTargetFolder();
         }
+    }
+
+    /**
+     * Sends the delete command to the given node aggregate.
+     *
+     * @param node
+     */
+    private void deleteNode(NodeName node) {
+        NodeId nodeId;
+        Object command;
+
+        if (node.isFolder()) {
+            nodeId = FolderId.of(node.getId());
+            command = new DeleteFolderCommand((FolderId) nodeId);
+        } else {
+            nodeId = FileId.of(node.getId());
+            command = new DeleteFileCommand((FileId) nodeId);
+        }
+
+        associateWith("toDelete", nodeId.toString());
+        nodesToDelete.add(nodeId);
+
+        gateway.send(command);
     }
 
     @SagaEventHandler(associationProperty = "id", keyName = "toDelete")

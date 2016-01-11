@@ -8,6 +8,7 @@ import cz.cvut.fel.integracniportal.dao.UserDetailsDao
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FileId
 import cz.cvut.fel.integracniportal.domain.node.valueobjects.FolderId
 import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserId
+import cz.cvut.fel.integracniportal.domain.user.valueobjects.UserPassword
 import cz.cvut.fel.integracniportal.model.UserDetails
 import cz.cvut.fel.integracniportal.service.FileUpload
 import org.apache.commons.io.IOUtils
@@ -196,6 +197,15 @@ abstract class AbstractIntegrationSpecification extends Specification {
                 space,
                 Optional.empty()
         ))
+    }
+
+    UserPassword password(String s) {
+        return new UserPassword() {
+            @Override
+            String getHashedUserPassword() {
+                return s
+            }
+        }
     }
 
 }

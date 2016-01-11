@@ -14,6 +14,13 @@ public abstract class AbstractNodeCommandHandler {
     @Autowired
     protected NodeNameDao nodeNameDao;
 
+    /**
+     * Checks whether the name of the node is unique, in the given parent folder in user's space
+     * @param name the new name of the node
+     * @param parentFolder the parent folder where to check for unique name
+     * @param space the space of the folder where it belongs
+     * @param command the UserAwareCommand which holds the user who sent the command
+     */
     protected void checkUniqueName(String name, FolderId parentFolder, String space, UserAwareCommand command) {
         boolean exists;
 

@@ -1,6 +1,5 @@
 package cz.cvut.fel.integracniportal.domain.user.saga;
 
-import cz.cvut.fel.integracniportal.domain.user.events.UserPasswordResetExpiredEvent;
 import cz.cvut.fel.integracniportal.domain.user.events.UserPasswordResetStartedEvent;
 import cz.cvut.fel.integracniportal.domain.user.events.UserPasswordSetEvent;
 import org.axonframework.saga.annotation.SagaEventHandler;
@@ -15,19 +14,16 @@ public class RestoreLostUserPasswordSaga extends AbstractExpirableUserTokenSaga 
     @StartSaga
     @SagaEventHandler(associationProperty = "userId")
     public void handle(UserPasswordResetStartedEvent event) {
-        createTokenAndScheduleExpireEvent(
-                event.getUserId(),
-                new UserPasswordResetExpiredEvent(event.getUserId()));
+        createTokenAndScheduleExpireEvent(event.getUserId());
+
+        // TODO send token via email
+//        UserDetails user = userDao.getUserById(event.getUserId().getId());
+//        user.getEmail();
     }
 
     @SagaEventHandler(associationProperty = "userId")
     public void handle(UserPasswordSetEvent event) {
-        finish(event.getUserId());
-    }
-
-    @SagaEventHandler(associationProperty = "userId")
-    public void handle(UserPasswordResetExpiredEvent event) {
-        finish(event.getUserId());
+        end();
     }
 
 }

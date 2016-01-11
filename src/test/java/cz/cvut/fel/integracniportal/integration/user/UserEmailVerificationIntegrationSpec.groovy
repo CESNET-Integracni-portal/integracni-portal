@@ -19,7 +19,7 @@ public class UserEmailVerificationIntegrationSpec extends AbstractIntegrationSpe
             dispatch new CreateUserCommand(UserId.of("1"), "tester1", "test@example.com")
 
         when:
-            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, "newPassword")
+            dispatch new SetUserPasswordCommand(get(UserToken, "1").token, password("newPassword"))
 
         then:
             def user = getUser("1")
@@ -32,7 +32,7 @@ public class UserEmailVerificationIntegrationSpec extends AbstractIntegrationSpe
 
         when:
             def unknownToken = ";@;666;@;"
-            dispatch new SetUserPasswordCommand(unknownToken, "newPassword")
+            dispatch new SetUserPasswordCommand(unknownToken, password("newPassword"))
 
         then:
             def user = getUser("1")

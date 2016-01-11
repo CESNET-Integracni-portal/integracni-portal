@@ -68,7 +68,7 @@ public class UserCommandHandlers {
         // we set the password here, for security reasons
         // events must not contain password (event sourced events would contain old passwords!)
         UserDetails userDetails = userDao.getReference(userId);
-        userDetails.setPassword(command.getEncodedPassword());
+        userDetails.setPassword(command.getPassword().getHashedUserPassword());
         userDao.save(userDetails);
     }
 

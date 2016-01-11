@@ -70,21 +70,7 @@ public class FileApiAdapter {
     }
 
     public void moveFolder(Folder folder, Folder parent) {
-        fileRepository.moveFolder(mapFolder(folder, null), mapFolder(parent, null));
-    }
-
-    public void moveFolderOnline(Folder folder) {
-        if (fileRepository instanceof OfflinableFileRepository) {
-            // TODO
-//            ((OfflinableFileRepository) fileRepository).moveOnline();
-        }
-    }
-
-    public void moveFolderOffline(Folder folder) {
-        if (fileRepository instanceof OfflinableFileRepository) {
-            // TODO
-//            ((OfflinableFileRepository) fileRepository).moveOffline();
-        }
+        fileRepository.moveFolder(mapFolder(folder, folder.getOwner()), mapFolder(parent, folder.getOwner()));
     }
 
     public void renameFile(FileMetadata fileMetadata, String newName) {
