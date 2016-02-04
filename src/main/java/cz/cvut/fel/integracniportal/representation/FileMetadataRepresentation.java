@@ -34,6 +34,9 @@ public class FileMetadataRepresentation {
 
     private List<LabelRepresentation> labels;
 
+    private boolean online;
+
+
     public FileMetadataRepresentation() {
     }
 
@@ -56,6 +59,7 @@ public class FileMetadataRepresentation {
         }
         createdOn = fileMetadata.getCreatedOn();
         changedOn = fileMetadata.getChangedOn();
+        online = fileMetadata.isOnline();
     }
 
     public String getUuid() {
@@ -132,5 +136,13 @@ public class FileMetadataRepresentation {
 
     public String getType() {
         return type;
+    }
+
+    public void setOnline(boolean online){
+        this.online=online;
+    }
+
+    public boolean getOnline(){
+        return(online);
     }
 }

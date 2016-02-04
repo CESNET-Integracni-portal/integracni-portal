@@ -34,6 +34,8 @@ public class FolderRepresentation {
 
     private List<LabelRepresentation> labels;
 
+    private boolean online;
+
     public FolderRepresentation() {
     }
 
@@ -82,6 +84,8 @@ public class FolderRepresentation {
                 }
             }
         }
+
+        online = folder.isOnline();
     }
 
     public static void generateBreadcrumbs(List<Map<String, String>> breadcrumbs, Folder folder) {
@@ -169,5 +173,13 @@ public class FolderRepresentation {
 
     public String getType() {
         return type;
+    }
+
+    public void setOnline(boolean online){
+        this.online = online;
+    }
+
+    public boolean getOnline(){
+        return this.online;
     }
 }

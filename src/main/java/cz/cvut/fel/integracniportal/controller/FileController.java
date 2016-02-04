@@ -30,7 +30,6 @@ public class FileController extends AbstractController {
     @Autowired
     private UserDetailsService userService;
 
-
     @Autowired
     private SpaceService spaceService;
 
@@ -235,7 +234,7 @@ public class FileController extends AbstractController {
     /**
      * Upload a file.
      *
-     * @param file File to be uploaded
+     * @param fileId File to be uploaded
      * @return
      */
     @PreAuthorize("isAuthenticated()")
@@ -249,10 +248,53 @@ public class FileController extends AbstractController {
         FileUpload fileUpload = UploadUtils.handleFileUpload(request);
 
         fileMetadataService.updateFile(fileId, fileUpload);
+
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
     private void ensureSpace(String space) {
         spaceService.getOfType(space); // throws exception if space doesn't exist
+    }
+
+
+    /**
+     * Returns file as zip archive.
+     *
+     * @param fileId the file id to get
+     * @return
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/fileCompressed/{fileId}/contents", method = GET)
+    @ResponseBody
+    public void getFileZippedContents(@PathVariable String spaceId,
+                                @PathVariable String fileId,
+                                HttpServletResponse response) throws IOException {
+        String fileName;
+        int dotIdx;
+
+        ensureSpace(spaceId);
+
+        FileMetadata fileMetadata = fileMetadataService.getFileMetadataByUuid(fileId);
+
+        FileCompressor zipCompressor = new ZipFileCompressorImpl(response.getOutputStream(), fileMetadataService);
+
+        response.setContentType(fileMetadata.getMimetype());
+
+        fileName = fileMetadata.getFilename();
+
+        if((dotIdx = fileName.lastIndexOf('.')) != -1){
+            fileName = fileName.replaceAll(fileName.substring(dotIdx), zipCompressor.getExtension());
+        }
+        else{
+            fileName = fileName.concat(zipCompressor.getExtension());
+        }
+
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+        zipCompressor.putFile(fileMetadata);
+        zipCompressor.finish();
+
+        zipCompressor.flush();
+        response.flushBuffer();
     }
 }

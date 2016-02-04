@@ -15,7 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -246,18 +249,34 @@ public class FolderController extends AbstractController {
     }
 
     /**
-     * Downloads the whole contents of folder as a compressed archive.
+     * Downloads the whole contents of a folder as a compressed archive.
      *
-     * @param folderId       the ID of folder to share
+     * @param folderId the ID of a folder to download
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space/{spaceId}/folder/{folderId}/download", method = GET)
-    public ResponseEntity downloadFolder(@PathVariable String spaceId,
-                                      @PathVariable Long folderId) {
+    public void downloadFolder(@PathVariable String spaceId, @PathVariable Long folderId,
+                               HttpServletResponse response) throws IOException {
         ensureSpace(spaceId);
-        // TODO async processing
-//        folderService.downloadFolder(folderId, representation.getShareWith(), userService.getCurrentUser());
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+
+
+        Map<FileMetadata, String> map = new HashMap<FileMetadata, String>();
+
+        folderService.getFileMetadataPathMap(map, folderId, null);
+
+        FileCompressor zipCompressor = new ZipFileCompressorImpl(response.getOutputStream(), fileMetadataService);
+
+        response.setHeader("Content-Disposition", "attachment; filename=\"" +
+                folderService.getFolderById(folderId).getName() + zipCompressor.getExtension() + "\"");
+
+        for(FileMetadata fileMetadata: map.keySet()){
+            zipCompressor.putFile(fileMetadata, map.get(fileMetadata));
+        }
+
+        zipCompressor.finish();
+
+        zipCompressor.flush();
+        response.flushBuffer();
     }
 
     private void ensureSpace(String space) {

@@ -1,12 +1,14 @@
 package cz.cvut.fel.integracniportal.service;
 
 
+import cz.cvut.fel.integracniportal.model.FileMetadata;
 import cz.cvut.fel.integracniportal.model.Folder;
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.FolderRepresentation;
 import cz.cvut.fel.integracniportal.representation.TopLevelFolderRepresentation;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service for for {@link cz.cvut.fel.integracniportal.model.Folder}.
@@ -155,4 +157,13 @@ public interface FolderService {
      * @return
      */
     public List<Folder> getFavorites(String spaceId, UserDetails currentUser);
+
+    /**
+     * Recursively fills a map with fileMetadata, from folder and its subfolders, and string
+     * representing its path relative to folder defined by folderID.
+     * @param map the map to be filled
+     * @param folderId the folder to begin in
+     * @param path path to which a subfolder name is concatenated with each recursion.
+     */
+    public void getFileMetadataPathMap(Map<FileMetadata, String> map, Long folderId, String path);
 }

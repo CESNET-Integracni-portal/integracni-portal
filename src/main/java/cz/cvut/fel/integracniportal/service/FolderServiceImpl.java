@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Radek Jezdik
@@ -221,4 +222,21 @@ public class FolderServiceImpl implements FolderService {
     private FileApiAdapter getFileApi(String type) {
         return new FileApiAdapter(fileRepositoryService.getOfType(type));
     }
+
+    @Override
+    public void getFileMetadataPathMap(Map<FileMetadata, String> map, Long folderId, String path){
+
+        if(path == null){
+            path = new String("");
+        }
+
+        for(FileMetadata fileMetadata: this.getFolderById(folderId).getFiles()){
+            map.put(fileMetadata, path.concat(fileMetadata.getFilename()));
+        }
+
+        for(Folder f: this.getFolderById(folderId).getFolders()){
+            this.getFileMetadataPathMap(map, f.getId(), path.concat(f.getName()) + '/');
+        }
+    }
+
 }

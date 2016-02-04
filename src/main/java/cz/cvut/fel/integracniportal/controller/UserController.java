@@ -2,10 +2,12 @@ package cz.cvut.fel.integracniportal.controller;
 
 import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.UserDetailsRepresentation;
-import cz.cvut.fel.integracniportal.representation.UserPasswordRepresentation;
+import cz.cvut.fel.integracniportal.representation.NewPasswordRepresentation;
 import cz.cvut.fel.integracniportal.representation.UserPermissionsRepresentation;
 import cz.cvut.fel.integracniportal.representation.UserRolesRepresentation;
 import cz.cvut.fel.integracniportal.service.UserDetailsService;
+import cz.cvut.fel.integracniportal.validator.AggregateValidator;
+import cz.cvut.fel.integracniportal.validator.PasswordChangeValidator;
 import cz.cvut.fel.integracniportal.validator.UserDetailsResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +34,18 @@ public class UserController extends AbstractController {
     @Autowired
     private UserDetailsResourceValidator userDetailsResourceValidator;
 
+    @Autowired
+    private PasswordChangeValidator passwordChangeValidator;
+
     @InitBinder()
     public void initBinderUserDetailsResource(WebDataBinder binder) {
-        binder.setValidator(userDetailsResourceValidator);
+
+        Validator[] validatorArray = {
+                userDetailsResourceValidator,
+                passwordChangeValidator
+        };
+
+        binder.setValidator(new AggregateValidator(validatorArray));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -72,7 +85,7 @@ public class UserController extends AbstractController {
     @RequestMapping(value = "/v0.2/user/{userid}/passwordChange", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> changePassword(@PathVariable("userid") Long userId,
-                                                 @RequestBody UserPasswordRepresentation passwordRepresentation) {
+                                                 @RequestBody NewPasswordRepresentation passwordRepresentation) {
         userDetailsService.changePassword(userId, passwordRepresentation.getPassword(), passwordRepresentation.getOldPassword());
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
