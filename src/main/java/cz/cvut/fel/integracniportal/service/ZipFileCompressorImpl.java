@@ -5,6 +5,8 @@ import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -13,10 +15,48 @@ public class ZipFileCompressorImpl implements FileCompressor {
     private FileMetadataService fileMetadataService;
     private ZipOutputStream zipOutputStream;
     private boolean finished = false;
+    Map<FileMetadata, String> filePathMap = null;
 
     public ZipFileCompressorImpl(OutputStream outputStream, FileMetadataService fileMetadataService){
+        super();
         this.zipOutputStream = new ZipOutputStream(outputStream);
         this.fileMetadataService = fileMetadataService;
+    }
+
+    @Override
+    public void run(){
+
+        for(FileMetadata fileMetadata: this.filePathMap.keySet()){
+            this.putFile(fileMetadata, this.filePathMap.get(fileMetadata));
+        }
+
+        this.finish();
+        this.flush();
+
+    }
+
+    public void addFiles(Map<FileMetadata, String> map){
+        if(this.filePathMap == null){
+            this.filePathMap = map;
+        }
+        else {
+            this.filePathMap.putAll(map);
+        }
+    }
+
+    public void addFile(FileMetadata fileMetadata, String path){
+        if(this.filePathMap == null){
+            this.filePathMap = new HashMap<FileMetadata, String>();
+        }
+
+        this.filePathMap.put(fileMetadata, path);
+
+    }
+    /*
+        Adds a file signature into collection, which will then be compressed into archive
+     */
+    public void addFile(FileMetadata fileMetadata){
+        this.addFile(fileMetadata, fileMetadata.getFilename());
     }
 
     public OutputStream getOutputStream() {
@@ -44,6 +84,7 @@ public class ZipFileCompressorImpl implements FileCompressor {
         try {
             this.zipOutputStream.putNextEntry(new ZipEntry(path));
             fileMetadataService.copyFileToOutputStream(fileMetadata.getId(), this.zipOutputStream);
+
             this.zipOutputStream.closeEntry();
             this.flush();
         } catch (IOException e) {
@@ -62,5 +103,22 @@ public class ZipFileCompressorImpl implements FileCompressor {
         } catch (IOException e) {
             new ZipStreamException("ZipOutputStream failed to flush.", e);
         }
+    }
+
+    @Override
+    public String convertFileName(FileMetadata fileMetadata) {
+        int dotIdx;
+        String fileName;
+
+        fileName = fileMetadata.getFilename();
+        dotIdx = fileName.lastIndexOf(".");
+        if(dotIdx == -1){
+            fileName = fileName.concat(this.getExtension());
+        }
+        else{
+            fileName = fileName.substring(0,dotIdx).concat(this.getExtension());
+        }
+
+        return fileName;
     }
 }

@@ -3,9 +3,7 @@ package cz.cvut.fel.integracniportal.validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Created by mata on 28.1.16.
- */
+
 public class AggregateValidator implements Validator{
 
     private Validator[] validators;

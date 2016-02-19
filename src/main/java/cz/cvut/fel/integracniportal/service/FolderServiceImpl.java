@@ -227,7 +227,9 @@ public class FolderServiceImpl implements FolderService {
     public void getFileMetadataPathMap(Map<FileMetadata, String> map, Long folderId, String path){
 
         if(path == null){
-            path = new String("");
+            path = "";
+        }else {
+            path = path.concat("/");
         }
 
         for(FileMetadata fileMetadata: this.getFolderById(folderId).getFiles()){
@@ -235,7 +237,7 @@ public class FolderServiceImpl implements FolderService {
         }
 
         for(Folder f: this.getFolderById(folderId).getFolders()){
-            this.getFileMetadataPathMap(map, f.getId(), path.concat(f.getName()) + '/');
+            this.getFileMetadataPathMap(map, f.getId(), path.concat(f.getName()));
         }
     }
 

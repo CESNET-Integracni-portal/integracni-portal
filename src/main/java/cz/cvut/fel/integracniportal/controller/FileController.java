@@ -16,6 +16,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -269,8 +272,6 @@ public class FileController extends AbstractController {
     public void getFileZippedContents(@PathVariable String spaceId,
                                 @PathVariable String fileId,
                                 HttpServletResponse response) throws IOException {
-        String fileName;
-        int dotIdx;
 
         ensureSpace(spaceId);
 
@@ -278,23 +279,19 @@ public class FileController extends AbstractController {
 
         FileCompressor zipCompressor = new ZipFileCompressorImpl(response.getOutputStream(), fileMetadataService);
 
-        response.setContentType(fileMetadata.getMimetype());
+        response.setContentType("application/zip");
 
-        fileName = fileMetadata.getFilename();
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + zipCompressor.convertFileName(fileMetadata) + "\"");
 
-        if((dotIdx = fileName.lastIndexOf('.')) != -1){
-            fileName = fileName.replaceAll(fileName.substring(dotIdx), zipCompressor.getExtension());
+        zipCompressor.addFile(fileMetadata);
+
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        Future f = exec.submit(zipCompressor);
+
+        while(!f.isDone()){
+            //
         }
-        else{
-            fileName = fileName.concat(zipCompressor.getExtension());
-        }
-
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-
-        zipCompressor.putFile(fileMetadata);
-        zipCompressor.finish();
-
-        zipCompressor.flush();
         response.flushBuffer();
     }
+
 }

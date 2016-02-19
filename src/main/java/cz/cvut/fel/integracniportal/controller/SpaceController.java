@@ -6,21 +6,30 @@ import cz.cvut.fel.integracniportal.model.UserDetails;
 import cz.cvut.fel.integracniportal.representation.*;
 import cz.cvut.fel.integracniportal.service.*;
 import cz.cvut.fel.integracniportal.utils.UploadUtils;
+import cz.cvut.fel.integracniportal.validator.AggregateValidator;
+import cz.cvut.fel.integracniportal.validator.FileSelectionValidator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.Validator;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -43,6 +52,17 @@ public class SpaceController extends AbstractController {
 
     @Autowired
     private FileMetadataService fileMetadataService;
+
+    @Autowired
+    FileSelectionValidator fileSelectionValidator;
+
+    @InitBinder()
+    public void initBinderUserDetailsResource(WebDataBinder binder) {
+
+        Validator[] validatorArray = {fileSelectionValidator};
+
+        binder.setValidator(new AggregateValidator(validatorArray));
+    }
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/v0.2/space", method = GET)
@@ -104,6 +124,44 @@ public class SpaceController extends AbstractController {
 //        List<Folder> folders = folderService.getFavorites(spaceId, userService.getCurrentUser());
 //        List<FileMetadata> fileMetadata = fileMetadataService.getFavorites(spaceId, userService.getCurrentUser());
         return new ResponseEntity(new TopLevelFolderRepresentation(Collections.<Folder>emptyList(), Collections.<FileMetadata>emptyList(), userService.getCurrentUser()), HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/v0.2/space/{spaceId}/downloadSelection", method = POST)
+    public void downloadSelection(@PathVariable String spaceId, @RequestBody FileSelectionRepresentation fileSelection, HttpServletResponse response) throws IOException {
+
+        ensureSpace(spaceId);
+
+        FileCompressor zipCompressor = new ZipFileCompressorImpl(response.getOutputStream(), fileMetadataService);
+
+        response.setContentType("application/zip");
+
+        response.setHeader("Content-Disposition", "attachment; filename=\"selection.zip\"");
+
+
+        Map<FileMetadata, String> map = new HashMap<FileMetadata, String>();
+        for(String folderId : fileSelection.getFolders()) {
+            folderService.getFileMetadataPathMap(map, Long.valueOf(folderId), folderService.getFolderById(Long.valueOf(folderId)).getName());
+        }
+
+        zipCompressor.addFiles(map);
+
+        for(String fileId : fileSelection.getFiles()){
+            zipCompressor.addFile(fileMetadataService.getFileMetadataByUuid(fileId));
+        }
+
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        Future f = exec.submit(zipCompressor);
+
+        while(!f.isDone()){
+            //
+        }
+
+        response.flushBuffer();
+    }
+
+    private void ensureSpace(String space) {
+        spaceService.getOfType(space); // throws exception if space doesn't exist
     }
 
 }

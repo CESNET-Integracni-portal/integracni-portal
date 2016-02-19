@@ -7,9 +7,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-/**
- * Created by mata on 27.1.16.
- */
+
 @Component
 public class PasswordChangeValidator implements Validator {
     @Override
@@ -28,8 +26,5 @@ public class PasswordChangeValidator implements Validator {
         if(!newPass.getPassword().equals(newPass.getPassword2())){
             errors.reject("password2", "passwords do not match");
         }
-
-
-
     }
 }

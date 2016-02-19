@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -266,16 +269,20 @@ public class FolderController extends AbstractController {
 
         FileCompressor zipCompressor = new ZipFileCompressorImpl(response.getOutputStream(), fileMetadataService);
 
+        response.setContentType("application/zip");
+
         response.setHeader("Content-Disposition", "attachment; filename=\"" +
                 folderService.getFolderById(folderId).getName() + zipCompressor.getExtension() + "\"");
 
-        for(FileMetadata fileMetadata: map.keySet()){
-            zipCompressor.putFile(fileMetadata, map.get(fileMetadata));
+        zipCompressor.addFiles(map);
+
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        Future f = exec.submit(zipCompressor);
+
+        while(!f.isDone()){
+            //
         }
 
-        zipCompressor.finish();
-
-        zipCompressor.flush();
         response.flushBuffer();
     }
 

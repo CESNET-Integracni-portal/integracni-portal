@@ -3,11 +3,10 @@ package cz.cvut.fel.integracniportal.service;
 import cz.cvut.fel.integracniportal.model.FileMetadata;
 
 import java.io.OutputStream;
+import java.util.Map;
 
-/**
- * Created by mata on 14.1.16.
- */
-public interface FileCompressor {
+
+public interface FileCompressor extends Runnable {
 
     /**
      * Returns outputStream through which compressed data is sent.
@@ -22,13 +21,27 @@ public interface FileCompressor {
     void putFile(FileMetadata fileMetadata);
 
     /**
-     * Inserts a new file into the archive with name given in path variable.
+     * Adds a new file that will later be added to the archive with the provided path.
      * Used in archiving subfolders.
      *
      * @param fileMetadata
      * @param path
      */
-    void putFile(FileMetadata fileMetadata, String path);
+    void addFile(FileMetadata fileMetadata, String path);
+
+    /**
+     * Adds a new file that will later be added to the archive root with its default filename.
+     *
+     * @param fileMetadata
+     */
+    void addFile(FileMetadata fileMetadata);
+
+    /**
+     * Adds a map constisting of FileMetadata and its paths to be added to the archive.
+     *
+     * @param fileMetadataPathMap
+     */
+    void addFiles(Map<FileMetadata, String> fileMetadataPathMap);
 
     /**
      * Finishes the archived file. Should be called right after last item was put.
@@ -50,5 +63,13 @@ public interface FileCompressor {
      *
      */
     void flush();
+
+    /**
+     * Returns a file name with the compressor extension.
+     *
+     * @param fileMetadata
+     * @return
+     */
+    String convertFileName(FileMetadata fileMetadata);
 
 }
