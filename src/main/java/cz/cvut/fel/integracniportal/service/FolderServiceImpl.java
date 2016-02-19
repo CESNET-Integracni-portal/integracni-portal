@@ -180,6 +180,18 @@ public class FolderServiceImpl implements FolderService {
         if (folder.isOnline()) {
             return;
         }
+
+        for(FileMetadata fileMetadata: folder.getFiles()){
+            fileMetadataService.moveFileOnline(fileMetadata.getId());
+        }
+
+        for(Folder f: folder.getFolders()){
+            moveFolderOnline(f.getId());
+        }
+
+
+
+
         folder.setOnline(true);
         getFileApi(folder.getSpace()).moveFolderOnline(folder);
 
@@ -191,6 +203,16 @@ public class FolderServiceImpl implements FolderService {
         if (folder.isOnline() == false) {
             return;
         }
+
+        for(FileMetadata fileMetadata: folder.getFiles()){
+            fileMetadataService.moveFileOffline(fileMetadata.getId());
+        }
+
+        for(Folder f: folder.getFolders()){
+            moveFolderOffline(f.getId());
+        }
+
+
         folder.setOnline(false);
         getFileApi(folder.getSpace()).moveFolderOffline(folder);
     }
